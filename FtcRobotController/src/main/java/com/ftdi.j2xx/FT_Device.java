@@ -1,5 +1,6 @@
 package com.ftdi.j2xx;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.qualcomm.robotcore.util.TypeConversion;
@@ -9,7 +10,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FT_Device
 {
-
     private static final String TAG = "FTDI_Device::";
     D2xxManager.FtDeviceInfoListNode mDeviceInfoNode;
     String mySerialNumber;
@@ -17,6 +17,9 @@ public class FT_Device
     int mMotor2Encoder;  // Simulate motor 2 encoder.  Increment each write.
     double mMotor1TotalError;
     double mMotor2TotalError;
+    long mTimeInMilliseconds=0;
+    long mOldTimeInMilliseconds=0;
+    long mDeltaWriteTime=0;
 
     protected final byte[] mCurrentStateBuffer = new byte[208];
 
@@ -73,12 +76,12 @@ public class FT_Device
                 System.arraycopy(((CacheWriteRecord)localObject1).data, 0, data, 0, length);
                 rc = length;
                 if (length == 5) {
-                    Log.v("Legacy", "READ: Response Header (" + bufferToHexString(data,0,length) + ") len=" + length);
+                    //Log.v("Legacy", "READ: Response Header (" + bufferToHexString(data,0,length) + ") len=" + length);
                 } else if (length == 3) {
-                    Log.v("Legacy", "READ: Response Header (" + bufferToHexString(data,0,length) + ") len=" + length);
+                    //Log.v("Legacy", "READ: Response Header (" + bufferToHexString(data,0,length) + ") len=" + length);
                 } else if (length == 208) {
                     //Log.v("Legacy", "READ: Response Buffer S0 (" + bufferToHexString(data,16+4,20) + "...) len=" + length);
-                    Log.v("Legacy", "READ: Response Buffer FLAGS 0=" + bufferToHexString(data,0,3) + " 16=" + bufferToHexString(data,16,4) + "47=" + bufferToHexString(data,47,1));
+                    //Log.v("Legacy", "READ: Response Buffer FLAGS 0=" + bufferToHexString(data,0,3) + " 16=" + bufferToHexString(data,16,4) + "47=" + bufferToHexString(data,47,1));
                 }
             }
         } finally {
@@ -126,17 +129,29 @@ public class FT_Device
 
         // Write Command
         if (data[0] == writeCmd[0] && data[2] == writeCmd[2]) {  // writeCmd
+
+
+            // If size is 208(0xd0) bytes then they are writing a full buffer of data to all ports.
+            // Note: the buffer we were giving in this case is 208+5 bytes because the "writeCmd" header is attached
             if (data[4] == (byte)0xd0 ) {
                 //Log.v("Legacy", "WRITE: Write Header (" + bufferToHexString(data,0,5) + ") len=" + length);
                 queueUpForReadFromPhone(recSyncCmd0); // Reply we got your writeCmd
 
-                Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5+16+4, 20) + ") len=" + length);
-                Log.v("Legacy", "WRITE: Write Buffer FLAGS 0=" + bufferToHexString(data,5+0,3) + " 16=" + bufferToHexString(data,5+16,4) + "47=" + bufferToHexString(data,5+47,1));
+                //Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5+16+4, 20) + ") len=" + length);
+                //Log.v("Legacy", "WRITE: Write Buffer FLAGS 0=" + bufferToHexString(data,5+0,3) + " 16=" + bufferToHexString(data,5+16,4) + "47=" + bufferToHexString(data,5+47,1));
 
                 // Now, the reset of the buffer minus the header 5 bytes should be 208 (0xd0) bytes that need to be written to the connected devices
                 // Write the entire received buffer into the mCurrentState buffer so the android can see what we are up to
-                // 4 bytes of header (r/w, i2c address, i2c register, i2c buffer len)
+                // Note: the buffer we were giving in this case is 208+5 bytes because the "writeCmd" header is attached
                 System.arraycopy(data, 5, mCurrentStateBuffer, 0, 208);
+
+                // Check delta time to see if we are too slow in our simulation.
+                // Baud rate was 250,000 with real USB port connected to module
+                // We are getting deltas of 31ms between each write call
+                mTimeInMilliseconds = SystemClock.uptimeMillis();
+                mDeltaWriteTime = mTimeInMilliseconds - mOldTimeInMilliseconds;
+                mOldTimeInMilliseconds = mTimeInMilliseconds;
+                Log.v("Legacy", "WRITE: Delta Time = " + mDeltaWriteTime);
 
                 // This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
                 // If I2C_ACTION is set, take some action
@@ -145,7 +160,9 @@ public class FT_Device
                         if ((mCurrentStateBuffer[16] & (byte)0x80) == (byte)0x80) { // Read mode
                             // just for fun, simulate reading the encoder from i2c.
                             // really just from the mMotor1Encoder class variable
+                            // 4 bytes of header (r/w, i2c address, i2c register, i2c buffer len)
                             // +4 to get past the header, motor 1 encoder starts at 12 and is 4 bytes long
+                            // See Tetrix Dc Motor Controller data sheet
                             mCurrentStateBuffer[16+4+12+0] = (byte)(mMotor1Encoder >> 24);
                             mCurrentStateBuffer[16+4+12+1] = (byte)(mMotor1Encoder >> 16);
                             mCurrentStateBuffer[16+4+12+2] = (byte)(mMotor1Encoder >> 8);
@@ -208,7 +225,7 @@ public class FT_Device
                 if (mMotor1TotalError > 2000) mMotor1TotalError = 2000;
                 if (mMotor1TotalError < -2000) mMotor1TotalError = -2000;
 
-                Log.v("Legacy", "PID: " + error + " " + mMotor1TotalError);
+                //Log.v("Legacy", "PID: " + error + " " + mMotor1TotalError);
                 int power = (int)(P*error) + (int)(mMotor1TotalError*I);
                 if (power > 100) power=100;
                 if (power < -100) power= -100;
@@ -242,7 +259,7 @@ public class FT_Device
                 if (mMotor2TotalError > 2000) mMotor2TotalError = 2000;
                 if (mMotor2TotalError < -2000) mMotor2TotalError = -2000;
 
-                Log.v("Legacy", "PID: " + error + " " + mMotor2TotalError);
+                //Log.v("Legacy", "PID: " + error + " " + mMotor2TotalError);
                 int power = (int)(P*error) + (int)(mMotor2TotalError*I);
                 if (power > 100) power=100;
                 if (power < -100) power= -100;
