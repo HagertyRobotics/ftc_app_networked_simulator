@@ -67,14 +67,14 @@ public class FT_Device
 
                 System.arraycopy(((CacheWriteRecord)localObject1).data, 0, data, 0, length);
                 rc = length;
-                if (length == 5) {
-                    //Log.v("Legacy", "READ: Response Header (" + bufferToHexString(data,0,length) + ") len=" + length);
-                } else if (length == 3) {
-                    //Log.v("Legacy", "READ: Response Header (" + bufferToHexString(data,0,length) + ") len=" + length);
-                } else if (length == 208) {
-                    //Log.v("Legacy", "READ: Response Buffer S0 (" + bufferToHexString(data,16+4,20) + "...) len=" + length);
-                    //Log.v("Legacy", "READ: Response Buffer FLAGS 0=" + bufferToHexString(data,0,3) + " 16=" + bufferToHexString(data,16,4) + "47=" + bufferToHexString(data,47,1));
-                }
+//                if (length == 5) {
+//                    Log.v("Legacy", "READ: Response Header (" + bufferToHexString(data,0,length) + ") len=" + length);
+//                } else if (length == 3) {
+//                    Log.v("Legacy", "READ: Response Header (" + bufferToHexString(data,0,length) + ") len=" + length);
+//                } else if (length == 208) {
+//                    Log.v("Legacy", "READ: Response Buffer S0 (" + bufferToHexString(data,16+4,20) + "...) len=" + length);
+//                    Log.v("Legacy", "READ: Response Buffer FLAGS 0=" + bufferToHexString(data,0,3) + " 16=" + bufferToHexString(data,16,4) + "47=" + bufferToHexString(data,47,1));
+//                }
             }
         } finally {
             this.writeLocked = false;
@@ -155,15 +155,15 @@ public class FT_Device
                             // 4 bytes of header (r/w, i2c address, i2c register, i2c buffer len)
                             // +4 to get past the header, motor 1 encoder starts at 12 and is 4 bytes long
                             // See Tetrix Dc Motor Controller data sheet
-                            mCurrentStateBuffer[16+4+12+0] = (byte)(mMotor1Encoder >> 24);
+                            mCurrentStateBuffer[16+4+12] = (byte)(mMotor1Encoder >> 24);
                             mCurrentStateBuffer[16+4+12+1] = (byte)(mMotor1Encoder >> 16);
                             mCurrentStateBuffer[16+4+12+2] = (byte)(mMotor1Encoder >> 8);
-                            mCurrentStateBuffer[16+4+12+3] = (byte)(mMotor1Encoder >> 0);
+                            mCurrentStateBuffer[16+4+12+3] = (byte)(mMotor1Encoder);
 
-                            mCurrentStateBuffer[16+4+16+0] = (byte)(mMotor2Encoder >> 24);
+                            mCurrentStateBuffer[16+4+16] = (byte)(mMotor2Encoder >> 24);
                             mCurrentStateBuffer[16+4+16+1] = (byte)(mMotor2Encoder >> 16);
                             mCurrentStateBuffer[16+4+16+2] = (byte)(mMotor2Encoder >> 8);
-                            mCurrentStateBuffer[16+4+16+3] = (byte)(mMotor2Encoder >> 0);
+                            mCurrentStateBuffer[16+4+16+3] = (byte)(mMotor2Encoder);
 
                         } else { // Write mode
 
@@ -277,7 +277,7 @@ public class FT_Device
 
     private int getMotor1TargetEncoder() {
         byte[] arrayOfByte1 = new byte[4];
-        System.arraycopy(mCurrentStateBuffer, 16+4+0, arrayOfByte1, 0, arrayOfByte1.length);
+        System.arraycopy(mCurrentStateBuffer, 16+4, arrayOfByte1, 0, arrayOfByte1.length);
         return TypeConversion.byteArrayToInt(arrayOfByte1);
     }
 
