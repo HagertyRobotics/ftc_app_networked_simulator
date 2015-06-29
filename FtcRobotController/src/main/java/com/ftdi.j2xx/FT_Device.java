@@ -23,14 +23,6 @@ public class FT_Device
 
     protected final byte[] mCurrentStateBuffer = new byte[208];
 
-    private enum WriteStates {
-        READY_FOR_WRITE_COMMANDS,
-        READY_FOR_WRITE_DATA,
-    }
-
-    // Synchronized by 'this'
-    private WriteStates mWriteState = WriteStates.READY_FOR_WRITE_COMMANDS;
-
     protected final Queue<CacheWriteRecord> readQueue = new ConcurrentLinkedQueue();
     protected volatile boolean writeLocked = false;
 
@@ -69,7 +61,7 @@ public class FT_Device
             this.writeLocked = true;
 
             if (!this.readQueue.isEmpty()) {
-                localObject1 = (CacheWriteRecord)this.readQueue.poll();
+                localObject1 = this.readQueue.poll();
                 if (localObject1 == null)
                     return rc;
 
