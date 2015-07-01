@@ -1,4 +1,4 @@
-# ftc_app
+# ftc_app_networked_simulator
 
 ***NOTE: Copy of FTC Robot Controller App, forked from ftctechnh/ftc_app***
 
