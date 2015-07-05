@@ -1,0 +1,8 @@
+
+public class motorControllerSimulator {
+
+	public motorControllerSimulator() {
+		// TODO Auto-generated constructor stub
+	}
+
+}

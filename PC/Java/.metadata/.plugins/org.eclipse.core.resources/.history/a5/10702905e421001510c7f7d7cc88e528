@@ -1,0 +1,15 @@
+
+public class motorController
+{	
+	public static void main(String[] args)
+	{
+		robotApiClient client = new robotApiClient();
+		
+		System.out.println("Program started");
+					
+		client.loop();
+		
+		System.out.println("Program ended");
+	}
+}
+			

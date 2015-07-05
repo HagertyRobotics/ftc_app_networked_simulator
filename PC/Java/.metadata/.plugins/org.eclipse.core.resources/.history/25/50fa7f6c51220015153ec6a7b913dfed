@@ -1,0 +1,24 @@
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class RobotSimulator
+{	
+	public static void main(String[] args)
+	{
+		LinkedBlockingQueue mWriteQueue = new LinkedBlockingQueue(10);
+		
+		RobotApiClient client = new RobotApiClient();
+		
+        motorControllerSimulator simulator = new motorControllerSimulator(mWriteQueue);  // Runnable
+        Thread simulatorThread = new Thread(simulator,"");
+        simulatorThread.start();
+		
+		System.out.println("Program started");
+					
+		if (client.init()) {
+			client.loop();
+		}
+		
+		System.out.println("Program ended");
+	}
+}
+			

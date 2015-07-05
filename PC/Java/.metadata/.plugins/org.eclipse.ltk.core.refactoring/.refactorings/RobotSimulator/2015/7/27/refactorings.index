@@ -1,0 +1,6 @@
+1436015627563	Rename type 'motorController'
+1436016854209	Rename type 'robotApiClient'
+1436016881376	Rename type 'RobotApiClient'
+1436016955121	Rename type 'motorControllerSimulator'
+1436017500841	Rename type 'controllerData'
+1436017658416	Rename local variable 'writeBuf'

@@ -1,0 +1,198 @@
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class ControllerSimulator implements Runnable {
+
+    private LinkedBlockingQueue<ControllerData> queue;
+
+    DatagramSocket mClientSocket;
+    int mPhonePort;
+    InetAddress mPhoneIPAddress;
+    DatagramSocket mServerSocket = new DatagramSocket(6000);
+    
+    protected final byte[] mCurrentStateBuffer = new byte[208];
+    		
+    // Packet types
+    protected final byte[] writeCmd = { 85, -86, 0, 0, 0 };
+    protected final byte[] readCmd = { 85, -86, -128, 0, 0 };
+    protected final byte[] recSyncCmd3 = { 51, -52, 0, 0, 3};
+    protected final byte[] recSyncCmd0 = { 51, -52, -128, 0, 0};
+    protected final byte[] recSyncCmd208 = { 51, -52, -128, 0, (byte)208};
+    protected final byte[] controllerTypeLegacy = { 0, 77, 73};       // Controller type USBLegacyModule
+
+    /** Default Constructor.
+     *  
+     */
+    public ControllerSimulator(LinkedBlockingQueue<ControllerData> queue) {
+        this.queue = queue;
+
+        try {
+            mClientSocket = new DatagramSocket(2362);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void run() {
+        ControllerData dataPacket;
+        byte[] receiveData = new byte[1024];             
+        byte[] sendData = new byte[1024];
+        
+
+        while (true) {
+        	
+            try {
+            	DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            	mServerSocket.receive(receivePacket);
+            	
+            	// Set the global port and address of the sender.
+            	// TODO: do we need to set this everytime?
+            	int port = receivePacket.getPort();
+            	InetAddress IPAddress = receivePacket.getAddress(); 
+            	
+            //} catch (InterruptedException e) {
+            //    e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+            
+           
+        }
+    }
+    
+    private void sendPacket(byte[] sendData) {
+    	try {	
+    		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
+        	mServerSocket.send(sendPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+                      
+    
+    public int handleIncomingPacket(byte[] data, int length, boolean wait)
+    {
+        int rc = 0;
+
+        if (length <= 0) {
+            return rc;
+        }
+
+        // Write Command
+        if (data[0] == writeCmd[0] && data[2] == writeCmd[2]) {  // writeCmd
+
+
+            // If size is 208(0xd0) bytes then they are writing a full buffer of data to all ports.
+            // Note: the buffer we were giving in this case is 208+5 bytes because the "writeCmd" header is attached
+            if (data[4] == (byte)0xd0 ) {
+                //Log.v("Legacy", "WRITE: Write Header (" + bufferToHexString(data,0,5) + ") len=" + length);
+                queueUpForReadFromPhone(recSyncCmd0); // Reply we got your writeCmd
+
+                //Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5+16+4, 20) + ") len=" + length);
+                //Log.v("Legacy", "WRITE: Write Buffer FLAGS 0=" + bufferToHexString(data,5+0,3) + " 16=" + bufferToHexString(data,5+16,4) + "47=" + bufferToHexString(data,5+47,1));
+
+                // Now, the reset of the buffer minus the header 5 bytes should be 208 (0xd0) bytes that need to be written to the connected devices
+                // Write the entire received buffer into the mCurrentState buffer so the android can see what we are up to
+                // Note: the buffer we were giving in this case is 208+5 bytes because the "writeCmd" header is attached
+                System.arraycopy(data, 5, mCurrentStateBuffer, 0, 208);
+
+                // Check delta time to see if we are too slow in our simulation.
+                // Baud rate was 250,000 with real USB port connected to module
+                // We are getting deltas of 31ms between each write call
+                mTimeInMilliseconds = SystemClock.uptimeMillis();
+                mDeltaWriteTime = mTimeInMilliseconds - mOldTimeInMilliseconds;
+                mOldTimeInMilliseconds = mTimeInMilliseconds;
+                Log.v("Legacy", "WRITE: Delta Time = " + mDeltaWriteTime);
+
+                // This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
+                // If I2C_ACTION is set, take some action
+                if (mCurrentStateBuffer[47] == (byte)0xff) { // Action flag
+                    if ((mCurrentStateBuffer[16] & (byte)0x01) == (byte)0x01) { // I2C Mode
+                        if ((mCurrentStateBuffer[16] & (byte)0x80) == (byte)0x80) { // Read mode
+                            // just for fun, simulate reading the encoder from i2c.
+                            // really just from the mMotor1Encoder class variable
+                            // 4 bytes of header (r/w, i2c address, i2c register, i2c buffer len)
+                            // +4 to get past the header, motor 1 encoder starts at 12 and is 4 bytes long
+                            // See Tetrix Dc Motor Controller data sheet
+                            mCurrentStateBuffer[16+4+12] = (byte)(mMotor1Encoder >> 24);
+                            mCurrentStateBuffer[16+4+12+1] = (byte)(mMotor1Encoder >> 16);
+                            mCurrentStateBuffer[16+4+12+2] = (byte)(mMotor1Encoder >> 8);
+                            mCurrentStateBuffer[16+4+12+3] = (byte)(mMotor1Encoder);
+
+                            mCurrentStateBuffer[16+4+16] = (byte)(mMotor2Encoder >> 24);
+                            mCurrentStateBuffer[16+4+16+1] = (byte)(mMotor2Encoder >> 16);
+                            mCurrentStateBuffer[16+4+16+2] = (byte)(mMotor2Encoder >> 8);
+                            mCurrentStateBuffer[16+4+16+3] = (byte)(mMotor2Encoder);
+
+                        } else { // Write mode
+
+                            // Just for fun, simulate some of the motor modes
+                            simulateWritesToMotor1();
+                            simulateWritesToMotor2();
+                        }
+                    }
+                }
+
+                // Set the Port S0 ready bit in the global part of the Current State Buffer
+                mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
+
+            }
+        // Read Command
+        } else if (data[0] == readCmd[0] && data[2] == readCmd[2]) { // readCmd
+            if (data[4] == 3) { // Android asks for 3 bytes, initial query of device type
+                //Log.v("Legacy", "WRITE: Read Header (" + bufferToHexString(data,0,length) + ") len=" + length);
+                queueUpForReadFromPhone(recSyncCmd3);  // Send receive sync, bytes to follow
+                queueUpForReadFromPhone(controllerTypeLegacy);
+            } else if (data[4] == (byte)208) { // Android asks for 208 bytes, full read of device
+                //Log.v("Legacy", "WRITE: Read Header (" + bufferToHexString(data,0,length) + ") len=" + length);
+                queueUpForReadFromPhone(recSyncCmd208);  // Send receive sync, bytes to follow
+                queueUpForReadFromPhone(mCurrentStateBuffer); //
+            }
+        }
+
+        rc = length;
+        return rc;
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    private String bufferToHexString(byte[] data, int start, int length) {
+        int i;
+        int myStop;
+        StringBuilder sb = new StringBuilder();
+        //byte [] subArray = Arrays.copyOfRange(a, 4, 6);
+        myStop = (length > data.length) ? data.length : length;
+        for (i=start; i<start+myStop; i++) {
+            sb.append(String.format("%02x ", data[i]));
+        }
+        return sb.toString();
+    }
+	
+}
+
+
+
+
