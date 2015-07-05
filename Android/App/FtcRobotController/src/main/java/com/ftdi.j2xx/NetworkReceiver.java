@@ -31,11 +31,11 @@ public class NetworkReceiver implements Runnable {
         while (true) {
             DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
             try {
-                Log.v("D2xx::", "Before receive");
                 mSocket.receive(receivePacket);
-                Log.v("D2xx::", "After receive");
+
                 byte[] readBuffer = new byte[receivePacket.getLength()];
                 System.arraycopy(receivePacket.getData(), 0, readBuffer, 0, receivePacket.getLength());
+                Log.v("D2xx::", "Receive: " + readBuffer[0] + "Len: " + receivePacket.getLength());
                 queue.put(readBuffer);
             } catch (InterruptedException e) {
                 e.printStackTrace();

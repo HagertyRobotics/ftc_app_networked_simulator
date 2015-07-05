@@ -4,6 +4,8 @@ public class RobotSimulator
 {	
 	public static void main(String[] args)
 	{
+		System.out.println("Program started");
+		
 		LinkedBlockingQueue<ControllerData> mWriteQueue = new LinkedBlockingQueue<ControllerData>(10);
 		
 		CoppeliaApiClient client = new CoppeliaApiClient();
@@ -12,7 +14,7 @@ public class RobotSimulator
         Thread simulatorThread = new Thread(simulator,"");
         simulatorThread.start();
 		
-		System.out.println("Program started");
+		
 					
 		if (client.init()) {
 			client.loop();
