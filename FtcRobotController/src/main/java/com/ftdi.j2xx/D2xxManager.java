@@ -35,7 +35,7 @@ public class D2xxManager
 
         if (parentContext == null) return rc;
 
-        // Check if this is the frist time, don't change anything after the 1st call, we already made a list
+        // Check if this is the first time, don't change anything after the 1st call, we already made a list
         // Real code would look again for new usb devices
         if (this.mFtdiDevices==null) {
             ftDev = new FT_Device("A501E27V", "Hagerty USB1");
