@@ -2,9 +2,11 @@ package com.ftdi.j2xx;
 
 import android.util.Log;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.DatagramSocket;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class FT_Device
 {
@@ -16,12 +18,12 @@ public class FT_Device
     long mOldTimeInMilliseconds=0;
     long mDeltaWriteTime=0;
 
-    LinkedBlockingQueue mWriteQueue = new LinkedBlockingQueue();
-    LinkedBlockingQueue mReadQueue = new LinkedBlockingQueue();
+    Socket mSimulatorSocket = null;
+    DataOutputStream os = null;
+    DataInputStream is = null;
 
-    DatagramSocket mSimulatorSocket;
     // the Server's Port
-    public static final int SERVERPORT  = 6000;
+    public static final int SERVERPORT  = 6500;
 
     public FT_Device(String serialNumber, String description)
     {
@@ -32,24 +34,48 @@ public class FT_Device
         this.mDeviceInfoNode.serialNumber = serialNumber;
         this.mDeviceInfoNode.description = description;
 
-        // Start the Network Sender thread
-        // This thread will read from the mWriteQueue and send packets to the PC application
-        // THe mWriteQueue will get packets from the FT_Device write call
         try {
-            mSimulatorSocket = new DatagramSocket(6000);
-            Log.v("D2xx::", "Local Port " + mSimulatorSocket.getLocalPort());
-            NetworkSender myNetworkSender = new NetworkSender(mWriteQueue, mSimulatorSocket);  // Runnable
-            Thread networkSenderThread = new Thread(myNetworkSender);
-            networkSenderThread.start();
-
-            NetworkReceiver myNetworkReceiver = new NetworkReceiver(mReadQueue, mSimulatorSocket);
-            Thread networkReceiverThread = new Thread(myNetworkReceiver);
-            networkReceiverThread.start();
+            mSimulatorSocket = new Socket("10.0.1.193", SERVERPORT);
+            os = new DataOutputStream(mSimulatorSocket.getOutputStream());
+            is = new DataInputStream(mSimulatorSocket.getInputStream());
+        } catch (UnknownHostException e) {
+            Log.v("D2xx::", "Error: " + e);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.v("D2xx::", "Error: " + e);
         }
     }
 
+
+
+    public void sendBytesToSimulator(byte[] data) {
+        // If everything has been initialized then we want to write some data
+        // to the socket we have opened a connection to on port 25
+        if (mSimulatorSocket != null && os != null && is != null) {
+            try {
+                os.write(data, 0, data.length);
+            } catch (UnknownHostException e) {
+                Log.v("D2xx::", "Error: " + e);
+            } catch (IOException e) {
+                Log.v("D2xx::", "Error: " + e);
+            }
+        }
+    }
+
+    private void readBytesFromSimulator(byte[] data, int length) {
+        int totalRead = 0;
+
+        while (totalRead < length) {
+            int bytesRead = 0;
+            try {
+                bytesRead = is.read(data, totalRead, length - totalRead);
+            } catch (IOException e) {
+                Log.v("D2xx::", "Error: " + e);
+                e.printStackTrace();
+            }
+
+            totalRead += bytesRead;
+        }
+    }
 
     public synchronized void close()
     {
@@ -59,20 +85,14 @@ public class FT_Device
     public int read(byte[] data, int length, long wait_ms)
     {
         int rc = 0;
-        Log.v("D2xx::", "Read");
 
-        byte[] tempData;
-        try {
-            tempData = (byte[])mReadQueue.take();
-            Log.v("D2xx::", "Read after");
-            if (tempData.length == length) {
-                System.arraycopy(tempData, 0, data, 0, length);
-                rc = length;
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (length <= 0) {
+            return -2;
         }
+        readBytesFromSimulator(data, length);
+        Log.v("D2xx::", "Read: " + bufferToHexString(data, 0, data.length));
 
+        rc = length;
         return rc;
     }
 
@@ -97,16 +117,12 @@ public class FT_Device
     public int write(byte[] data, int length, boolean wait)
     {
         int rc = 0;
-        Log.v("D2xx::", "Write");
+        Log.v("D2xx::", "Write: " + bufferToHexString(data,0,data.length));
         if (length <= 0) {
             return rc;
         }
 
-        try {
-            mWriteQueue.put(data);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sendBytesToSimulator(data);
 
         return rc;
     }
