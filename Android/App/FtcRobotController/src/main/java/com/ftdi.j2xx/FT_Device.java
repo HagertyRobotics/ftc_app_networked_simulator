@@ -1,8 +1,5 @@
 package com.ftdi.j2xx;
 
-import android.os.SystemClock;
-import android.util.Log;
-
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -133,10 +130,10 @@ public class FT_Device
                 // Check delta time to see if we are too slow in our simulation.
                 // Baud rate was 250,000 with real USB port connected to module
                 // We are getting deltas of 31ms between each write call
-                mTimeInMilliseconds = SystemClock.uptimeMillis();
-                mDeltaWriteTime = mTimeInMilliseconds - mOldTimeInMilliseconds;
-                mOldTimeInMilliseconds = mTimeInMilliseconds;
-                Log.v("Legacy", "WRITE: Delta Time = " + mDeltaWriteTime);
+//                mTimeInMilliseconds = SystemClock.uptimeMillis();
+//                mDeltaWriteTime = mTimeInMilliseconds - mOldTimeInMilliseconds;
+//                mOldTimeInMilliseconds = mTimeInMilliseconds;
+//                Log.v("Legacy", "WRITE: Delta Time = " + mDeltaWriteTime);
 
                 // This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
                 // If I2C_ACTION is set, take some action
