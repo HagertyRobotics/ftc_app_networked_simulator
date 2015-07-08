@@ -55,14 +55,9 @@ public class FtcOpModeRegister implements OpModeRegister {
      * If two or more op modes are registered with the same name, the app will display an error.
      */
 
-    manager.register("NullOp", NullOp.class);
-    manager.register("K9TeleOp", K9TeleOp.class);
-    manager.register("K9TankDrive", K9TankDrive.class);
-    manager.register("K9Line", K9Line.class);
-    manager.register("K9IrSeeker", K9IrSeeker.class);
-    manager.register("K9AutoTime", K9AutoTime.class);
     manager.register("TestOp", TestOp.class);
-    manager.register("NxtEncoderOp", NxtEncoderOp.class);
+    manager.register("TestTankOp", TestTankOp.class);
+
     /*
     manager.register("IrSeekerOp", IrSeekerOp.class);
     manager.register("CompassCalibration", CompassCalibration.class);

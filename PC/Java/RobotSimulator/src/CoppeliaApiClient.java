@@ -1,3 +1,5 @@
+import java.util.concurrent.LinkedBlockingQueue;
+
 import coppelia.IntW;
 import coppelia.IntWA;
 import coppelia.remoteApi;
@@ -11,6 +13,12 @@ public class CoppeliaApiClient {
 	IntW mRightMotor;
 	int mClientID;
 	remoteApi mVrep;
+	private LinkedBlockingQueue<ControllerData> mQueue;
+	
+	public CoppeliaApiClient(LinkedBlockingQueue<ControllerData> queue) {
+		mQueue = queue;
+		
+	}
 	
 	public boolean init() {
 		
@@ -57,11 +65,26 @@ public class CoppeliaApiClient {
 	public void loop()
 	{
 		boolean done=false;
+		float leftMotorSpeed=0;
+		float rightMotorSpeed=0;
 		
 		while (!done)
 		{
-			mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotor.getValue(),(float)3.14,remoteApi.simx_opmode_oneshot);
-			mVrep.simxSetJointTargetVelocity(mClientID,mRightMotor.getValue(),(float)3.14,remoteApi.simx_opmode_oneshot);
+			ControllerData cd;
+			try {
+				cd = mQueue.take();
+				leftMotorSpeed = cd.getMotorSpeed(1) * 3.14f;
+				rightMotorSpeed = cd.getMotorSpeed(2) * 3.14f;
+				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//System.out.println("motor 1: " + leftMotorSpeed + " motor_2: " + rightMotorSpeed +" Count: " + mQueue.remainingCapacity());
+        	
+			mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotor.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
+			mVrep.simxSetJointTargetVelocity(mClientID,mRightMotor.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);
 		}
 		
 		// Before closing the connection to V-REP, make sure that the last command sent out had time to arrive. You can guarantee this with (for example):

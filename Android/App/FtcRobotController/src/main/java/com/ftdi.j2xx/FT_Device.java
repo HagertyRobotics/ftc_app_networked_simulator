@@ -1,5 +1,7 @@
 package com.ftdi.j2xx;
 
+import android.util.Log;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,6 +24,8 @@ public class FT_Device
     LinkedBlockingQueue mReadFromPcQueue;
 
     protected final byte[] mCurrentStateBuffer = new byte[208];
+
+    int mPacketCount=0;
 
     // Queue used to pass packets between writes and reads in the onboard simulator.
     // Read and Writes come from the ftc_app when it thinks it is talking to the
@@ -95,6 +99,7 @@ public class FT_Device
 
     public int write(byte[] data, int length, boolean wait)
     {
+
         int rc = 0;
 
         if (length <= 0) {
@@ -111,8 +116,9 @@ public class FT_Device
                 //Log.v("Legacy", "WRITE: Write Header (" + bufferToHexString(data,0,5) + ") len=" + length);
                 queueUpForReadFromPhone(recSyncCmd0); // Reply, we got your writeCmd
 
-                //Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5+16+4, 20) + ") len=" + length);
+                //Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5 + 16 + 4, 20) + ") len=" + length);
                 //Log.v("Legacy", "WRITE: Write Buffer FLAGS 0=" + bufferToHexString(data,5+0,3) + " 16=" + bufferToHexString(data,5+16,4) + "47=" + bufferToHexString(data,5+47,1));
+                Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5 + 16 + 4 + 5, 2) + ") flag=" + data[5+47]);
 
                 // Now, the reset of the buffer minus the 5 header bytes should be 208 (0xd0) bytes.
                 // These 208 bytes need to be written to the connected module.
@@ -125,7 +131,10 @@ public class FT_Device
                 // Write the mCurrentStateBuffer to the NetworkManager queue to be sent to the PC Simulator
                 byte[] tempBytes = new byte[208];
                 System.arraycopy(mCurrentStateBuffer, 0, tempBytes, 0, 208);
+                tempBytes[1] =(byte)mPacketCount;
+                mPacketCount++;
                 mWriteToPcQueue.add(tempBytes);
+                Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5 + 16 + 4 + 5, 2) + ") flag=" + data[5 + 47] + "remain: " + mWriteToPcQueue.remainingCapacity());
 
                 // Check delta time to see if we are too slow in our simulation.
                 // Baud rate was 250,000 with real USB port connected to module
@@ -134,19 +143,6 @@ public class FT_Device
 //                mDeltaWriteTime = mTimeInMilliseconds - mOldTimeInMilliseconds;
 //                mOldTimeInMilliseconds = mTimeInMilliseconds;
 //                Log.v("Legacy", "WRITE: Delta Time = " + mDeltaWriteTime);
-
-                // This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
-                // If I2C_ACTION is set, take some action
-                if (mCurrentStateBuffer[47] == (byte)0xff) { // Action flag
-                    if ((mCurrentStateBuffer[16] & (byte)0x01) == (byte)0x01) { // I2C Mode
-                        if ((mCurrentStateBuffer[16] & (byte)0x80) == (byte)0x80) { // Read mode
-
-
-                        } else { // Write mode
-
-                        }
-                    }
-                }
 
                 // Set the Port S0 ready bit in the global part of the Current State Buffer
                 mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
@@ -236,3 +232,4 @@ public class FT_Device
         }
     }
 }
+

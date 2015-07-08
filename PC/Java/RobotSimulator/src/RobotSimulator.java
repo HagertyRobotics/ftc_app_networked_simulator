@@ -6,11 +6,12 @@ public class RobotSimulator
 	{
 		System.out.println("Program started");
 		
-		LinkedBlockingQueue<ControllerData> mWriteQueue = new LinkedBlockingQueue<ControllerData>(10);
+		LinkedBlockingQueue<ControllerData> mQueue = new LinkedBlockingQueue<ControllerData>(100);
 		
-		CoppeliaApiClient client = new CoppeliaApiClient();
+		CoppeliaApiClient client = new CoppeliaApiClient(mQueue);
 		
-        ControllerSimulator simulator = new ControllerSimulator(mWriteQueue);  // Runnable
+		// Start the network reader 
+        ControllerSimulator simulator = new ControllerSimulator(mQueue);  // Runnable
         Thread simulatorThread = new Thread(simulator,"");
         simulatorThread.start();
 		

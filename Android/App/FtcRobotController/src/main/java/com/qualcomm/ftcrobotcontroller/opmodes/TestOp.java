@@ -50,6 +50,9 @@ public class TestOp extends OpMode {
 	DcMotor motorRight;
 	DcMotor motorLeft;
 
+	double right;
+	double left;
+
 	/**
 	 * Constructor
 	 */
@@ -82,6 +85,9 @@ public class TestOp extends OpMode {
 		motorRight = hardwareMap.dcMotor.get("motor_2");
 		motorLeft = hardwareMap.dcMotor.get("motor_1");
 		motorLeft.setDirection(DcMotor.Direction.REVERSE);
+
+		right = 0.0;
+		left = 0.0;
 	}
 
 	/*
@@ -91,15 +97,16 @@ public class TestOp extends OpMode {
 	 */
 	@Override
 	public void loop() {
-		double right;
-		double left;
 
-		right = .10;
-		left = .20;
+
+
 
 		// write the values to the motors
 		motorRight.setPower(right);
 		motorLeft.setPower(left);
+
+		right += .01;  if (right > 1.0) right = 0.0;
+		left += .01;   if (left > 1.0) left = 0.0;
 
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using

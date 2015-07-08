@@ -96,7 +96,7 @@ public class NetworkManager {
     /**
      * NetworkSender
      * Send packets to the PC simulator.
-     * Pull the packets from the passed queue.  Packets were queued in the FT_Device class after begin
+     * Pull the packets from the passed queue.  Packets were queued in the FT_Device class after being
      * received from the USB transmit functions of this app.  The FT_Device class is simulating the
      * USB stack using a UDP network connection to the PC simulator.
      *
@@ -112,7 +112,7 @@ public class NetworkManager {
             this.mSocket = mySocket;
 
             try {
-                IPAddress = InetAddress.getByName("10.0.1.193");
+                IPAddress = InetAddress.getByName("192.168.11.2");
             } catch (IOException e) {
                 e.printStackTrace();
             }
