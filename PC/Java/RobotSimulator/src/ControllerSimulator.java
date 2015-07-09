@@ -90,9 +90,8 @@ public class ControllerSimulator implements Runnable {
                 	ControllerData cd = new ControllerData();
                 	float m1 = (float)data[16+4+5]/100.0f;
                 	float m2 = (float)data[16+4+6]/100.0f;
-                	byte count = data[1];
                 	
-                	System.out.println("motor 1: " + m1 + " motor_2: " + m2 +" Count: " + count);
+                	System.out.println("motor 1: " + m1 + " motor_2: " + m2);
                 	
                 	cd.setMotorSpeed(1, m1);
                 	cd.setMotorSpeed(2, m2);
