@@ -37,10 +37,27 @@ public class ControllerSimulator implements Runnable {
     public void run() {
     	byte[] packet;
     	
-        while (true) {
-        	packet = receivePacketFromPhone();  
-        	handleIncomingPacket(packet, packet.length, false);
-        }
+    	try {
+            while (true) {
+            	packet = receivePacketFromPhone();  
+            	handleIncomingPacket(packet, packet.length, false);
+            }
+            // Catch unhandled exceptions and cleanup
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		close();
+    	}
+
+    }
+    
+    public void close() {
+    	try {
+    		mServerSocket.close();
+    		mQueue.clear();
+    	} catch (Exception ex) {
+    		System.out.println("An error occurred while closing!");
+    		ex.printStackTrace();
+    	}
     }
     
     private byte[] receivePacketFromPhone() {
