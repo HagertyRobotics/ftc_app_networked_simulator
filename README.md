@@ -49,7 +49,8 @@ In the repo you'll find the following directories and files.
   * Compile and run the app
     * Setup the newly found legacy controller with two motors "motor_1" and "motor_2"
     * Save configuration
-* Open PC Path editor and add c:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\remoteApiBindings\java\lib\64Bit
+* Open PC Path editor and add following directory to PATH variable:
+ * C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\remoteApiBindings\java\lib\64Bit
 * Open V-Rep simulator and open scene file PC/V-rep/FTCRobot.ttt
 * Open Eclipse and import PC/Java/RobotSimulator
   * Compile and Run RobotSimulator  
