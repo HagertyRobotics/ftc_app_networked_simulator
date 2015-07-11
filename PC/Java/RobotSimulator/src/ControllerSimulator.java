@@ -110,7 +110,7 @@ public class ControllerSimulator implements Runnable {
     	System.out.println("Receive Buffer: (" + bufferToHexString(data,0,25) + ") len=" + data.length);
     	
     	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
-                sendPacketToPhone(mCurrentStateBuffer);
+    		sendPacketToPhone(mCurrentStateBuffer);
                 // Set the Port S0 ready bit in the global part of the Current State Buffer
                 mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
         } else {
@@ -137,13 +137,20 @@ public class ControllerSimulator implements Runnable {
 	                    
 	                	
 	                	ControllerData cd = new ControllerData();
-	                	float m1 = (float)mCurrentStateBuffer[p+4+5]/100.0f;
-	                	float m2 = (float)mCurrentStateBuffer[p+4+6]/100.0f;
+	                	if (mCurrentStateBuffer[p+4+5] == (byte)0x80) {
+	                		cd.setFloatMode(1, true);
+	                	} else {
+		                	float m1 = (float)mCurrentStateBuffer[p+4+5]/100.0f;
+		                	cd.setMotorSpeed(1, m1);
+	                	}
 	                	
-	                	//System.out.println("motor 1: " + m1 + " motor_2: " + m2);
+	                	if (mCurrentStateBuffer[p+4+6] == (byte)0x80) {
+	                		cd.setFloatMode(2, true);
+	                	} else {
+		                	float m1 = (float)mCurrentStateBuffer[p+4+6]/100.0f;
+		                	cd.setMotorSpeed(2, m1);
+	                	}
 	                	
-	                	cd.setMotorSpeed(1, m1);
-	                	cd.setMotorSpeed(2, m2);
 	                    mQueue.add(cd);
 	                }
 
