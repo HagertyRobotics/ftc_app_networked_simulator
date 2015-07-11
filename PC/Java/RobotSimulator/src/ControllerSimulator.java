@@ -60,6 +60,17 @@ public class ControllerSimulator implements Runnable {
     	}
     }
     
+    /*
+     ** Packet types
+     */
+	protected final byte[] writeCmd = { 85, -86, 0, 0, 0 };
+	protected final byte[] readCmd = { 85, -86, -128, 0, 0 };
+	protected final byte[] recSyncCmd3 = { 51, -52, 0, 0, 3};
+	protected final byte[] recSyncCmd0 = { 51, -52, -128, 0, 0};
+	protected final byte[] recSyncCmd208 = { 51, -52, -128, 0, (byte)208};
+	protected final byte[] controllerTypeLegacy = { 0, 77, 73};       // Controller type USBLegacyModule
+     
+     
     private byte[] receivePacketFromPhone() {
     	
     	DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
@@ -96,27 +107,49 @@ public class ControllerSimulator implements Runnable {
     
     public void handleIncomingPacket(byte[] data, int length, boolean wait)
     {
-    	// This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
-        // If I2C_ACTION is set, take some action
-//        if (data[47] == (byte)0xff) { // Action flag
-//            if ((data[16] & (byte)0x01) == (byte)0x01) { // I2C Mode
-//                if ((data[16] & (byte)0x80) == (byte)0x80) { // Read mode
-//
-//
-//                } else { // Write mode
-                	ControllerData cd = new ControllerData();
-                	float m1 = (float)data[16+4+5]/100.0f;
-                	float m2 = (float)data[16+4+6]/100.0f;
-                	
-                	System.out.println("motor 1: " + m1 + " motor_2: " + m2);
-                	
-                	cd.setMotorSpeed(1, m1);
-                	cd.setMotorSpeed(2, m2);
-                    mQueue.add(cd);
-//                }
-//            }
-//        }
+    	System.out.println("Receive Buffer: (" + bufferToHexString(data,0,25) + ") len=" + data.length);
+    	
+    	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
+                sendPacketToPhone(mCurrentStateBuffer);
+                // Set the Port S0 ready bit in the global part of the Current State Buffer
+                mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
+        } else {
+        	
+	        // Write Command
+	    	// Process the received data packet
+	        // Loop through each of the 6 ports and see if the Action flag is set.  
+	        // If set then copy the 32 bytes for the port into the CurrentStateBuffer
+		
+	        //for (int i=0;i<6;i++) 
+	        int i=0;
+	        int p=16+i*32;
+	    	// This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
+	        // If I2C_ACTION is set, take some action
+	//        if (data[p+32] == (byte)0xff) { // Action flag
+	            if ((data[p] & (byte)0x01) == (byte)0x01) { // I2C Mode
+	                if ((data[p] & (byte)0x80) == (byte)0x80) { // Read mode
+	                	// Copy this port's 32 bytes into buffer 
+	                	System.arraycopy(data, p, mCurrentStateBuffer, p, 32);
+	
+	                } else { // Write mode
+	                	// Copy this port's 32 bytes into buffer 
+	                	System.arraycopy(data, p, mCurrentStateBuffer, p, 32);
+	                    
+	                	
+	                	ControllerData cd = new ControllerData();
+	                	float m1 = (float)mCurrentStateBuffer[p+4+5]/100.0f;
+	                	float m2 = (float)mCurrentStateBuffer[p+4+6]/100.0f;
+	                	
+	                	//System.out.println("motor 1: " + m1 + " motor_2: " + m2);
+	                	
+	                	cd.setMotorSpeed(1, m1);
+	                	cd.setMotorSpeed(2, m2);
+	                    mQueue.add(cd);
+	                }
 
+	            }
+	//        }
+        }
     }
 
     

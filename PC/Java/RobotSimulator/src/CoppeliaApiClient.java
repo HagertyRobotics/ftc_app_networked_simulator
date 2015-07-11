@@ -81,7 +81,7 @@ public class CoppeliaApiClient {
 				e.printStackTrace();
 			}
 			
-			//System.out.println("motor 1: " + leftMotorSpeed + " motor_2: " + rightMotorSpeed +" Count: " + mQueue.remainingCapacity());
+			System.out.println("motor 1: " + leftMotorSpeed + " motor_2: " + rightMotorSpeed +" Count: " + mQueue.remainingCapacity());
         	
 			mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotor.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
 			mVrep.simxSetJointTargetVelocity(mClientID,mRightMotor.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);
