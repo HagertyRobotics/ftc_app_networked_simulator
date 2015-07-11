@@ -24,7 +24,7 @@ The goal of this project is to create a standalone app that will replace the USB
 Clone the repo using Git:
 
 ```bash
-git clone --bare https://github.com/HagertyRobotics/ftc_app_networked_simulator
+git clone https://github.com/HagertyRobotics/ftc_app_networked_simulator
 ```
 
 > Remember, please use the "onboard" branch as the master branch is still in flux.
