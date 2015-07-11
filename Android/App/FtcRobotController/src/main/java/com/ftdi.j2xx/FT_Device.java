@@ -66,7 +66,7 @@ public class FT_Device
 
         DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
         try {
-            mSimulatorSocket.setSoTimeout(300);
+            mSimulatorSocket.setSoTimeout((int)wait_ms);
             mSimulatorSocket.receive(receivePacket);
 
             // If packet is not the size we are expecting, just return 0
