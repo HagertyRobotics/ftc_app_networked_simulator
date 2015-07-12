@@ -2,10 +2,11 @@
 public class ControllerData {
 
 	float[] mMotorSpeed = new float[2];
-	boolean	mFloatMode = false;
+	boolean[] mFloatMode = new boolean[2];
 	
 	public ControllerData() {
-		
+		mFloatMode[0] = false;
+		mFloatMode[1] = false;
 	}
 	
 	float getMotorSpeed(int i) {
@@ -17,7 +18,12 @@ public class ControllerData {
 	}
 	
 	void setFloatMode(int i, boolean floatMode) {
-		mFloatMode = floatMode;
+		mFloatMode[i-1] = floatMode;
+		setMotorSpeed(i, 0);
+	}
+	
+	boolean getFloatMode(int i){
+		return mFloatMode[i-1];
 	}
 
 }
