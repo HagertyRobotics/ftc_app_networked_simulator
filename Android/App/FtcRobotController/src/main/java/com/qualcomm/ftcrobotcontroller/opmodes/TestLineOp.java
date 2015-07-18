@@ -90,13 +90,6 @@ public class TestLineOp extends OpMode {
 		motorRight = hardwareMap.dcMotor.get("motor_2");
 		motorLeft = hardwareMap.dcMotor.get("motor_1");
 		motorLeft.setDirection(DcMotor.Direction.REVERSE);
-		
-		arm = hardwareMap.servo.get("servo_1");
-		claw = hardwareMap.servo.get("servo_6");
-
-		// set the starting position of the wrist and claw
-		armPosition = 0.2;
-		clawPosition = 0.25;
 
 		/*
 		 * We also assume that we have a LEGO light sensor
@@ -117,10 +110,6 @@ public class TestLineOp extends OpMode {
 	public void loop() {
 		double reflection = 0.0;
 		double left, right = 0.0;
-		
-		// keep manipulator out of the way.
-		arm.setPosition(armPosition);
-		claw.setPosition(clawPosition);
 
         /*
          * As a temporary fix, turn on LED in run() event rather than in start().

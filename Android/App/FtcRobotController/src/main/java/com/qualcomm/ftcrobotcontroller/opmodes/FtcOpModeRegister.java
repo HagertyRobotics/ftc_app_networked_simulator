@@ -57,6 +57,7 @@ public class FtcOpModeRegister implements OpModeRegister {
 
     manager.register("TestOp", TestOp.class);
     manager.register("TestTankOp", TestTankOp.class);
+    manager.register("TestLineOp", TestLineOp.class);
 
     /*
     manager.register("IrSeekerOp", IrSeekerOp.class);

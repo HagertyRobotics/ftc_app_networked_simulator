@@ -16,7 +16,7 @@ public class NetworkManager {
 
     // the Server's Port
     public static final int PHONEPORT  = 6000;
-    public static final String PC_IP_ADDRESS  = "10.0.1.193";
+    public static final String PC_IP_ADDRESS  = "192.168.11.6";
 
     DatagramSocket mSimulatorSocket;
     LinkedBlockingQueue mWriteToPcQueue = new LinkedBlockingQueue();
