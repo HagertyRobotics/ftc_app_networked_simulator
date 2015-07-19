@@ -1,7 +1,7 @@
-package hagerty.robot.view;
+package gui.view;
 
-import hagerty.robot.MainApp;
-import hagerty.robot.model.Brick;
+import gui.MainApp;
+import gui.model.Brick;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -78,12 +78,10 @@ public class BrickOverviewController {
         if (brick != null) {
             // Fill the labels with info from the brick object.
             brickNameLabel.setText(brick.getAlias());
-            brickIPAddressLabel.setText(brick.getIPAddress());
             brickPortLabel.setText(brick.getPort().toString());
         } else {
             // Brick is null, remove all the text.
             brickNameLabel.setText("");
-            brickIPAddressLabel.setText("");
             brickPortLabel.setText("");
         }
     }

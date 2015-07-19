@@ -1,8 +1,8 @@
-package hagerty.robot.view;
+package gui.view;
 
 import java.io.File;
 
-import hagerty.robot.MainApp;
+import gui.MainApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;

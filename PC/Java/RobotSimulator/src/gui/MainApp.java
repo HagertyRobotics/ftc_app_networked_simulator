@@ -1,4 +1,4 @@
-package hagerty.robot;
+package gui;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,15 +19,15 @@ import javafx.stage.Stage;
 
 import javax.xml.bind.*;
 
-import hagerty.robot.model.Brick;
-import hagerty.robot.model.BrickListWrapper;
-import hagerty.robot.model.LegacyBrick;
-import hagerty.robot.model.MotorBrick;
-import hagerty.robot.model.ServoBrick;
-import hagerty.robot.view.BrickEditDialogController;
-import hagerty.robot.view.BrickNewDialogController;
-import hagerty.robot.view.BrickOverviewController;
-import hagerty.robot.view.RootLayoutController;
+import gui.model.Brick;
+import gui.model.BrickListWrapper;
+import gui.model.LegacyBrick;
+import gui.model.MotorBrick;
+import gui.model.ServoBrick;
+import gui.view.BrickEditDialogController;
+import gui.view.BrickNewDialogController;
+import gui.view.BrickOverviewController;
+import gui.view.RootLayoutController;
 
 public class MainApp extends Application {
 

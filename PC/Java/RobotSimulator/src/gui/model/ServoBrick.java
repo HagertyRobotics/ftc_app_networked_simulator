@@ -1,4 +1,4 @@
-package hagerty.robot.model;
+package gui.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -7,15 +7,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Hagerty High
  */
-@XmlRootElement(name="motor")
-public class MotorBrick extends Brick {
+@XmlRootElement(name="servo")
+public class ServoBrick extends Brick {
 
-    private final String name = "Core Motor Controller";
+    private final String name = "Core Servo Controller";
 
     /**
      * Default constructor.
      */
-    public MotorBrick() {
+    public ServoBrick() {
     }
 
     public String getName() {

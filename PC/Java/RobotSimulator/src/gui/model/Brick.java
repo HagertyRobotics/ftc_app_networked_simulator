@@ -1,4 +1,4 @@
-package hagerty.robot.model;
+package gui.model;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -14,7 +14,6 @@ public abstract class Brick {
 
 
     private final StringProperty alias;
-    private static StringProperty mIPAddress;
     private IntegerProperty mPort;
 
 
@@ -23,7 +22,6 @@ public abstract class Brick {
      */
     public Brick() {
         this.alias = new SimpleStringProperty("");
-        mIPAddress = new SimpleStringProperty("10.0.0.1");
         mPort = new SimpleIntegerProperty(6000);
     }
 
@@ -32,20 +30,12 @@ public abstract class Brick {
         return alias.get();
     }
 
-    public String getIPAddress() {
-    	return mIPAddress.get();
-    }
-
     public Integer getPort() {
     	return mPort.get();
     }
 
     public void setAlias(String alias) {
         this.alias.set(alias);
-    }
-
-    public void setIPAddress(String address) {
-    	mIPAddress.set(address);
     }
 
     public void setPort(Integer port) {

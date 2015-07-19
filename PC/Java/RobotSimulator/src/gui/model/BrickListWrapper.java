@@ -1,4 +1,4 @@
-package hagerty.robot.model;
+package gui.model;
 
 import java.util.List;
 
