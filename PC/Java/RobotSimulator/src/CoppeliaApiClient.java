@@ -14,7 +14,7 @@ public class CoppeliaApiClient implements Runnable {
 	int mClientID;
 	remoteApi mVrep;
 	private LinkedBlockingQueue<ControllerData> mQueue;
-	boolean mRun=false;
+	volatile boolean mRun=false;
 
 	public CoppeliaApiClient(LinkedBlockingQueue<ControllerData> queue) {
 		mQueue = queue;
@@ -74,9 +74,11 @@ public class CoppeliaApiClient implements Runnable {
 		float leftMotorSpeed=0;
 		float rightMotorSpeed=0;
 
-		if (mRun) {
-			while (!done)
-			{
+
+		while (!done)
+		{
+
+			if (mRun) {
 				ControllerData cd;
 				try {
 					cd = mQueue.take();
@@ -93,15 +95,14 @@ public class CoppeliaApiClient implements Runnable {
 				mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotor.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
 				mVrep.simxSetJointTargetVelocity(mClientID,mRightMotor.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);
 			}
-
-
-			// Before closing the connection to V-REP, make sure that the last command sent out had time to arrive. You can guarantee this with (for example):
-			IntW pingTime = new IntW(0);
-			mVrep.simxGetPingTime(mClientID,pingTime);
-
-			// Now close the connection to V-REP:
-			mVrep.simxFinish(mClientID);
 		}
-	}
-}
 
+		// Before closing the connection to V-REP, make sure that the last command sent out had time to arrive. You can guarantee this with (for example):
+		IntW pingTime = new IntW(0);
+		mVrep.simxGetPingTime(mClientID,pingTime);
+
+		// Now close the connection to V-REP:
+		mVrep.simxFinish(mClientID);
+	}
+
+}
