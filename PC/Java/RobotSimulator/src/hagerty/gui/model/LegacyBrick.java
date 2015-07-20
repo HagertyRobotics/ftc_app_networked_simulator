@@ -1,4 +1,4 @@
-package gui.model;
+package hagerty.gui.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

@@ -1,8 +1,8 @@
-package gui.view;
+package hagerty.gui.view;
 
 import java.io.File;
 
-import gui.MainApp;
+import hagerty.gui.MainApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;

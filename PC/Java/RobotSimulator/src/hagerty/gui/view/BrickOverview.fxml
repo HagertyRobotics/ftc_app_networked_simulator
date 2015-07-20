@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="363.0" prefWidth="693.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.view.BrickOverviewController">
+<AnchorPane prefHeight="363.0" prefWidth="693.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hagerty.gui.view.BrickOverviewController">
    <children>
       <SplitPane dividerPositions="0.5" layoutX="153.0" layoutY="70.0" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -67,6 +67,8 @@
                               <Label fx:id="brickNameLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" />
                               <Label text="UDP Port" GridPane.rowIndex="1" />
                               <Label fx:id="brickPortLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="Serial Number" GridPane.rowIndex="2" />
+                              <Label fx:id="brickSerialLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
                      </children>

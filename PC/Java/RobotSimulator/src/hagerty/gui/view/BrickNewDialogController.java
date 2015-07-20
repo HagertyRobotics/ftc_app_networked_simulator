@@ -1,10 +1,14 @@
-package gui.view;
+package hagerty.gui.view;
 
-import gui.model.Brick;
+import hagerty.gui.model.Brick;
+import hagerty.gui.model.LegacyBrick;
+import hagerty.gui.model.MotorBrick;
+import hagerty.gui.model.ServoBrick;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.TextField;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -13,19 +17,14 @@ import javafx.stage.Stage;
  *
  * @author Hagerty High
  */
-public class BrickEditDialogController {
+public class BrickNewDialogController {
 
     @FXML
-    private TextField brickNameField;
+    private ChoiceBox<String> brickChoiceBox;
 
-    @FXML
-    private TextField brickIPAddressField;
-
-    @FXML
-    private TextField brickPortField;
 
     private Stage dialogStage;
-    private Brick brick;
+    private Brick brickHolder[];
     private boolean okClicked = false;
 
     /**
@@ -49,25 +48,20 @@ public class BrickEditDialogController {
         this.dialogStage.getIcons().add(new Image("file:resources/images/edit.png"));
     }
 
-    /**
-     * Sets the brick to be edited.
-     *
-     * @param brick
-     */
-    public void setBrick(Brick brick) {
-        this.brick = brick;
+    @FXML
+    public void initChoiceBox() {
+    	brickChoiceBox.setItems(FXCollections.observableArrayList("Core Legacy Module","Core Motor Controller","Core Servo Controller"));
+    	brickChoiceBox.getSelectionModel().selectFirst();
     }
 
     /**
-     * Sets the brick to be edited.
+     * Sets the brick to be edited in the dialog.
      *
      * @param brick
      */
-    public void fillFieldsWithCurrentValues() {
-        brickNameField.setText(brick.getAlias());
-        brickPortField.setText(brick.getPort().toString());
+    public void setBrick(Brick[] brickHolder) {
+        this.brickHolder = brickHolder;
     }
-
 
     /**
      * Returns true if the user clicked OK, false otherwise.
@@ -84,8 +78,19 @@ public class BrickEditDialogController {
     @FXML
     private void handleOk() {
         if (isInputValid()) {
-            brick.setAlias(brickNameField.getText());
-            brick.setPort(Integer.parseInt(brickPortField.getText()));
+
+        	switch (brickChoiceBox.getValue()) {
+        	case "Core Legacy Module":
+        		brickHolder[0] = new LegacyBrick();
+        		brickHolder[0].setPort(6000);
+        		break;
+        	case "Core Motor Controller":
+        		brickHolder[0] = new MotorBrick();
+        		break;
+        	case "Core Servo Controller":
+        		brickHolder[0] = new ServoBrick();
+        		break;
+        	}
 
             okClicked = true;
             dialogStage.close();
@@ -107,10 +112,6 @@ public class BrickEditDialogController {
      */
     private boolean isInputValid() {
         String errorMessage = "";
-
-        if (brickNameField.getText() == null || brickNameField.getText().length() == 0) {
-            errorMessage += "No valid first name!\n";
-        }
 
         if (errorMessage.length() == 0) {
             return true;

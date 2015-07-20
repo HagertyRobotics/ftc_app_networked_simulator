@@ -1,7 +1,7 @@
-package gui.view;
+package hagerty.gui.view;
 
-import gui.MainApp;
-import gui.model.Brick;
+import hagerty.gui.MainApp;
+import hagerty.gui.model.Brick;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -24,6 +24,8 @@ public class BrickOverviewController {
     private Label brickIPAddressLabel;
     @FXML
     private Label brickPortLabel;
+    @FXML
+    private Label brickSerialLabel;
 
 
 
@@ -79,10 +81,12 @@ public class BrickOverviewController {
             // Fill the labels with info from the brick object.
             brickNameLabel.setText(brick.getAlias());
             brickPortLabel.setText(brick.getPort().toString());
+            brickSerialLabel.setText(brick.getSerial());
         } else {
             // Brick is null, remove all the text.
             brickNameLabel.setText("");
             brickPortLabel.setText("");
+            brickSerialLabel.setText("");
         }
     }
 

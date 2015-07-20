@@ -1,4 +1,4 @@
-package gui;
+package hagerty.gui;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,15 +19,17 @@ import javafx.stage.Stage;
 
 import javax.xml.bind.*;
 
-import gui.model.Brick;
-import gui.model.BrickListWrapper;
-import gui.model.LegacyBrick;
-import gui.model.MotorBrick;
-import gui.model.ServoBrick;
-import gui.view.BrickEditDialogController;
-import gui.view.BrickNewDialogController;
-import gui.view.BrickOverviewController;
-import gui.view.RootLayoutController;
+import hagerty.gui.model.Brick;
+import hagerty.gui.model.BrickListWrapper;
+import hagerty.gui.model.LegacyBrick;
+import hagerty.gui.model.MotorBrick;
+import hagerty.gui.model.ServoBrick;
+import hagerty.gui.view.BrickEditDialogController;
+import hagerty.gui.view.BrickNewDialogController;
+import hagerty.gui.view.BrickOverviewController;
+import hagerty.gui.view.RootLayoutController;
+
+import hagerty.simulator.RobotSimulator;
 
 public class MainApp extends Application {
 
@@ -43,8 +45,6 @@ public class MainApp extends Application {
      * Constructor
      */
     public MainApp() {
-        // Add some sample data
-        //brickData.add(new Brick("Legacy Controller"));
 
     }
 
@@ -58,6 +58,15 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+    	Runtime.getRuntime().addShutdownHook(new Thread("shutdown thread") {
+            public void run() {
+                System.out.println("***** Threads Exiting *****");
+                RobotSimulator.gThreadsAreRunning = false;
+
+            }
+        });
+
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("AddressApp");
 
@@ -67,6 +76,8 @@ public class MainApp extends Application {
         initRootLayout();
 
         showBrickOverview();
+
+        RobotSimulator.startSimulator(this);
     }
 
     /**
@@ -301,9 +312,6 @@ public class MainApp extends Application {
             // Marshalling and saving XML to the file.
             m.marshal(wrapper, file);
             //m.marshal(wrapper, System.out);
-
-            //JAXBElement<BrickListWrapper> jaxbElement = new JAXBElement<BrickListWrapper>(new QName(null, "customer"), BrickListWrapper.class, wrapper);
-            //m.marshal(jaxbElement, System.out);
 
             // Save the file path to the registry.
             setBrickFilePath(file);
