@@ -18,6 +18,7 @@ public abstract class Brick {
     private final StringProperty serial;
 
 
+
     /**
      * Default constructor.
      */
@@ -35,7 +36,7 @@ public abstract class Brick {
     public Integer getPort() {
     	return mPort.get();
     }
-    
+
     public String getSerial() {
         return serial.get();
     }
@@ -47,7 +48,7 @@ public abstract class Brick {
     public void setPort(Integer port) {
     	mPort.set(port);
     }
-    
+
     public void setSerial(String serial) {
         this.serial.set(serial);
     }
@@ -55,8 +56,12 @@ public abstract class Brick {
     public StringProperty aliasProperty() {
         return alias;
     }
-    
+
     public StringProperty serialProperty() {
         return serial;
+    }
+
+    private int listStuff() {
+    	return 0;
     }
 }

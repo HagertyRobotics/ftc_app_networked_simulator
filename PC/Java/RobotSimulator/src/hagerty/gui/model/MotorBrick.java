@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Hagerty High
  */
-@XmlRootElement(name="motor")
+@XmlRootElement(name="Motor")
 public class MotorBrick extends Brick {
 
     private final String name = "Core Motor Controller";

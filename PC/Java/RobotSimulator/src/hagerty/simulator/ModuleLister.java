@@ -8,7 +8,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -88,7 +87,6 @@ public class ModuleLister implements Runnable {
     	return mypacket;
     }
 
-
     private void sendPacketToPhone(byte[] sendData) {
     	try {
     		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, RobotSimulator.gPhoneIPAddress, RobotSimulator.gPhonePort);
@@ -98,7 +96,6 @@ public class ModuleLister implements Runnable {
             e.printStackTrace();
         }
     }
-
 
     public void handleIncomingPacket(byte[] data, int length, boolean wait)
     {
@@ -119,7 +116,7 @@ public class ModuleLister implements Runnable {
 	        BrickListWrapper wrapper = new BrickListWrapper();
 	        wrapper.setBricks(mBrickList);
 
-	        // Marshalling and saving XML to the file.
+	        // Marshalling to generate XML stream.
 	        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 			m.marshal(wrapper, outputStream);

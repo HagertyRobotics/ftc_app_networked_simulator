@@ -1,7 +1,7 @@
 package hagerty.utils;
 
-public class Utils {
-    
+public final class Utils {
+
 	public static String bufferToHexString(byte[] data, int start, int length) {
         int i;
         int myStop;

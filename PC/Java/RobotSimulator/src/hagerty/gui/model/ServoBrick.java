@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Hagerty High
  */
-@XmlRootElement(name="servo")
+@XmlRootElement(name="Servo")
 public class ServoBrick extends Brick {
 
     private final String name = "Core Servo Controller";

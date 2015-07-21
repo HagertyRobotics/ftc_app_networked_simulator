@@ -2,6 +2,7 @@ package hagerty.gui.view;
 
 import hagerty.gui.MainApp;
 import hagerty.gui.model.Brick;
+import hagerty.simulator.RobotSimulator;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -146,5 +147,23 @@ public class BrickOverviewController {
 
             alert.showAndWait();
         }
+    }
+
+    /**
+     * Called when the user clicks the Start Simulator button.
+     */
+    @FXML
+    private void handleStartSimulatorButton() {
+    	if (!RobotSimulator.simulatorStarted())
+    		RobotSimulator.startSimulator(mainApp);
+    }
+
+    /**
+     * Called when the user clicks the Start Simulator button.
+     */
+    @FXML
+    private void handleStartVisualizerButton() {
+    	if (!RobotSimulator.visualizerStarted())
+    		RobotSimulator.startVisualizer(mainApp);
     }
 }

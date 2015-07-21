@@ -77,7 +77,7 @@ public class MainApp extends Application {
 
         showBrickOverview();
 
-        RobotSimulator.startSimulator(this);
+        
     }
 
     /**
