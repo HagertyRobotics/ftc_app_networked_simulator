@@ -1,7 +1,11 @@
 package hagerty.simulator;
 
 import hagerty.utils.*;
-import hagerty.gui.model.*;
+import hagerty.simulator.modules.BrickListWrapper;
+import hagerty.simulator.modules.BrickSimulator;
+import hagerty.simulator.modules.LegacyBrickSimulator;
+import hagerty.simulator.modules.MotorBrickSimulator;
+import hagerty.simulator.modules.ServoBrickSimulator;
 import javafx.collections.ObservableList;
 
 import java.io.ByteArrayOutputStream;
@@ -106,9 +110,9 @@ public class ModuleLister implements Runnable {
         }
     }
 
-    private byte[] getXmlModuleList(ObservableList<Brick> mBrickList) {
+    private byte[] getXmlModuleList(ObservableList<BrickSimulator> mBrickList) {
     	try {
-	    	JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class, LegacyBrick.class, MotorBrick.class, ServoBrick.class );
+	    	JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class );
 	        Marshaller m = context.createMarshaller();
 	        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 

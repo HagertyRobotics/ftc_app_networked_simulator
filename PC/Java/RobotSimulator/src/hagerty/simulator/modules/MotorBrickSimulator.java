@@ -1,4 +1,4 @@
-package hagerty.gui.model;
+package hagerty.simulator.modules;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -7,15 +7,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Hagerty High
  */
-@XmlRootElement(name="Legacy")
-public class LegacyBrick extends Brick {
+@XmlRootElement(name="Motor")
+public class MotorBrickSimulator extends BrickSimulator {
 
-    private final String name = "Core Legacy Module";
+    private final String name = "Core Motor Controller";
 
     /**
      * Default constructor.
      */
-    public LegacyBrick() {
+    public MotorBrickSimulator() {
     }
 
     public String getName() {

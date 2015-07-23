@@ -1,4 +1,4 @@
-package hagerty.gui.model;
+package hagerty.simulator.modules;
 
 import java.util.List;
 
@@ -16,14 +16,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "bricks")
 public class BrickListWrapper {
 
-    private List<Brick> bricks;
+    private List<BrickSimulator> bricks;
 
     @XmlElementRef(name = "brick")
-    public List<Brick> getBricks() {
+    public List<BrickSimulator> getBricks() {
         return bricks;
     }
 
-    public void setBricks(List<Brick> bricks) {
+    public void setBricks(List<BrickSimulator> bricks) {
         this.bricks = bricks;
     }
 }

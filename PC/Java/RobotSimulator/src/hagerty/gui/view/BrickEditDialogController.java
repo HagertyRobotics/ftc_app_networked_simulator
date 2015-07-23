@@ -1,6 +1,6 @@
 package hagerty.gui.view;
 
-import hagerty.gui.model.Brick;
+import hagerty.simulator.modules.BrickSimulator;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -25,7 +25,7 @@ public class BrickEditDialogController {
     private TextField brickSerialField;
 
     private Stage dialogStage;
-    private Brick brick;
+    private BrickSimulator brick;
     private boolean okClicked = false;
 
     /**
@@ -54,7 +54,7 @@ public class BrickEditDialogController {
      *
      * @param brick
      */
-    public void setBrick(Brick brick) {
+    public void setBrick(BrickSimulator brick) {
         this.brick = brick;
     }
 

@@ -1,9 +1,9 @@
 package hagerty.gui.view;
 
-import hagerty.gui.model.Brick;
-import hagerty.gui.model.LegacyBrick;
-import hagerty.gui.model.MotorBrick;
-import hagerty.gui.model.ServoBrick;
+import hagerty.simulator.modules.BrickSimulator;
+import hagerty.simulator.modules.LegacyBrickSimulator;
+import hagerty.simulator.modules.MotorBrickSimulator;
+import hagerty.simulator.modules.ServoBrickSimulator;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -24,7 +24,7 @@ public class BrickNewDialogController {
 
 
     private Stage dialogStage;
-    private Brick brickHolder[];
+    private BrickSimulator brickHolder[];
     private boolean okClicked = false;
 
     /**
@@ -59,7 +59,7 @@ public class BrickNewDialogController {
      *
      * @param brick
      */
-    public void setBrick(Brick[] brickHolder) {
+    public void setBrick(BrickSimulator[] brickHolder) {
         this.brickHolder = brickHolder;
     }
 
@@ -81,14 +81,14 @@ public class BrickNewDialogController {
 
         	switch (brickChoiceBox.getValue()) {
         	case "Core Legacy Module":
-        		brickHolder[0] = new LegacyBrick();
+        		brickHolder[0] = new LegacyBrickSimulator();
         		brickHolder[0].setPort(6000);
         		break;
         	case "Core Motor Controller":
-        		brickHolder[0] = new MotorBrick();
+        		brickHolder[0] = new MotorBrickSimulator();
         		break;
         	case "Core Servo Controller":
-        		brickHolder[0] = new ServoBrick();
+        		brickHolder[0] = new ServoBrickSimulator();
         		break;
         	}
 

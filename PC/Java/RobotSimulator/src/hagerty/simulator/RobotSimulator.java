@@ -4,7 +4,7 @@ import java.net.InetAddress;
 import java.util.Collection;
 import java.util.List;
 
-import hagerty.gui.model.Brick;
+import hagerty.simulator.modules.BrickSimulator;
 import javafx.collections.ObservableList;
 
 public class RobotSimulator  {
@@ -30,13 +30,15 @@ public class RobotSimulator  {
         gModuleLister = new ModuleLister(mainApp);  // Runnable
         Thread moduleListerThread = new Thread(gModuleLister,"");
         moduleListerThread.start();
-        
+
         // Start the individual threads for each module
         // Read the current list of modules from the GUI MainApp class
-        List<Brick> brickList = mainApp.getBrickData();
-        
-        for (Brick temp : brickList) {
-			System.out.println(temp.getAlias());
+        List<BrickSimulator> brickList = mainApp.getBrickData();
+
+        for (BrickSimulator temp : brickList) {
+        	Thread t = new Thread(temp,temp.getAlias());  // Make a thread from the object and also set the process name
+        	t.start();
+			System.out.println(temp.getAlias() + " " + temp.getName());
 		}
 
     }
@@ -51,7 +53,7 @@ public class RobotSimulator  {
 
 		// Start the module info server
     	System.out.println("Starting Visualizer...");
-    	gCoppeliaApiClient = new CoppeliaApiClient(); // Runnable
+    	gCoppeliaApiClient = new CoppeliaApiClient(mainApp); // Runnable
     	Thread coppeliaThread = new Thread(gCoppeliaApiClient,"");
     	if (gCoppeliaApiClient.init()) {
     		coppeliaThread.start();

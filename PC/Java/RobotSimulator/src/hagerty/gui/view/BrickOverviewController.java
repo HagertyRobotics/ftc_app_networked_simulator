@@ -1,8 +1,8 @@
 package hagerty.gui.view;
 
 import hagerty.gui.MainApp;
-import hagerty.gui.model.Brick;
 import hagerty.simulator.RobotSimulator;
+import hagerty.simulator.modules.BrickSimulator;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -13,11 +13,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 public class BrickOverviewController {
     @FXML
-    private TableView<Brick> brickTable;
+    private TableView<BrickSimulator> brickTable;
     @FXML
-    private TableColumn<Brick, String> brickNameColumn;
+    private TableColumn<BrickSimulator, String> brickNameColumn;
     @FXML
-    private TableColumn<Brick, String> brickAliasColumn;
+    private TableColumn<BrickSimulator, String> brickAliasColumn;
 
     @FXML
     private Label brickNameLabel;
@@ -48,7 +48,7 @@ public class BrickOverviewController {
     private void initialize() {
         // Initialize the brick table with the two columns.
         //controllerNameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
-        brickNameColumn.setCellValueFactory(new PropertyValueFactory<Brick,String>("name"));
+        brickNameColumn.setCellValueFactory(new PropertyValueFactory<BrickSimulator,String>("name"));
         brickAliasColumn.setCellValueFactory(cellData -> cellData.getValue().aliasProperty());
 
         // Clear brick details.
@@ -77,7 +77,7 @@ public class BrickOverviewController {
      *
      * @param brick or null
      */
-    private void showBrickDetails(Brick brick) {
+    private void showBrickDetails(BrickSimulator brick) {
         if (brick != null) {
             // Fill the labels with info from the brick object.
             brickNameLabel.setText(brick.getAlias());
@@ -117,7 +117,7 @@ public class BrickOverviewController {
      */
     @FXML
     private void handleNewBrick() {
-        Brick[] tempBrick = new Brick[1];
+        BrickSimulator[] tempBrick = new BrickSimulator[1];
         boolean okClicked = mainApp.showBrickNewDialog(tempBrick);
         if (okClicked) {
             mainApp.getBrickData().add(tempBrick[0]);
@@ -130,7 +130,7 @@ public class BrickOverviewController {
      */
     @FXML
     private void handleEditBrick() {
-        Brick selectedBrick = brickTable.getSelectionModel().getSelectedItem();
+        BrickSimulator selectedBrick = brickTable.getSelectionModel().getSelectedItem();
         if (selectedBrick != null) {
             boolean okClicked = mainApp.showBrickEditDialog(selectedBrick);
             if (okClicked) {
@@ -159,7 +159,7 @@ public class BrickOverviewController {
     }
 
     /**
-     * Called when the user clicks the Start Simulator button.
+     * Called when the user clicks the Start Visualizer button.
      */
     @FXML
     private void handleStartVisualizerButton() {

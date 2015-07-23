@@ -1,8 +1,11 @@
 package hagerty.simulator;
 
+import java.util.List;
+
 import coppelia.IntW;
 import coppelia.IntWA;
 import coppelia.remoteApi;
+import hagerty.simulator.modules.BrickSimulator;
 
 public class CoppeliaApiClient implements Runnable {
 
@@ -12,6 +15,11 @@ public class CoppeliaApiClient implements Runnable {
 	IntW mRightMotor;
 	int mClientID;
 	remoteApi mVrep;
+	hagerty.gui.MainApp mMainApp;
+
+	public CoppeliaApiClient(hagerty.gui.MainApp mainApp) {
+		mMainApp = mainApp;
+	}
 
 	public boolean init() {
 
@@ -63,19 +71,24 @@ public class CoppeliaApiClient implements Runnable {
 		float leftMotorSpeed=0;
 		float rightMotorSpeed=0;
 
+        // Read the current list of modules from the GUI MainApp class
+		BrickSimulator wheelsBrick=null;
+        List<BrickSimulator> brickList = mMainApp.getBrickData();
+        for (BrickSimulator temp : brickList) {
+        	if (temp.getAlias().equals("Wheels")) {
+        		wheelsBrick = temp;
+        	}
+		}
+
 		while (!done)
 		{
-//				try {
-//					cd = mQueue.take();
-//					leftMotorSpeed = cd.getMotorSpeed(1) * 3.14f;
-//					rightMotorSpeed = cd.getMotorSpeed(2) * 3.14f;
-//
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//
-//				System.out.println("motor 1: " + leftMotorSpeed + " motor_2: " + rightMotorSpeed +" Count: " + mQueue.remainingCapacity());
+			wheelsBrick.mLegacyMotorSimData.lock.readLock().lock();
+	        try {
+	            leftMotorSpeed = wheelsBrick.mLegacyMotorSimData.getMotor1Speed() * 3.14f;
+	            rightMotorSpeed = wheelsBrick.mLegacyMotorSimData.getMotor2Speed() * 3.14f;
+	        } finally {
+	        	wheelsBrick.mLegacyMotorSimData.lock.readLock().unlock();
+	        }
 
 			mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotor.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
 			mVrep.simxSetJointTargetVelocity(mClientID,mRightMotor.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);

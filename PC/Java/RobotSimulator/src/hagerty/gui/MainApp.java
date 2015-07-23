@@ -19,17 +19,16 @@ import javafx.stage.Stage;
 
 import javax.xml.bind.*;
 
-import hagerty.gui.model.Brick;
-import hagerty.gui.model.BrickListWrapper;
-import hagerty.gui.model.LegacyBrick;
-import hagerty.gui.model.MotorBrick;
-import hagerty.gui.model.ServoBrick;
 import hagerty.gui.view.BrickEditDialogController;
 import hagerty.gui.view.BrickNewDialogController;
 import hagerty.gui.view.BrickOverviewController;
 import hagerty.gui.view.RootLayoutController;
-
 import hagerty.simulator.RobotSimulator;
+import hagerty.simulator.modules.BrickListWrapper;
+import hagerty.simulator.modules.BrickSimulator;
+import hagerty.simulator.modules.LegacyBrickSimulator;
+import hagerty.simulator.modules.MotorBrickSimulator;
+import hagerty.simulator.modules.ServoBrickSimulator;
 
 public class MainApp extends Application {
 
@@ -39,7 +38,7 @@ public class MainApp extends Application {
     /**
      * The data as an observable list of Controllers.
      */
-    private ObservableList<Brick> brickList = FXCollections.observableArrayList();
+    private ObservableList<BrickSimulator> brickList = FXCollections.observableArrayList();
 
     /**
      * Constructor
@@ -52,7 +51,7 @@ public class MainApp extends Application {
      * Returns the data as an observable list of Controllers.
      * @return
      */
-    public ObservableList<Brick> getBrickData() {
+    public ObservableList<BrickSimulator> getBrickData() {
         return brickList;
     }
 
@@ -77,7 +76,6 @@ public class MainApp extends Application {
 
         showBrickOverview();
 
-        
     }
 
     /**
@@ -142,7 +140,7 @@ public class MainApp extends Application {
      * @param brick the controller object to be edited
      * @return true if the user clicked OK, false otherwise.
      */
-    public boolean showBrickEditDialog(Brick brick) {
+    public boolean showBrickEditDialog(BrickSimulator brick) {
         try {
             // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
@@ -182,7 +180,7 @@ public class MainApp extends Application {
      * @param brick the controller object to be edited
      * @return true if the user clicked OK, false otherwise.
      */
-    public boolean showBrickNewDialog(Brick[] brick) {
+    public boolean showBrickNewDialog(BrickSimulator[] brick) {
         try {
             // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
@@ -266,7 +264,7 @@ public class MainApp extends Application {
     public void loadBrickDataFromFile(File file) {
         try {
             JAXBContext context = JAXBContext
-                    .newInstance(BrickListWrapper.class, LegacyBrick.class, MotorBrick.class, ServoBrick.class );
+                    .newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class );
             Unmarshaller um = context.createUnmarshaller();
             try {
             // Reading XML from the file and unmarshalling.
@@ -301,7 +299,7 @@ public class MainApp extends Application {
      */
     public void saveBrickDataToFile(File file) {
         try {
-            JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class, LegacyBrick.class, MotorBrick.class, ServoBrick.class );
+            JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class );
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
