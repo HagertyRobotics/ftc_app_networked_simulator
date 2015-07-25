@@ -1,5 +1,9 @@
 package hagerty.simulator.legacy.data;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
+@XmlAccessorType(XmlAccessType.NONE)
 public class LegacyMotorSimData extends SimData {
 
 	volatile float mMotor1Speed=0.0f;

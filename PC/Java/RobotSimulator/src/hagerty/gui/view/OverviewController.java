@@ -3,6 +3,8 @@ package hagerty.gui.view;
 import hagerty.gui.MainApp;
 import hagerty.simulator.RobotSimulator;
 import hagerty.simulator.modules.BrickSimulator;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -11,7 +13,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-public class BrickOverviewController {
+public class OverviewController {
     @FXML
     private TableView<BrickSimulator> brickTable;
     @FXML
@@ -28,6 +30,9 @@ public class BrickOverviewController {
     @FXML
     private Label brickSerialLabel;
 
+    @FXML
+    private Label mylabel;
+
 
 
     // Reference to the main application.
@@ -37,7 +42,7 @@ public class BrickOverviewController {
      * The constructor.
      * The constructor is called before the initialize() method.
      */
-    public BrickOverviewController() {
+    public OverviewController() {
     }
 
     /**
@@ -58,6 +63,8 @@ public class BrickOverviewController {
         brickTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> showBrickDetails(newValue));
     }
+
+
 
     /**
      * Is called by the main application to give a reference back to itself.
@@ -166,4 +173,16 @@ public class BrickOverviewController {
     	if (!RobotSimulator.visualizerStarted())
     		RobotSimulator.startVisualizer(mainApp);
     }
+
+    /**
+     * Called when the user clicks the edit button. Opens a dialog to edit
+     * details for the selected brick.
+     */
+    @FXML
+    private void handleStartDebugButton() {
+
+            mainApp.showBrickDebugWindow();
+    }
+
+
 }

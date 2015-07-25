@@ -2,26 +2,39 @@ package hagerty.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import javax.xml.bind.*;
 
-import hagerty.gui.view.BrickEditDialogController;
-import hagerty.gui.view.BrickNewDialogController;
-import hagerty.gui.view.BrickOverviewController;
+import hagerty.gui.view.DebugWindowController;
+import hagerty.gui.view.EditDialogController;
+import hagerty.gui.view.NewDialogController;
+import hagerty.gui.view.OverviewController;
 import hagerty.gui.view.RootLayoutController;
 import hagerty.simulator.RobotSimulator;
 import hagerty.simulator.modules.BrickListWrapper;
@@ -31,6 +44,7 @@ import hagerty.simulator.modules.MotorBrickSimulator;
 import hagerty.simulator.modules.ServoBrickSimulator;
 
 public class MainApp extends Application {
+
 
     private Stage primaryStage;
     private BorderPane rootLayout;
@@ -75,7 +89,6 @@ public class MainApp extends Application {
         initRootLayout();
 
         showBrickOverview();
-
     }
 
     /**
@@ -86,8 +99,7 @@ public class MainApp extends Application {
         try {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class
-                    .getResource("view/RootLayout.fxml"));
+            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
             rootLayout = (BorderPane) loader.load();
 
             // Show the scene containing the root layout.
@@ -117,14 +129,14 @@ public class MainApp extends Application {
         try {
             // Load controller overview.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/BrickOverview.fxml"));
+            loader.setLocation(MainApp.class.getResource("view/Overview.fxml"));
             AnchorPane controllerOverview = (AnchorPane) loader.load();
 
             // Set controller overview into the center of root layout.
             rootLayout.setCenter(controllerOverview);
 
             // Give the controller access to the main app.
-            BrickOverviewController controller = loader.getController();
+            OverviewController controller = loader.getController();
             controller.setMainApp(this);
 
         } catch (IOException e) {
@@ -144,7 +156,7 @@ public class MainApp extends Application {
         try {
             // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/BrickEditDialog.fxml"));
+            loader.setLocation(MainApp.class.getResource("view/EditDialog.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
 
             // Create the dialog Stage.
@@ -156,7 +168,7 @@ public class MainApp extends Application {
             dialogStage.setScene(scene);
 
             // Set the Brick into the controller.
-            BrickEditDialogController c = loader.getController();
+            EditDialogController c = loader.getController();
             c.setDialogStage(dialogStage);
             c.setBrick(brick);
             c.fillFieldsWithCurrentValues();
@@ -175,6 +187,83 @@ public class MainApp extends Application {
     }
 
     /**
+     * Opens a dialog to edit details for the specified brick. If the user
+     * clicks OK, the changes are saved into the provided brick object and true
+     * is returned.
+     *
+     * @param brick the controller object to be edited
+     * @return true if the user clicked OK, false otherwise.
+     */
+    public void showBrickDebugWindow() {
+        try {
+            // Load the fxml file and create a new stage for the popup dialog.
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("view/DebugWindow.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+
+            VBox vbox = new VBox();
+            vbox.setPadding(new Insets(10));
+            vbox.setSpacing(8);
+
+
+            // Read the current list of modules from the GUI MainApp class
+            List<BrickSimulator> brickList = this.getBrickData();
+            for (BrickSimulator temp : brickList) {
+            	Text title = new Text(temp.getAlias());
+                title.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+                vbox.getChildren().add(title);
+
+                HBox hboxMotor1 = new HBox();
+                hboxMotor1.setPadding(new Insets(5, 12, 5, 12));
+                hboxMotor1.setSpacing(10);
+
+            	Text motor1Text = new Text("Motor 1");
+            	VBox.setMargin(motor1Text, new Insets(0, 0, 0, 8));
+            	hboxMotor1.getChildren().add(motor1Text);
+
+            	Label motor1Label = new Label("label");
+            	hboxMotor1.getChildren().add(motor1Label);
+            	vbox.getChildren().add(hboxMotor1);
+
+				HBox hboxMotor2 = new HBox();
+				hboxMotor2.setPadding(new Insets(5, 12, 5, 12));
+				hboxMotor2.setSpacing(10);
+
+             	Text motor2Text = new Text("Motor 2");
+             	VBox.setMargin(motor2Text, new Insets(0, 0, 0, 8));
+             	hboxMotor2.getChildren().add(motor2Text);
+
+             	Label motor2Label = new Label("label");
+             	hboxMotor2.getChildren().add(motor2Label);
+             	vbox.getChildren().add(hboxMotor2);
+    		}
+            page.getChildren().add(vbox);
+
+
+            // Create the dialog Stage.
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Debug");
+            dialogStage.initModality(Modality.NONE);
+            dialogStage.initOwner(primaryStage);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Call some routines in the controller
+            DebugWindowController c = loader.getController();
+            c.setDialogStage(dialogStage);
+
+            // Set the dialog icon.
+            dialogStage.getIcons().add(new Image("file:resources/images/edit.png"));
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Opens a dialog to choose the type of brick we are creating
      *
      * @param brick the controller object to be edited
@@ -184,7 +273,7 @@ public class MainApp extends Application {
         try {
             // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/BrickNewDialog.fxml"));
+            loader.setLocation(MainApp.class.getResource("view/NewDialog.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
 
             // Create the dialog Stage.
@@ -196,7 +285,7 @@ public class MainApp extends Application {
             dialogStage.setScene(scene);
 
             // Set the Brick into the controller.
-            BrickNewDialogController c = loader.getController();
+            NewDialogController c = loader.getController();
             c.setDialogStage(dialogStage);
             c.setBrick(brick);
             c.initChoiceBox();
@@ -317,11 +406,12 @@ public class MainApp extends Application {
         	Alert alert = new Alert(AlertType.ERROR);
         	alert.setTitle("Error");
         	alert.setHeaderText("Could not save data");
-        	alert.setContentText("Could not save data to file:\n" + file.getPath());
+        	alert.setContentText("Could not save data to file:\n" + file.getPath() + "\n" + e);
 
         	alert.showAndWait();
         }
     }
+
 
     /**
      * Returns the main stage.

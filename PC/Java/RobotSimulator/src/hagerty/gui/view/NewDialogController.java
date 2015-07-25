@@ -17,7 +17,7 @@ import javafx.stage.Stage;
  *
  * @author Hagerty High
  */
-public class BrickNewDialogController {
+public class NewDialogController {
 
     @FXML
     private ChoiceBox<String> brickChoiceBox;

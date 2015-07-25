@@ -10,6 +10,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
 import hagerty.simulator.legacy.data.*;
 
 /**
@@ -17,8 +21,8 @@ import hagerty.simulator.legacy.data.*;
  *
  * @author Hagerty High
  */
+@XmlAccessorType(XmlAccessType.NONE)
 public abstract class BrickSimulator implements Runnable {
-
 
     private final StringProperty alias;
     private IntegerProperty mPort;
@@ -204,14 +208,17 @@ public abstract class BrickSimulator implements Runnable {
         return serial.get();
     }
 
+    @XmlElement
     public void setAlias(String alias) {
         this.alias.set(alias);
     }
 
+    @XmlElement
     public void setPort(Integer port) {
     	mPort.set(port);
     }
 
+    @XmlElement
     public void setSerial(String serial) {
         this.serial.set(serial);
     }

@@ -13,7 +13,7 @@ import javafx.stage.Stage;
  *
  * @author Hagerty High
  */
-public class BrickEditDialogController {
+public class EditDialogController {
 
     @FXML
     private TextField brickNameField;

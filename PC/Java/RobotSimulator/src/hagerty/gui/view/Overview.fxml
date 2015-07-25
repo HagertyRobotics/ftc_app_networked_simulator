@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="363.0" prefWidth="693.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hagerty.gui.view.BrickOverviewController">
+<AnchorPane prefHeight="363.0" prefWidth="693.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hagerty.gui.view.OverviewController">
    <children>
       <SplitPane dividerPositions="0.5" layoutX="153.0" layoutY="70.0" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -77,6 +77,7 @@
                      <children>
                         <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleStartSimulatorButton" text="Start Simulator" />
                         <Button layoutX="127.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleStartVisualizerButton" text="Start Visualizer" />
+                        <Button layoutX="14.0" layoutY="54.0" mnemonicParsing="false" onAction="#handleStartDebugButton" text="Start Debugger" />
                      </children></AnchorPane>
               </items>
             </SplitPane>
