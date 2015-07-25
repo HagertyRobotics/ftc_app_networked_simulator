@@ -1,6 +1,12 @@
 package hagerty.gui.view;
 
+import java.util.List;
+
+import coppelia.remoteApi;
+import hagerty.gui.MainApp;
+import hagerty.simulator.legacy.data.LegacyMotorSimData;
 import hagerty.simulator.modules.BrickSimulator;
+import hagerty.simulator.modules.LegacyBrickSimulator;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -23,6 +29,8 @@ public class DebugWindowController {
 
     private Stage dialogStage;
 
+    private MainApp mMainApp;
+
 
     /**
      * Initializes the controller class. This method is automatically called
@@ -31,6 +39,15 @@ public class DebugWindowController {
     @FXML
     private void initialize() {
     	startLiveDebug();
+    }
+
+    /**
+     * Is called by the main application to give a reference back to itself.
+     *
+     * @param mainApp
+     */
+    public void setMainApp(MainApp mainApp) {
+        mMainApp = mainApp;
     }
 
     /**
@@ -47,7 +64,13 @@ public class DebugWindowController {
       	      Platform.runLater(new Runnable() {
       	        @Override
       	        public void run() {
-      	          brickDebugField.setText("" + finalI);
+      	        	brickDebugField.setText("" + finalI);
+
+					// Read the current list of modules from the GUI MainApp class
+					List<BrickSimulator> brickList = mMainApp.getBrickData();
+					for (BrickSimulator currentBrick : brickList) {
+						currentBrick.populateDebugGuiVbox();
+					}
       	        }
       	      });
       	      i++;

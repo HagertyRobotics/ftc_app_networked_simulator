@@ -4,6 +4,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -49,6 +50,10 @@ public abstract class BrickSimulator implements Runnable {
     }
 
     public abstract String getName();
+
+	public abstract void setupDebugGuiVbox(VBox vbox);
+	
+	public abstract void populateDebugGuiVbox();
 
     @Override
     public void run() {
@@ -230,6 +235,8 @@ public abstract class BrickSimulator implements Runnable {
     public StringProperty serialProperty() {
         return serial;
     }
+
+
 
 }
 

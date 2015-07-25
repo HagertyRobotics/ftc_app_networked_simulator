@@ -2,6 +2,8 @@ package hagerty.simulator.modules;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import javafx.scene.layout.VBox;
+
 /**
  * Model class for a Motor Controller
  *
@@ -21,5 +23,9 @@ public class MotorBrickSimulator extends BrickSimulator {
     public String getName() {
     	return name;
     }
+    
+	public void setupDebugGuiVbox(VBox vbox) {}
+	
+	public void populateDebugGuiVbox() {}
 
 }

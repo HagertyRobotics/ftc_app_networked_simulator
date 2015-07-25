@@ -156,7 +156,10 @@ public class MainApp extends Application {
         try {
             // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/EditDialog.fxml"));
+            if (brick instanceof LegacyBrickSimulator)
+            	loader.setLocation(MainApp.class.getResource("view/EditLegacyDialog.fxml"));
+            else
+            	loader.setLocation(MainApp.class.getResource("view/EditDialog.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
 
             // Create the dialog Stage.
@@ -167,7 +170,7 @@ public class MainApp extends Application {
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
-            // Set the Brick into the controller.
+            // Give the Brick we are editing to the controller.
             EditDialogController c = loader.getController();
             c.setDialogStage(dialogStage);
             c.setBrick(brick);
@@ -205,40 +208,13 @@ public class MainApp extends Application {
             vbox.setPadding(new Insets(10));
             vbox.setSpacing(8);
 
-
             // Read the current list of modules from the GUI MainApp class
             List<BrickSimulator> brickList = this.getBrickData();
-            for (BrickSimulator temp : brickList) {
-            	Text title = new Text(temp.getAlias());
-                title.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-                vbox.getChildren().add(title);
 
-                HBox hboxMotor1 = new HBox();
-                hboxMotor1.setPadding(new Insets(5, 12, 5, 12));
-                hboxMotor1.setSpacing(10);
-
-            	Text motor1Text = new Text("Motor 1");
-            	VBox.setMargin(motor1Text, new Insets(0, 0, 0, 8));
-            	hboxMotor1.getChildren().add(motor1Text);
-
-            	Label motor1Label = new Label("label");
-            	hboxMotor1.getChildren().add(motor1Label);
-            	vbox.getChildren().add(hboxMotor1);
-
-				HBox hboxMotor2 = new HBox();
-				hboxMotor2.setPadding(new Insets(5, 12, 5, 12));
-				hboxMotor2.setSpacing(10);
-
-             	Text motor2Text = new Text("Motor 2");
-             	VBox.setMargin(motor2Text, new Insets(0, 0, 0, 8));
-             	hboxMotor2.getChildren().add(motor2Text);
-
-             	Label motor2Label = new Label("label");
-             	hboxMotor2.getChildren().add(motor2Label);
-             	vbox.getChildren().add(hboxMotor2);
+            for (BrickSimulator currentBrick : brickList) {
+            	currentBrick.setupDebugGuiVbox(vbox);
     		}
             page.getChildren().add(vbox);
-
 
             // Create the dialog Stage.
             Stage dialogStage = new Stage();
@@ -251,6 +227,7 @@ public class MainApp extends Application {
             // Call some routines in the controller
             DebugWindowController c = loader.getController();
             c.setDialogStage(dialogStage);
+            c.setMainApp(this);
 
             // Set the dialog icon.
             dialogStage.getIcons().add(new Image("file:resources/images/edit.png"));
@@ -366,9 +343,9 @@ public class MainApp extends Application {
             setBrickFilePath(file);
 
             } catch (UnmarshalException e) {
-            	System.err.println("UnmarshalExcemption: ");
+            	System.err.println("UnmarshalExcemption: " + e);
             } catch (JAXBException e) {
-            	System.err.println("UnmarshalExcemption: ");
+            	System.err.println("UnmarshalExcemption: " + e);
             }
 
         } catch (Exception e) { // catches ANY exception

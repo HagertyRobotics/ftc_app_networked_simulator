@@ -82,7 +82,6 @@ public class NewDialogController {
         	switch (brickChoiceBox.getValue()) {
         	case "Core Legacy Module":
         		brickHolder[0] = new LegacyBrickSimulator();
-        		brickHolder[0].setPort(6000);
         		break;
         	case "Core Motor Controller":
         		brickHolder[0] = new MotorBrickSimulator();
