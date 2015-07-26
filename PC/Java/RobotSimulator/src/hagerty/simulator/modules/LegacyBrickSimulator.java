@@ -1,23 +1,13 @@
 package hagerty.simulator.modules;
 
-import java.util.ArrayList;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import hagerty.simulator.legacy.data.LegacyMotorSimData;
 import hagerty.simulator.legacy.data.SimData;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
+import hagerty.simulator.legacy.data.SimDataFactory;
+import hagerty.simulator.legacy.data.SimDataType;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+
 
 /**
  * Model class for a Motor Controller
@@ -30,30 +20,42 @@ public class LegacyBrickSimulator extends BrickSimulator {
     private final String name = "Core Legacy Module";
 
     @XmlElement
-    private String[] portNames = new String[6];
+    private String[] portName = new String[6];
     @XmlElement
-    private int[] portNumbers = new int[6];
-    @XmlElement
+    private SimDataType[] portType = new SimDataType[6];
+
     private SimData[] portSimData = new SimData[6];
 
     /**
      * Default constructor.
      */
     public LegacyBrickSimulator() {
-    	//ports[0]= new SimpleStringProperty("S0");
-    	portSimData[0] = new LegacyMotorSimData();
-    	portSimData[1] = null;
-    	portSimData[2] = null;
-    	portSimData[3] = null;
-    	portSimData[4] = null;
-    	portSimData[5] = null;
-
     	for (int i=0;i<6;i++) {
-    		portNames[i] = "";
-    		portNumbers[i] = 1;
+    		portName[i] = null;
+    		portType[i] = SimDataType.NONE;
+    		portSimData[i] = null;
     	}
     }
 
+    /**
+     * For the LegacyBrickSimulator objects, since we couldn't get the marshaler to handle the list of small
+     * SimData objects(6), we need to create the objects by hand using the unmarshaled list of portTypes.
+     */
+    public void fixupUnMarshaling() {
+    	for (int i=0;i<6;i++) {
+    		// if port is not configured then don't create any SimData objects for it!
+    		System.out.println("fixup: " + portName[i]);
+    		portSimData[i] = SimDataFactory.buildSimData(portType[i]);
+    		if (portSimData[i] != null){
+        		portSimData[i].setSimDataName(portName[i]);  // name the newly created SimData object
+    		}
+
+    	}
+    }
+
+    /**
+     * Getters/Setters
+     */
     public String getName() {
     	return name;
     }
@@ -62,22 +64,26 @@ public class LegacyBrickSimulator extends BrickSimulator {
     	return portSimData;
     }
 
-    public String[] getPortNames() {
-    	return portNames;
+    public String[] getPortName() {
+    	return portName;
     }
 
-    public int[] getPortNumbers() {
-    	return portNumbers;
+    public SimDataType[] getPortType() {
+    	return portType;
     }
 
-    public void setPortNames(String[] s) {
-    	portNames = s;
+    public void setPortName(String[] s) {
+    	portName = s;
     }
 
-    public void setPortNumbers(int[] n) {
-    	portNumbers = n;
+    public void setPortType(SimDataType[] type) {
+    	portType = type;
     }
 
+
+    /**
+     * GUI Stuff
+     */
 	public void setupDebugGuiVbox(VBox vbox) {
 
 		for (int i=0;i<6;i++) {

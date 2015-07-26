@@ -31,6 +31,8 @@ public class DebugWindowController {
 
     private MainApp mMainApp;
 
+    private boolean mDone = false;
+
 
     /**
      * Initializes the controller class. This method is automatically called
@@ -51,7 +53,7 @@ public class DebugWindowController {
     }
 
     /**
-     * Start a thread thats queries the Brick Simulators and displays current values here.
+     * Start a thread that queries the Brick Simulators and displays current values here.
      */
     public void startLiveDebug() {
 
@@ -59,7 +61,7 @@ public class DebugWindowController {
       	  @Override
       	  public Void call() throws Exception {
       	    int i = 0;
-      	    while (true) {
+      	    while (!mDone) {
       	      final int finalI = i;
       	      Platform.runLater(new Runnable() {
       	        @Override
@@ -76,6 +78,7 @@ public class DebugWindowController {
       	      i++;
       	      Thread.sleep(1000);
       	    }
+			return null;
       	  }
       	};
       	Thread th = new Thread(task);
@@ -100,6 +103,7 @@ public class DebugWindowController {
      */
     @FXML
     private void handleCancel() {
+    	mDone = true;
         dialogStage.close();
     }
 

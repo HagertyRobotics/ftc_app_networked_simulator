@@ -25,14 +25,16 @@ public class LegacyMotorSimData extends SimData {
 	public Label mMotor1SpeedDebugLabel;
 	public Label mMotor2SpeedDebugLabel;
 
-
 	public LegacyMotorSimData() {
+		super(SimDataType.LEGACY_MOTOR);
+		construct();
 	}
 
-	public String getSimDataName() {
-		return simDataName.getValue();
-	}
-
+    @Override
+    protected void construct() {
+        System.out.println("Building Legacy Motor SimData");
+    }
+    
 	public void populateDebugGuiVbox() {
 		mMotor1SpeedDebugLabel.setText("" + mMotor1Speed);
 		mMotor2SpeedDebugLabel.setText("" + mMotor2Speed);

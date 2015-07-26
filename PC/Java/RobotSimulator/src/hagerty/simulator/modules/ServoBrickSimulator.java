@@ -24,6 +24,8 @@ public class ServoBrickSimulator extends BrickSimulator {
     	return name;
     }
 
+    public void fixupUnMarshaling() {}
+
 	public void setupDebugGuiVbox(VBox vbox) {}
 
 	public void populateDebugGuiVbox() {}

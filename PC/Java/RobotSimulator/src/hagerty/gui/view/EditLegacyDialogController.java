@@ -1,5 +1,6 @@
 package hagerty.gui.view;
 
+import hagerty.simulator.legacy.data.SimDataType;
 import hagerty.simulator.modules.BrickSimulator;
 import hagerty.simulator.modules.LegacyBrickSimulator;
 import javafx.collections.FXCollections;
@@ -46,8 +47,12 @@ public class EditLegacyDialogController extends EditDialogController {
     @FXML
     private void initialize() {
     	for (int i=0;i<6;i++) {
-    		legacyChoiceBoxes[i] = new ChoiceBox();
-    		legacyChoiceBoxes[i].setItems(FXCollections.observableArrayList("None", "Motor Controller", "Light Sensor", "Touch Sensor"));
+    		legacyChoiceBoxes[i] = new ChoiceBox<SimDataType>(FXCollections.observableArrayList(
+    				SimDataType.NONE,
+    				SimDataType.LEGACY_MOTOR,
+    				SimDataType.LEGACY_LIGHT,
+    				SimDataType.LEGACY_TOUCH));
+
     		legacyChoiceBoxes[i].getSelectionModel().selectFirst();
     		portGrid.add(legacyChoiceBoxes[i], 1, i);
 
@@ -95,7 +100,9 @@ public class EditLegacyDialogController extends EditDialogController {
         LegacyBrickSimulator lb = (LegacyBrickSimulator)brick;
 
         for (int i=0;i<6;i++) {
-        	legacyChoiceBoxes[i].getSelectionModel().select(lb.getPortNumbers()[i]);
+        	legacyChoiceBoxes[i].getSelectionModel().select(
+        			lb.getPortType()[i]);
+        	legacyPortNames[i].setText(lb.getPortName()[i]);
     	}
     }
 
@@ -112,16 +119,17 @@ public class EditLegacyDialogController extends EditDialogController {
             LegacyBrickSimulator lb = (LegacyBrickSimulator)brick;
 
             for (int i=0;i<6;i++) {
-            	lb.getPortNumbers()[i] = legacyChoiceBoxes[i].getSelectionModel().getSelectedIndex();
-
-            	lb.getPortNames()[i] = legacyPortNames[i].getText();
+            	lb.getPortType()[i] = (SimDataType)legacyChoiceBoxes[i].getSelectionModel().getSelectedItem();
+            	lb.getPortName()[i] = legacyPortNames[i].getText();
         	}
+            
+            lb.fixupUnMarshaling();
 
             okClicked = true;
             dialogStage.close();
         }
     }
-    
+
     /**
      * Called when the user clicks cancel.
      */

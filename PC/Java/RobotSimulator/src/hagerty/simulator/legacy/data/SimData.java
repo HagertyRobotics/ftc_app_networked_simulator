@@ -11,16 +11,32 @@ import javafx.scene.layout.VBox;
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class SimData {
 
-    protected final StringProperty simDataName;
+    protected StringProperty simDataName = null;
+    private SimDataType mType=null;
 
 	public final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-	public SimData() {
-		this.simDataName = new SimpleStringProperty("S0");
+	public SimData(SimDataType type) {
+		mType=type;
 	}
+
+    // Do subclass level processing in this method
+    protected abstract void construct();
 
 	public String getSimDataName() {
 		return simDataName.getValue();
+	}
+
+	public void setSimDataName(String name) {
+		this.simDataName = new SimpleStringProperty(name);
+	}
+
+	public SimDataType getType() {
+		return mType;
+	}
+
+	public void setType(SimDataType type) {
+		mType = type;
 	}
 
 	abstract public void setupDebugGuiVbox(VBox vbox);

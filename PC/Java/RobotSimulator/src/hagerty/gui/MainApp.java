@@ -62,7 +62,7 @@ public class MainApp extends Application {
     }
 
     /**
-     * Returns the data as an observable list of Controllers.
+     * Returns the data as an observable list of Controller Simulators.
      * @return
      */
     public ObservableList<BrickSimulator> getBrickData() {
@@ -81,7 +81,7 @@ public class MainApp extends Application {
         });
 
         this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("AddressApp");
+        this.primaryStage.setTitle("SimulatorApp");
 
         // Set the application icon.
         this.primaryStage.getIcons().add(new Image("file:resources/images/robot.png"));
@@ -333,11 +333,20 @@ public class MainApp extends Application {
                     .newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class );
             Unmarshaller um = context.createUnmarshaller();
             try {
-            // Reading XML from the file and unmarshalling.
+            // Reading XML from the file and unmarshalling to a Wrapper class that just contains a single List
+            // of Simulator objects.
             BrickListWrapper wrapper = (BrickListWrapper) um.unmarshal(file);
 
+            // Add the list from the Wrapper class into the local member variable "brickList"
+            // This list will be returned from the method getBrickData()
             brickList.clear();
             brickList.addAll(wrapper.getBricks());
+
+            // For the LegacyBrickSimulator objects, since we couldn't get the marshaler to handle the list of small
+            // SimData objects(6), we need to create the objects by hand using the returned list of portTypes.
+            for (BrickSimulator currentBrick : brickList) {
+            	currentBrick.fixupUnMarshaling();
+    		}
 
             // Save the file path to the registry.
             setBrickFilePath(file);
@@ -352,7 +361,7 @@ public class MainApp extends Application {
         	Alert alert = new Alert(AlertType.ERROR);
         	alert.setTitle("Error");
         	alert.setHeaderText("Could not load data");
-        	alert.setContentText("Could not load data from file:\n" + file.getPath());
+        	alert.setContentText("Could not load data from file:\n" + file.getPath() + "  " + e);
 
         	alert.showAndWait();
         }
