@@ -3,11 +3,7 @@ public class ControllerData {
 
 	float[] mMotorSpeed = new float[2];
 	boolean	mFloatMode = false;
-	
-	public ControllerData() {
-		
-	}
-	
+
 	float getMotorSpeed(int i) {
 		return mMotorSpeed[i-1];
 	}

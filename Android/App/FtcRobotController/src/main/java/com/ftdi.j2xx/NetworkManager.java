@@ -15,8 +15,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class NetworkManager {
 
     // the Server's Port
-    public static final int PHONEPORT  = 6000;
-    public static final String PC_IP_ADDRESS  = "10.0.1.2";
+    public static final int PHONE_PORT  = 6000;
+    public static final String PC_IP_ADDRESS  = "192.168.2.189";
+    public static final int SENDING_PORT = 6500;
 
     DatagramSocket mSimulatorSocket;
     LinkedBlockingQueue mWriteToPcQueue = new LinkedBlockingQueue();
@@ -28,16 +29,18 @@ public class NetworkManager {
         // This thread will read from the mWriteToPcQueue and send packets to the PC application
         // The mWriteToPcQueue will get packets from the FT_Device write call
         try {
-            mSimulatorSocket = new DatagramSocket(PHONEPORT);
+            mSimulatorSocket = new DatagramSocket(PHONE_PORT);
             Log.v("D2xx::", "Local Port " + mSimulatorSocket.getLocalPort());
-            NetworkSender myNetworkSender = new NetworkSender(mWriteToPcQueue, mSimulatorSocket);  // Runnable
+            NetworkSender myNetworkSender = new NetworkSender(mWriteToPcQueue,
+                    mSimulatorSocket,
+                    PC_IP_ADDRESS);  // Runnable
             Thread networkSenderThread = new Thread(myNetworkSender);
             networkSenderThread.start();
 
             NetworkReceiver myNetworkReceiver = new NetworkReceiver(mReadFromPcQueue, mSimulatorSocket);
             Thread networkReceiverThread = new Thread(myNetworkReceiver);
             networkReceiverThread.start();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -73,8 +76,7 @@ public class NetworkManager {
 
         @Override
         public void run() {
-
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
                 try {
                     mSocket.receive(receivePacket);
@@ -83,9 +85,7 @@ public class NetworkManager {
                     System.arraycopy(receivePacket.getData(), 0, readBuffer, 0, receivePacket.getLength());
                     Log.v("D2xx::", "Receive: " + readBuffer[0] + "Len: " + receivePacket.getLength());
                     queue.put(readBuffer);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -106,16 +106,20 @@ public class NetworkManager {
         private LinkedBlockingQueue queue;
 
         DatagramSocket mSocket;
-        InetAddress IPAddress;
+        private InetAddress IPAddress;
 
-        public NetworkSender(LinkedBlockingQueue queue, DatagramSocket mySocket) {
+        public NetworkSender(LinkedBlockingQueue queue, DatagramSocket mySocket, final String ip) {
             this.queue = queue;
             this.mSocket = mySocket;
 
             try {
-                IPAddress = InetAddress.getByName(PC_IP_ADDRESS);
+                this.IPAddress = InetAddress.getByName(ip);
+
+                // TODO: add verfications to the IP
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e("FTC Controller", "The following ip address is not invalid: " +
+                    ip + "Details: " + e.getMessage(), e);
+                throw new AssertionError("IP Address is invalid!");
             }
 
         }
@@ -124,14 +128,12 @@ public class NetworkManager {
         public void run() {
             byte[] writeBuf;
 
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     writeBuf = (byte[])queue.take();
-                    DatagramPacket send_packet = new DatagramPacket(writeBuf,writeBuf.length, IPAddress, 6500);
+                    DatagramPacket send_packet = new DatagramPacket(writeBuf,writeBuf.length, IPAddress, SENDING_PORT);
                     mSocket.send(send_packet);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

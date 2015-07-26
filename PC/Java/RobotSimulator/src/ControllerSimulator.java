@@ -1,11 +1,15 @@
+import javafx.application.Application;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ControllerSimulator implements Runnable {
+import static java.lang.Thread.currentThread;
 
+public class ControllerSimulator implements Runnable {
+    private final int BIND_PORT_NUM = 6500;
     private LinkedBlockingQueue<ControllerData> mQueue;
 
     int mPhonePort;
@@ -18,33 +22,57 @@ public class ControllerSimulator implements Runnable {
     
     protected final byte[] mCurrentStateBuffer = new byte[208];
 
-    
+    private volatile boolean running = true;
+
+    private int packetsReceived;
+    private int packetsSent;
+
     /** Default Constructor.
      *  
      */
-    public ControllerSimulator(LinkedBlockingQueue<ControllerData> queue) {
+    public ControllerSimulator(LinkedBlockingQueue<ControllerData> queue) throws java.net.BindException,
+        IOException {
+
+        packetsReceived = 0;
+        packetsSent = 0;
+
         mQueue = queue;
 
         try {
-        	mServerSocket = new DatagramSocket(6500);
+        	mServerSocket = new DatagramSocket(BIND_PORT_NUM);
+        } catch (java.net.BindException ex) {
+            System.out.println("Sorry! I cannot bind to the port " + BIND_PORT_NUM);
+            throw ex;
         } catch (IOException e) {
             e.printStackTrace();
+            throw e;
         }
 
     }
 
     @Override
     public void run() {
+        System.out.print("Controller Sim. Started");
     	byte[] packet;
-    	
-        while (true) {
-        	packet = receivePacketFromPhone();  
-        	handleIncomingPacket(packet, packet.length, false);
+
+        try {
+            while(!currentThread().isInterrupted() && running) {
+                System.out.print("Waiting for packet...");
+                packet = receivePacketFromPhone();
+                handleIncomingPacket(packet, packet.length, false);
+                System.out.println("Received!");
+            }
+            //Catch unhandled exceptions and cleanup
+        } catch (Exception e) {
+            e.printStackTrace();
+            close();
         }
+
+        //Thread interrupted; close session
+        close();
     }
     
     private byte[] receivePacketFromPhone() {
-    	
     	DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
     	try {
     		mServerSocket.receive(receivePacket);
@@ -56,13 +84,8 @@ public class ControllerSimulator implements Runnable {
     	// to be used when we reply back.
     	// TODO: do we need to set this every time?
     	mPhonePort = receivePacket.getPort();
-    	mPhoneIPAddress = receivePacket.getAddress(); 
-    	
-    	// Make a copy of the packet.  Not sure if we need to do this.  Might not hold on to it for long.
-    	byte[] mypacket = new byte[receivePacket.getLength()];
-    	System.arraycopy(receivePacket.getData(), 0, mypacket, 0, receivePacket.getLength());
-
-    	return mypacket;
+    	mPhoneIPAddress = receivePacket.getAddress();
+    	return receivePacket.getData();
     }
     
     
@@ -90,9 +113,7 @@ public class ControllerSimulator implements Runnable {
                 	ControllerData cd = new ControllerData();
                 	float m1 = (float)data[16+4+5]/100.0f;
                 	float m2 = (float)data[16+4+6]/100.0f;
-                	
-                	System.out.println("motor 1: " + m1 + " motor_2: " + m2);
-                	
+
                 	cd.setMotorSpeed(1, m1);
                 	cd.setMotorSpeed(2, m2);
                     mQueue.add(cd);
@@ -114,7 +135,31 @@ public class ControllerSimulator implements Runnable {
         }
         return sb.toString();
     }
-	
+
+    public  void requestTerminate() {
+        running = false;
+    }
+
+
+
+    public void close() {
+        try {
+            // mServerSocket.disconnect();
+            mServerSocket.close();
+            mQueue.clear();
+        } catch (Exception ex) {
+            System.out.println("An error occurred while closing!");
+            ex.printStackTrace();
+        }
+    }
+
+    public int getPacketsReceived() {
+        return packetsReceived;
+    }
+
+    public int getPacketsSent() {
+        return packetsSent;
+    }
 }
 
 

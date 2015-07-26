@@ -30,7 +30,7 @@ package coppelia;
 
 public class remoteApi
 {
-	static{	
+	static {
 		System.loadLibrary("remoteApiJava");
 	}
 
