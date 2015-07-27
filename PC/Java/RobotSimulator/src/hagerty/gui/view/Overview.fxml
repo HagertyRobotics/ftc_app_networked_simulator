@@ -68,13 +68,41 @@
                               <Label fx:id="brickSerialLabel" styleClass="label-bright" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
+                        <Pane fx:id="detailsPane" layoutX="4.0" layoutY="94.0" prefHeight="168.0" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="6.0" />
                      </children>
                   </AnchorPane>
                 <AnchorPane fx:id="buttonStartSimulator" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                      <children>
-                        <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleStartSimulatorButton" text="Start Simulator" />
-                        <Button layoutX="127.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleStartVisualizerButton" text="Start Visualizer" />
-                        <Button layoutX="14.0" layoutY="54.0" mnemonicParsing="false" onAction="#handleStartDebugButton" text="Start Debugger" />
+                        <GridPane layoutX="14.0" layoutY="26.0" prefHeight="102.0" prefWidth="342.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#handleStartSimulatorButton" text="Start Simulator">
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <Button mnemonicParsing="false" onAction="#handleStartDebugButton" text="Start Debugger" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <Button mnemonicParsing="false" onAction="#handleStartVisualizerButton" text="Start Visualizer" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets left="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <ToggleButton mnemonicParsing="false" text="ToggleButton" GridPane.columnIndex="1" />
+                           </children>
+                        </GridPane>
                      </children></AnchorPane>
               </items>
             </SplitPane>

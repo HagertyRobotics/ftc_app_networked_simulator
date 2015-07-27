@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 @XmlAccessorType(XmlAccessType.NONE)
@@ -42,4 +43,6 @@ public abstract class SimData {
 	abstract public void setupDebugGuiVbox(VBox vbox);
 
 	abstract public void populateDebugGuiVbox();
+	
+
 }

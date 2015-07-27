@@ -1,19 +1,18 @@
 package hagerty.simulator;
 
 import java.net.InetAddress;
-import java.util.Collection;
 import java.util.List;
 
 import hagerty.simulator.modules.BrickSimulator;
-import javafx.collections.ObservableList;
 
 public class RobotSimulator  {
 
-	static ModuleLister gModuleLister;
+	static BrickListGenerator gBrickListGenerator;
 	static CoppeliaApiClient gCoppeliaApiClient;
 	static public volatile boolean gThreadsAreRunning = true;
     static int gPhonePort;
     static InetAddress gPhoneIPAddress;
+    
     static boolean simulatorStarted = false;
     static boolean visualizerStarted = false;
 
@@ -27,8 +26,8 @@ public class RobotSimulator  {
 
 		// Start the module info server
     	System.out.println("Starting Module Lister...");
-        gModuleLister = new ModuleLister(mainApp);  // Runnable
-        Thread moduleListerThread = new Thread(gModuleLister,"");
+        gBrickListGenerator = new BrickListGenerator(mainApp);  // Runnable
+        Thread moduleListerThread = new Thread(gBrickListGenerator,"");
         moduleListerThread.start();
 
         // Start the individual threads for each module

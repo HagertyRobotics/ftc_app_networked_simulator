@@ -2,18 +2,12 @@ package hagerty.gui.view;
 
 import java.util.List;
 
-import coppelia.remoteApi;
 import hagerty.gui.MainApp;
-import hagerty.simulator.legacy.data.LegacyMotorSimData;
 import hagerty.simulator.modules.BrickSimulator;
-import hagerty.simulator.modules.LegacyBrickSimulator;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -76,7 +70,7 @@ public class DebugWindowController {
       	        }
       	      });
       	      i++;
-      	      Thread.sleep(1000);
+      	      Thread.sleep(500);
       	    }
 			return null;
       	  }

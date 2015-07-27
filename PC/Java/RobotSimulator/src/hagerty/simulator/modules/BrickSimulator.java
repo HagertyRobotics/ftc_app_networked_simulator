@@ -4,6 +4,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -25,9 +26,9 @@ import hagerty.simulator.legacy.data.*;
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class BrickSimulator implements Runnable {
 
-    private final StringProperty alias;
-    private IntegerProperty mPort;
-    private final StringProperty serial;
+    protected final StringProperty alias;
+    protected IntegerProperty mPort;
+    protected final StringProperty serial;
 
     int mPhonePort;
     InetAddress mPhoneIPAddress;
@@ -35,10 +36,6 @@ public abstract class BrickSimulator implements Runnable {
 
     byte[] mReceiveData = new byte[1024];
     byte[] mSendData = new byte[1024];
-
-    protected final byte[] mCurrentStateBuffer = new byte[208];
-
-    public LegacyMotorSimData mLegacyMotorSimData = new LegacyMotorSimData();
 
     /** Default Constructor.
      *
@@ -49,13 +46,6 @@ public abstract class BrickSimulator implements Runnable {
         serial = new SimpleStringProperty("");
     }
 
-    public abstract String getName();
-
-	public abstract void setupDebugGuiVbox(VBox vbox);
-	
-	public abstract void populateDebugGuiVbox();
-	
-	public abstract void fixupUnMarshaling();
 
     @Override
     public void run() {
@@ -72,28 +62,7 @@ public abstract class BrickSimulator implements Runnable {
     		e.printStackTrace();
     		close();
     	}
-
     }
-
-    public void close() {
-    	try {
-    		mServerSocket.close();
-    	} catch (Exception ex) {
-    		System.out.println("An error occurred while closing!");
-    		ex.printStackTrace();
-    	}
-    }
-
-    /*
-     ** Packet types
-     */
-	protected final byte[] writeCmd = { 85, -86, 0, 0, 0 };
-	protected final byte[] readCmd = { 85, -86, -128, 0, 0 };
-	protected final byte[] recSyncCmd3 = { 51, -52, 0, 0, 3};
-	protected final byte[] recSyncCmd0 = { 51, -52, -128, 0, 0};
-	protected final byte[] recSyncCmd208 = { 51, -52, -128, 0, (byte)208};
-	protected final byte[] controllerTypeLegacy = { 0, 77, 73};       // Controller type USBLegacyModule
-
 
     private byte[] receivePacketFromPhone() {
 
@@ -117,86 +86,28 @@ public abstract class BrickSimulator implements Runnable {
     	return mypacket;
     }
 
-
-    private void sendPacketToPhone(byte[] sendData) {
+    public void close() {
     	try {
-    		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
-        	mServerSocket.send(sendPacket);
-        	System.out.println("sendPacketToPhone: (" + bufferToHexString(sendData,0,sendData.length) + ") len=" + sendData.length);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    		mServerSocket.close();
+    	} catch (Exception ex) {
+    		System.out.println("An error occurred while closing!");
+    		ex.printStackTrace();
+    	}
     }
+    public abstract String getName();
 
+	public abstract void setupDebugGuiVbox(VBox vbox);
 
-    public void handleIncomingPacket(byte[] data, int length, boolean wait)
-    {
-    	System.out.println("Receive Buffer: (" + bufferToHexString(data,0,25) + ") len=" + data.length);
+	public abstract void populateDebugGuiVbox();
 
-    	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
-    		sendPacketToPhone(mCurrentStateBuffer);
-                // Set the Port S0 ready bit in the global part of the Current State Buffer
-                mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
-        } else {
+	public abstract void fixupUnMarshaling();
 
-	        // Write Command
-	    	// Process the received data packet
-	        // Loop through each of the 6 ports and see if the Action flag is set.
-	        // If set then copy the 32 bytes for the port into the CurrentStateBuffer
+	public abstract void populateDetailsPane(Pane pane);
 
-	        //for (int i=0;i<6;i++)
-	        int i=0;
-	        int p=16+i*32;
-	    	// This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
-	        // If I2C_ACTION is set, take some action
-	//        if (data[p+32] == (byte)0xff) { // Action flag
-	            if ((data[p] & (byte)0x01) == (byte)0x01) { // I2C Mode
-	                if ((data[p] & (byte)0x80) == (byte)0x80) { // Read mode
-	                	// Copy this port's 32 bytes into buffer
-	                	System.arraycopy(data, p, mCurrentStateBuffer, p, 32);
+	public abstract SimData findSimDataName(String name);
 
-	                } else { // Write mode
-	                	// Copy this port's 32 bytes into buffer
-	                	System.arraycopy(data, p, mCurrentStateBuffer, p, 32);
+	public abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
 
-	                	// Use the lock in the MotorData object to lock before write
-	                	mLegacyMotorSimData.lock.writeLock().lock();
-	                    try {
-		                	if (mCurrentStateBuffer[p+4+5] == (byte)0x80) {
-		                		mLegacyMotorSimData.setMotor1FloatMode(true);
-		                	} else {
-			                	float m1 = (float)mCurrentStateBuffer[p+4+5]/100.0f;
-			                	mLegacyMotorSimData.setMotor1Speed(m1);
-		                	}
-
-		                	if (mCurrentStateBuffer[p+4+6] == (byte)0x80) {
-		                		mLegacyMotorSimData.setMotor2FloatMode(true);
-		                	} else {
-			                	float m1 = (float)mCurrentStateBuffer[p+4+6]/100.0f;
-			                	mLegacyMotorSimData.setMotor2Speed(m1);
-		                	}
-	                    } finally {
-	                    	mLegacyMotorSimData.lock.writeLock().unlock();
-	                    }
-	                }
-
-	            }
-	//        }
-        }
-    }
-
-
-    private String bufferToHexString(byte[] data, int start, int length) {
-        int i;
-        int myStop;
-        StringBuilder sb = new StringBuilder();
-        //byte [] subArray = Arrays.copyOfRange(a, 4, 6);
-        myStop = (length > data.length) ? data.length : length;
-        for (i=start; i<start+myStop; i++) {
-            sb.append(String.format("%02x ", data[i]));
-        }
-        return sb.toString();
-    }
 
 
     //---------------------------------------------------------------

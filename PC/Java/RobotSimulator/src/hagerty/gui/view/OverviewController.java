@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
 
 public class OverviewController {
     @FXML
@@ -24,14 +25,11 @@ public class OverviewController {
     @FXML
     private Label brickNameLabel;
     @FXML
-    private Label brickIPAddressLabel;
-    @FXML
     private Label brickPortLabel;
     @FXML
     private Label brickSerialLabel;
-
     @FXML
-    private Label mylabel;
+    private Pane detailsPane;
 
 
 
@@ -56,7 +54,7 @@ public class OverviewController {
         brickNameColumn.setCellValueFactory(new PropertyValueFactory<BrickSimulator,String>("name"));
         brickAliasColumn.setCellValueFactory(cellData -> cellData.getValue().aliasProperty());
 
-        // Clear brick details.
+        // Show brick details in the Details window.
         showBrickDetails(null);
 
         // Listen for selection changes and show the brick details when changed.
@@ -90,12 +88,16 @@ public class OverviewController {
             brickNameLabel.setText(brick.getAlias());
             brickPortLabel.setText(brick.getPort().toString());
             brickSerialLabel.setText(brick.getSerial());
+            detailsPane.getChildren().clear();
+            brick.populateDetailsPane(detailsPane);
         } else {
             // Brick is null, remove all the text.
             brickNameLabel.setText("");
             brickPortLabel.setText("");
             brickSerialLabel.setText("");
         }
+
+
     }
 
     /**

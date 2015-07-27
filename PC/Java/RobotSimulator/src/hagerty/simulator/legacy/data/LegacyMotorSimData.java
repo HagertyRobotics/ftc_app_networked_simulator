@@ -7,7 +7,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -34,10 +36,60 @@ public class LegacyMotorSimData extends SimData {
     protected void construct() {
         System.out.println("Building Legacy Motor SimData");
     }
-    
+
+
+
+    public void processBuffer(int port, byte[] packet, byte[] mCurrentStateBuffer ) {
+        int p;
+
+        p=16+port*32;
+    	// This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
+        // If I2C_ACTION is set, take some action
+//        if (packet[p+32] == (byte)0xff) { // Action flag
+            if ((packet[p] & (byte)0x01) == (byte)0x01) { // I2C Mode
+                if ((packet[p] & (byte)0x80) == (byte)0x80) { // Read mode
+                	// Copy this port's 32 bytes into buffer
+                	System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
+
+                } else { // Write mode
+                	// Copy this port's 32 bytes into buffer
+                	System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
+
+                	// Use the lock in the MotorData object to lock before write
+                	super.lock.writeLock().lock();
+                    try {
+	                	if (mCurrentStateBuffer[p+4+5] == (byte)0x80) {
+	                		mMotor1FloatMode=true;
+	                		mMotor1Speed=0.0f;
+	                	} else {
+		                	float m1 = (float)mCurrentStateBuffer[p+4+5]/100.0f;
+		                	mMotor1Speed=m1;
+	                	}
+
+	                	if (mCurrentStateBuffer[p+4+6] == (byte)0x80) {
+	                		mMotor2FloatMode=true;
+	                		mMotor2Speed=0.0f;
+	                	} else {
+		                	float m1 = (float)mCurrentStateBuffer[p+4+6]/100.0f;
+		                	mMotor2Speed=m1;
+	                	}
+                    } finally {
+                    	super.lock.writeLock().unlock();
+                    }
+                }
+
+            }
+    }
+
+
+//
+// GUI Routines
+//
+
 	public void populateDebugGuiVbox() {
 		mMotor1SpeedDebugLabel.setText("" + mMotor1Speed);
 		mMotor2SpeedDebugLabel.setText("" + mMotor2Speed);
+		//System.out.println("Populate Debug Gui VBox " + mMotor1Speed + " " + mMotor2Speed);
 	}
 
 	public void setupDebugGuiVbox(VBox vbox) {
@@ -76,31 +128,12 @@ public class LegacyMotorSimData extends SimData {
 	}
 
 
-
 	public float getMotor1Speed() {
 		return mMotor1Speed;
 	}
 
 	public float getMotor2Speed() {
 		return mMotor2Speed;
-	}
-
-	public void setMotor1Speed(float motorSpeed){
-		mMotor1Speed = motorSpeed;
-	}
-
-	public void setMotor2Speed(float motorSpeed){
-		mMotor2Speed = motorSpeed;
-	}
-
-	public void setMotor1FloatMode(boolean floatMode) {
-		mMotor1FloatMode = floatMode;
-		setMotor1Speed(0.0f);
-	}
-
-	public void setMotor2FloatMode(boolean floatMode) {
-		mMotor2FloatMode = floatMode;
-		setMotor2Speed(0.0f);
 	}
 
 	public boolean getMotor1FloatMode() {

@@ -5,10 +5,8 @@ import hagerty.simulator.modules.BrickSimulator;
 import hagerty.simulator.modules.LegacyBrickSimulator;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
@@ -122,7 +120,7 @@ public class EditLegacyDialogController extends EditDialogController {
             	lb.getPortType()[i] = (SimDataType)legacyChoiceBoxes[i].getSelectionModel().getSelectedItem();
             	lb.getPortName()[i] = legacyPortNames[i].getText();
         	}
-            
+
             lb.fixupUnMarshaling();
 
             okClicked = true;

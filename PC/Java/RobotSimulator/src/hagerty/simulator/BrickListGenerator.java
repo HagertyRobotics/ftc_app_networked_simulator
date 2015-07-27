@@ -17,7 +17,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-public class ModuleLister implements Runnable {
+public class BrickListGenerator implements Runnable {
 
 
     DatagramSocket mServerSocket;
@@ -30,12 +30,12 @@ public class ModuleLister implements Runnable {
     /** Default Constructor.
      *
      */
-    public ModuleLister(hagerty.gui.MainApp mainApp) {
+    public BrickListGenerator(hagerty.gui.MainApp mainApp) {
 
     	mMainApp = mainApp;
 
         try {
-        	mServerSocket = new DatagramSocket(5500);
+        	mServerSocket = new DatagramSocket(7000);
         } catch (IOException e) {
             e.printStackTrace();
         }
