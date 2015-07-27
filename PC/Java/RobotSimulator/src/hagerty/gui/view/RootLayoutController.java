@@ -102,7 +102,7 @@ public class RootLayoutController {
     @FXML
     private void handleAbout() {
     	Alert alert = new Alert(AlertType.INFORMATION);
-    	alert.setTitle("AddressApp");
+    	alert.setTitle("FTC Simulator");
     	alert.setHeaderText("About");
     	alert.setContentText("Author: Hagerty High School");
 
