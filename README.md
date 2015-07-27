@@ -9,6 +9,7 @@ The goal of this project is to create a standalone app that will replace the USB
   * Version: 1.2.1.1
 * Eclipse 
   * Version: Mars Release (4.5.0)
+  * Need JavaFX; use http://efxclipse.bestsolution.at/install.html#all-in-one for pre-packaged install.
 * V-Rep Pro EDU
   * Version: 3.2.1
   * Vendor: Coppelia Robotics
@@ -20,6 +21,11 @@ The goal of this project is to create a standalone app that will replace the USB
 ## Getting Started
 
 ### Download / Clone
+Windows: Download Git for Windows from:
+```bash
+https://windows.github.com
+```
+and follow the remaining steps in the Git Shell.
 
 Clone the repo using Git:
 
