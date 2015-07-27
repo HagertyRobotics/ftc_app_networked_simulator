@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class FT_Device
 {
@@ -52,6 +53,37 @@ public class FT_Device
 
     }
 
+    private int getPacketFromPC(byte[] data, int length, long wait_ms) {
+        int rc = 0;
+        byte[] packet;
+
+        try {
+            packet = (byte[])mReadFromPcQueue.poll(wait_ms, TimeUnit.MILLISECONDS);
+
+            // If timed out waiting for packet then return the last packet that was read
+            if (packet==null) {
+                System.arraycopy(mCurrentStateBuffer, 0, data, 0, 208);
+                rc = length;
+            } else {
+                System.arraycopy(packet, 0, data, 0, length);                   // return the packet
+                System.arraycopy(packet, 0, mCurrentStateBuffer, 0, length);    // Save in case we lose a packet
+                rc = length;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return rc;
+    }
+
+    private void sendPacketToPC(byte[] data, int start, int length) {
+        byte[] tempBytes = new byte[length];
+        System.arraycopy(data, start, tempBytes, 0, length);
+        tempBytes[1] =(byte)mPacketCount;   // Add a counter so we can see lost packets
+        mPacketCount++;
+        mWriteToPcQueue.add(tempBytes);
+    }
+
     public int read(byte[] data, int length, long wait_ms)
     {
         int rc = 0;
@@ -62,21 +94,21 @@ public class FT_Device
             return -2;
         }
 
-        try
-        {
-            this.writeLocked = true;
 
-            if (!this.readQueue.isEmpty()) {
-                localObject1 = this.readQueue.poll();
-                if (localObject1 == null)
-                    return rc;
+        // Check onboard read queue and see if we have a override
+        // Use this packet instead of reading one from the network
+        if (!this.readQueue.isEmpty()) {
+            localObject1 = this.readQueue.poll();
+            if (localObject1 == null)
+                return rc;
 
-                System.arraycopy(((CacheWriteRecord)localObject1).data, 0, data, 0, length);
-                rc = length;
-            }
-        } finally {
-            this.writeLocked = false;
+            System.arraycopy(((CacheWriteRecord)localObject1).data, 0, data, 0, length);
+            rc = length;
+        } else {
+            rc = getPacketFromPC(data, length, wait_ms);
         }
+
+        Log.v("Legacy", "READ(): Buffer len=" + length + " (" + bufferToHexString(data,0,length) + ")");
 
         return rc;
     }
@@ -106,6 +138,8 @@ public class FT_Device
             return rc;
         }
 
+        Log.v("Legacy", "WRITE(): Buffer len=" + length + " (" + bufferToHexString(data,0,length) + ")");
+
         // Write Command
         if (data[0] == writeCmd[0] && data[2] == writeCmd[2]) {  // writeCmd
 
@@ -113,28 +147,16 @@ public class FT_Device
             // If size is 208(0xd0) bytes then they are writing a full buffer of data to all ports.
             // Note: the buffer we were giving in this case is 208+5 bytes because the "writeCmd" header is attached
             if (data[4] == (byte)0xd0 ) {
-                //Log.v("Legacy", "WRITE: Write Header (" + bufferToHexString(data,0,5) + ") len=" + length);
-                queueUpForReadFromPhone(recSyncCmd0); // Reply, we got your writeCmd
 
-                //Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5 + 16 + 4, 20) + ") len=" + length);
-                //Log.v("Legacy", "WRITE: Write Buffer FLAGS 0=" + bufferToHexString(data,5+0,3) + " 16=" + bufferToHexString(data,5+16,4) + "47=" + bufferToHexString(data,5+47,1));
-                Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5 + 16 + 4 + 5, 2) + ") flag=" + data[5+47]);
+                queueUpForReadFromPhone(recSyncCmd0); // Reply, we got your writeCmd
 
                 // Now, the reset of the buffer minus the 5 header bytes should be 208 (0xd0) bytes.
                 // These 208 bytes need to be written to the connected module.
                 // Write the entire received buffer into the mCurrentState buffer.
                 // We will use this buffer when the ftc_app askes for the current state of the module.
-                //
-                // Note: the buffer we were giving in this case is 208+5 bytes because the "writeCmd" header is attached
-                System.arraycopy(data, 5, mCurrentStateBuffer, 0, 208);
 
-                // Write the mCurrentStateBuffer to the NetworkManager queue to be sent to the PC Simulator
-                byte[] tempBytes = new byte[208];
-                System.arraycopy(mCurrentStateBuffer, 0, tempBytes, 0, 208);
-                tempBytes[1] =(byte)mPacketCount;
-                mPacketCount++;
-                mWriteToPcQueue.add(tempBytes);
-                Log.v("Legacy", "WRITE: Write Buffer S0 (" + bufferToHexString(data, 5 + 16 + 4 + 5, 2) + ") flag=" + data[5 + 47] + "remain: " + mWriteToPcQueue.remainingCapacity());
+                // Write the 208 buffer to the NetworkManager queue to be sent to the PC Simulator
+                sendPacketToPC(data, 5, 208);
 
                 // Check delta time to see if we are too slow in our simulation.
                 // Baud rate was 250,000 with real USB port connected to module
@@ -151,13 +173,11 @@ public class FT_Device
             // Read Command
         } else if (data[0] == readCmd[0] && data[2] == readCmd[2]) { // readCmd
             if (data[4] == 3) { // Android asks for 3 bytes, initial query of device type
-                //Log.v("Legacy", "WRITE: Read Header (" + bufferToHexString(data,0,length) + ") len=" + length);
                 queueUpForReadFromPhone(recSyncCmd3);  // Send receive sync, bytes to follow
                 queueUpForReadFromPhone(controllerTypeLegacy);
             } else if (data[4] == (byte)208) { // Android asks for 208 bytes, full read of device
-                //Log.v("Legacy", "WRITE: Read Header (" + bufferToHexString(data,0,length) + ") len=" + length);
-                queueUpForReadFromPhone(recSyncCmd208);  // Send receive sync, bytes to follow
-                queueUpForReadFromPhone(mCurrentStateBuffer); //
+                queueUpForReadFromPhone(recSyncCmd208);  // Send receive sync loop back
+                sendPacketToPC(data,0,5);   // Send the actual message to the PC so it can respond
             }
         }
 

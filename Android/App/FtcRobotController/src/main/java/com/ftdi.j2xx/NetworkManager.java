@@ -85,7 +85,9 @@ public class NetworkManager {
                     System.arraycopy(receivePacket.getData(), 0, readBuffer, 0, receivePacket.getLength());
                     Log.v("D2xx::", "Receive: " + readBuffer[0] + "Len: " + receivePacket.getLength());
                     queue.put(readBuffer);
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
