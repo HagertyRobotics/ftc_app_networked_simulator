@@ -14,27 +14,23 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class NetworkManager {
 
-    // the Server's Port
-    public static final int PHONEPORT  = 6000;
-    public static final String PC_IP_ADDRESS  = "192.168.11.6";
-
-    DatagramSocket mSimulatorSocket;
+    DatagramSocket mSocket;
     LinkedBlockingQueue mWriteToPcQueue = new LinkedBlockingQueue();
     LinkedBlockingQueue mReadFromPcQueue = new LinkedBlockingQueue();
 
 
-    public NetworkManager() {
+    public NetworkManager(String ipAddress, int port) {
         // Start the Network Sender thread
         // This thread will read from the mWriteToPcQueue and send packets to the PC application
         // The mWriteToPcQueue will get packets from the FT_Device write call
         try {
-            mSimulatorSocket = new DatagramSocket(PHONEPORT);
-            Log.v("D2xx::", "Local Port " + mSimulatorSocket.getLocalPort());
-            NetworkSender myNetworkSender = new NetworkSender(mWriteToPcQueue, mSimulatorSocket);  // Runnable
+            mSocket = new DatagramSocket(port);
+            Log.v("D2xx::", "Local Port " + mSocket.getLocalPort());
+            NetworkSender myNetworkSender = new NetworkSender(mWriteToPcQueue, ipAddress, mSocket, port);  // Runnable
             Thread networkSenderThread = new Thread(myNetworkSender);
             networkSenderThread.start();
 
-            NetworkReceiver myNetworkReceiver = new NetworkReceiver(mReadFromPcQueue, mSimulatorSocket);
+            NetworkReceiver myNetworkReceiver = new NetworkReceiver(mReadFromPcQueue, mSocket);
             Thread networkReceiverThread = new Thread(myNetworkReceiver);
             networkReceiverThread.start();
         } catch (IOException e) {
@@ -107,13 +103,15 @@ public class NetworkManager {
 
         DatagramSocket mSocket;
         InetAddress IPAddress;
+        int mDestPort;
 
-        public NetworkSender(LinkedBlockingQueue queue, DatagramSocket mySocket) {
+        public NetworkSender(LinkedBlockingQueue queue, String ipAddress, DatagramSocket mySocket, int destPort) {
             this.queue = queue;
             this.mSocket = mySocket;
+            this.mDestPort = destPort;
 
             try {
-                IPAddress = InetAddress.getByName(PC_IP_ADDRESS);
+                IPAddress = InetAddress.getByName(ipAddress);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -127,7 +125,7 @@ public class NetworkManager {
             while (true) {
                 try {
                     writeBuf = (byte[])queue.take();
-                    DatagramPacket send_packet = new DatagramPacket(writeBuf,writeBuf.length, IPAddress, 6500);
+                    DatagramPacket send_packet = new DatagramPacket(writeBuf,writeBuf.length, IPAddress, mDestPort);
                     mSocket.send(send_packet);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
