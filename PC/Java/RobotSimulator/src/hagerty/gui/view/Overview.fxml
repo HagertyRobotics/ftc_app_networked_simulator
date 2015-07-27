@@ -100,7 +100,6 @@
                                     <Insets left="10.0" />
                                  </GridPane.margin>
                               </Button>
-                              <ToggleButton mnemonicParsing="false" text="ToggleButton" GridPane.columnIndex="1" />
                            </children>
                         </GridPane>
                      </children></AnchorPane>
