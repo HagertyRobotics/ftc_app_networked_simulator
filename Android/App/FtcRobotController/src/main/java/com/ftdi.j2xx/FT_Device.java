@@ -1,16 +1,15 @@
 package com.ftdi.j2xx;
 
-import android.util.Log;
-
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class FT_Device
+abstract public class FT_Device
 {
     private static final String TAG = "FTDI_Device::";
     D2xxManager.FtDeviceInfoListNode mDeviceInfoNode;
+    String mFT_DeviceDescription;
     String mySerialNumber;
     int mMotor1Encoder;  // Simulate motor 1 encoder.  Increment each write.
     int mMotor2Encoder;  // Simulate motor 2 encoder.  Increment each write.
@@ -34,15 +33,16 @@ public class FT_Device
     protected final Queue<CacheWriteRecord> readQueue = new ConcurrentLinkedQueue();
     protected volatile boolean writeLocked = false;
 
-    public FT_Device(String serialNumber, String description)
+    public FT_Device(String serialNumber, String description, String ipAddress, int port)
     {
         int i;
         mDeviceInfoNode = new D2xxManager.FtDeviceInfoListNode();
 
         mDeviceInfoNode.serialNumber = serialNumber;
         mDeviceInfoNode.description = description;
+        mFT_DeviceDescription = description;  // for use in log
 
-        mNetworkManager = new NetworkManager();
+        mNetworkManager = new NetworkManager(ipAddress, port);
         mReadFromPcQueue = mNetworkManager.getReadFromPcQueue();
         mWriteToPcQueue = mNetworkManager.getWriteToPcQueue();
     }
@@ -62,7 +62,7 @@ public class FT_Device
 
             // If timed out waiting for packet then return the last packet that was read
             if (packet==null) {
-                System.arraycopy(mCurrentStateBuffer, 0, data, 0, 208);
+                System.arraycopy(mCurrentStateBuffer, 0, data, 0, length);
                 rc = length;
             } else {
                 System.arraycopy(packet, 0, data, 0, length);                   // return the packet
@@ -76,7 +76,7 @@ public class FT_Device
         return rc;
     }
 
-    private void sendPacketToPC(byte[] data, int start, int length) {
+    protected void sendPacketToPC(byte[] data, int start, int length) {
         byte[] tempBytes = new byte[length];
         System.arraycopy(data, start, tempBytes, 0, length);
         tempBytes[1] =(byte)mPacketCount;   // Add a counter so we can see lost packets
@@ -108,7 +108,7 @@ public class FT_Device
             rc = getPacketFromPC(data, length, wait_ms);
         }
 
-        Log.v("Legacy", "READ(): Buffer len=" + length + " (" + bufferToHexString(data,0,length) + ")");
+        //Log.v(mFT_DeviceDescription, "READ(): Buffer len=" + length + " (" + bufferToHexString(data,0,length) + ")");
 
         return rc;
     }
@@ -119,74 +119,9 @@ public class FT_Device
         this.readQueue.add(new CacheWriteRecord(data));
     }
 
-    /*
-    ** Packet types
-    */
-    protected final byte[] writeCmd = { 85, -86, 0, 0, 0 };
-    protected final byte[] readCmd = { 85, -86, -128, 0, 0 };
-    protected final byte[] recSyncCmd3 = { 51, -52, 0, 0, 3};
-    protected final byte[] recSyncCmd0 = { 51, -52, -128, 0, 0};
-    protected final byte[] recSyncCmd208 = { 51, -52, -128, 0, (byte)208};
-    protected final byte[] controllerTypeLegacy = { 0, 77, 73};       // Controller type USBLegacyModule
-
-    public int write(byte[] data, int length, boolean wait)
-    {
-
-        int rc = 0;
-
-        if (length <= 0) {
-            return rc;
-        }
-
-        Log.v("Legacy", "WRITE(): Buffer len=" + length + " (" + bufferToHexString(data,0,length) + ")");
-
-        // Write Command
-        if (data[0] == writeCmd[0] && data[2] == writeCmd[2]) {  // writeCmd
 
 
-            // If size is 208(0xd0) bytes then they are writing a full buffer of data to all ports.
-            // Note: the buffer we were giving in this case is 208+5 bytes because the "writeCmd" header is attached
-            if (data[4] == (byte)0xd0 ) {
-
-                queueUpForReadFromPhone(recSyncCmd0); // Reply, we got your writeCmd
-
-                // Now, the reset of the buffer minus the 5 header bytes should be 208 (0xd0) bytes.
-                // These 208 bytes need to be written to the connected module.
-                // Write the entire received buffer into the mCurrentState buffer.
-                // We will use this buffer when the ftc_app askes for the current state of the module.
-
-                // Write the 208 buffer to the NetworkManager queue to be sent to the PC Simulator
-                sendPacketToPC(data, 5, 208);
-
-                // Check delta time to see if we are too slow in our simulation.
-                // Baud rate was 250,000 with real USB port connected to module
-                // We are getting deltas of 31ms between each write call
-//                mTimeInMilliseconds = SystemClock.uptimeMillis();
-//                mDeltaWriteTime = mTimeInMilliseconds - mOldTimeInMilliseconds;
-//                mOldTimeInMilliseconds = mTimeInMilliseconds;
-//                Log.v("Legacy", "WRITE: Delta Time = " + mDeltaWriteTime);
-
-                // Set the Port S0 ready bit in the global part of the Current State Buffer
-                mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
-
-            }
-            // Read Command
-        } else if (data[0] == readCmd[0] && data[2] == readCmd[2]) { // readCmd
-            if (data[4] == 3) { // Android asks for 3 bytes, initial query of device type
-                queueUpForReadFromPhone(recSyncCmd3);  // Send receive sync, bytes to follow
-                queueUpForReadFromPhone(controllerTypeLegacy);
-            } else if (data[4] == (byte)208) { // Android asks for 208 bytes, full read of device
-                queueUpForReadFromPhone(recSyncCmd208);  // Send receive sync loop back
-                sendPacketToPC(data,0,5);   // Send the actual message to the PC so it can respond
-            }
-        }
-
-        rc = length;
-        return rc;
-    }
-
-
-    private String bufferToHexString(byte[] data, int start, int length) {
+    protected String bufferToHexString(byte[] data, int start, int length) {
         int i;
         int myStop;
         StringBuilder sb = new StringBuilder();
@@ -213,6 +148,8 @@ public class FT_Device
         long l=0;
         return read(data, data.length,l);
     }
+
+    abstract public int write(byte[] data, int length, boolean wait);
 
     public int write(byte[] data, int length)
     {

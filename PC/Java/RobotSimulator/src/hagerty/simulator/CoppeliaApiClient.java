@@ -1,11 +1,15 @@
-import java.util.concurrent.LinkedBlockingQueue;
+package hagerty.simulator;
+
+import java.util.List;
 
 import coppelia.IntW;
 import coppelia.IntWA;
 import coppelia.remoteApi;
+import hagerty.simulator.legacy.data.LegacyMotorSimData;
+import hagerty.simulator.legacy.data.SimData;
+import hagerty.simulator.modules.BrickSimulator;
 
 public class CoppeliaApiClient implements Runnable {
-
 
 	long mStartTime;
 	IntWA mObjectHandles;
@@ -13,12 +17,10 @@ public class CoppeliaApiClient implements Runnable {
 	IntW mRightMotor;
 	int mClientID;
 	remoteApi mVrep;
-	private LinkedBlockingQueue<ControllerData> mQueue;
-	volatile boolean mRun=false;
+	hagerty.gui.MainApp mMainApp;
 
-	public CoppeliaApiClient(LinkedBlockingQueue<ControllerData> queue) {
-		mQueue = queue;
-
+	public CoppeliaApiClient(hagerty.gui.MainApp mainApp) {
+		mMainApp = mainApp;
 	}
 
 	public boolean init() {
@@ -63,9 +65,6 @@ public class CoppeliaApiClient implements Runnable {
 
 	}
 
-	void setRun(boolean run) {
-		mRun=run;
-	}
 
     @Override
     public void run()
@@ -74,28 +73,35 @@ public class CoppeliaApiClient implements Runnable {
 		float leftMotorSpeed=0;
 		float rightMotorSpeed=0;
 
+		/*
+		 * Read the current list of modules from the GUI MainApp class
+		 */
+		SimData simData=null;
+        List<BrickSimulator> brickList = mMainApp.getBrickData();
+        for (BrickSimulator currentBrick : brickList) {
+        	simData = currentBrick.findSimDataName("Wheels");
+        	if (simData != null) break;
+		}
+
+        if (simData == null) {
+        	System.out.println("Failed to find a module name 'Wheels'");
+        	done = true;
+        }
 
 		while (!done)
 		{
+			simData.lock.readLock().lock();
+	        try {
+	            leftMotorSpeed = ((LegacyMotorSimData)simData).getMotor1Speed() * 3.14f;
+	            rightMotorSpeed = ((LegacyMotorSimData)simData).getMotor2Speed() * 3.14f;
+	        } finally {
+	        	simData.lock.readLock().unlock();
+	        }
 
-			if (mRun) {
-				ControllerData cd;
-				try {
-					cd = mQueue.take();
-					leftMotorSpeed = cd.getMotorSpeed(1) * 3.14f;
-					rightMotorSpeed = cd.getMotorSpeed(2) * 3.14f;
-
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				System.out.println("motor 1: " + leftMotorSpeed + " motor_2: " + rightMotorSpeed +" Count: " + mQueue.remainingCapacity());
-
-				mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotor.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
-				mVrep.simxSetJointTargetVelocity(mClientID,mRightMotor.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);
-			}
+			mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotor.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
+			mVrep.simxSetJointTargetVelocity(mClientID,mRightMotor.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);
 		}
+
 
 		// Before closing the connection to V-REP, make sure that the last command sent out had time to arrive. You can guarantee this with (for example):
 		IntW pingTime = new IntW(0);
@@ -104,5 +110,5 @@ public class CoppeliaApiClient implements Runnable {
 		// Now close the connection to V-REP:
 		mVrep.simxFinish(mClientID);
 	}
-
 }
+
