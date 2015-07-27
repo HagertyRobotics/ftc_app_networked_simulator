@@ -1,6 +1,5 @@
 package org.ftccommunity.simulator;
 
-import java.io.Console;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class RobotSimulator

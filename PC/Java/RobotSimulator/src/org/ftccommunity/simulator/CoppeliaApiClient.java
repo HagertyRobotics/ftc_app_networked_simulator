@@ -7,14 +7,16 @@ import coppelia.remoteApi;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class CoppeliaApiClient {
-    private static final int MILLI_SECOND_TIMEOUT = 5000;
-    public static String LOCAL_HOST = "127.0.0.1";
+    public static final String LOCAL_HOST = "127.0.0.1";
     public static final boolean WAIT_UNTIL_CONNECTED = true;
     public static final boolean DO_NOT_RECONNECT_ONCE_DISCONNECTED = true;
     public static final int THREAD_CYCLE_IN_MS = 50;
+    private static final int MILLI_SECOND_TIMEOUT = 5000;
+    final int CONNECT_PORT = 5000;
+
 
     long mStartTime;
-	IntWA mObjectHandles;
+    IntWA mObjectHandles;
 
 	IntW mLeftMotor;
 	IntW mRightMotor;
@@ -41,14 +43,12 @@ public class CoppeliaApiClient {
             LOCAL_HOST = "127.0.0.1";
         }*/
 
-        LOCAL_HOST = "127.0.0.1";
 	}
 	
 	public boolean init() {
 		mVrep = new remoteApi();
 		mVrep.simxFinish(-1); // just in case, close all opened connections
 
-        final int CONNECT_PORT = 5000;
 
         mClientID = mVrep.simxStart(LOCAL_HOST,
                 CONNECT_PORT, WAIT_UNTIL_CONNECTED,

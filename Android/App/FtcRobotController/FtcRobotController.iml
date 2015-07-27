@@ -91,8 +91,12 @@
     <orderEntry type="library" exported="" name="RobotCore-release-" level="project" />
     <orderEntry type="library" exported="" name="ModernRobotics-release-" level="project" />
     <orderEntry type="library" exported="" name="WirelessP2p-release-" level="project" />
+    <orderEntry type="library" exported="" name="guava-19.0-rc1" level="project" />
     <orderEntry type="library" exported="" name="Analytics-release-" level="project" />
     <orderEntry type="library" exported="" name="android-support-v4" level="project" />
+    <orderEntry type="library" exported="" name="javassist-3.18.2-GA" level="project" />
+    <orderEntry type="library" exported="" name="reflections-0.9.10" level="project" />
+    <orderEntry type="library" exported="" name="annotations-2.0.1" level="project" />
     <orderEntry type="library" exported="" name="FtcCommon-release-" level="project" />
   </component>
 </module>
