@@ -1,10 +1,10 @@
-import java.net.InetAddress;
-import java.util.concurrent.LinkedBlockingQueue;
+package org.ftccommunity.simulator;
 
 import coppelia.IntW;
 import coppelia.IntWA;
 import coppelia.remoteApi;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class CoppeliaApiClient {
     private static final int MILLI_SECOND_TIMEOUT = 5000;

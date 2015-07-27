@@ -1,5 +1,6 @@
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+package org.ftccommunity.simulator;
 
+import java.io.Console;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class RobotSimulator
@@ -28,7 +29,29 @@ public class RobotSimulator
             if (client.init()) {
                 System.out.println("Done!");
                 simulatorThread.start();
-                client.loop();
+
+                Thread clientThread = new Thread(new ClientRunner(client));
+                clientThread.start();
+
+                long totalPackets = 0;
+                int packetsReceivedPerSecond;
+                double packetsReceivedAvg;
+                int secondCounter=0;
+                while (!Thread.currentThread().isInterrupted()) {
+                    Thread.sleep(1000);
+                    secondCounter++;
+
+                    packetsReceivedPerSecond = simulator.getPacketsReceived();
+                    totalPackets += packetsReceivedPerSecond;
+
+                    packetsReceivedAvg = (double) totalPackets / secondCounter;
+                    System.out.println("Status: " + "GOOD" +
+                            "\tPackets sent: " + simulator.getPacketsSent() +
+                            "\tPacket received: " + packetsReceivedPerSecond +
+                            "\tAverage # of packets received: " + Math.round(packetsReceivedAvg));
+                    simulator.resetCount();
+
+                }
             } else {
                 System.out.println("Failed!");
                 simulator.close();
@@ -46,7 +69,7 @@ public class RobotSimulator
             } catch (InterruptedException e) {
                 System.out.println("Interruption acknowledged!");
             }
-        } catch (java.lang.UnsatisfiedLinkError libraryNotFound){
+        } catch (UnsatisfiedLinkError libraryNotFound){
             System.out.println("I could not find the 'remoteApiJava.dll' in the system PATH or the current directory.");
             simulator.close();
             try {
@@ -67,5 +90,6 @@ public class RobotSimulator
         System.out.println("Done!");
         System.out.println("Program ended");
 	}
+
 }
 			

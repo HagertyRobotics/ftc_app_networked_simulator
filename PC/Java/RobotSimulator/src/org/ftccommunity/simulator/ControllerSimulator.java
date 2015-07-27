@@ -1,9 +1,10 @@
-import javafx.application.Application;
+package org.ftccommunity.simulator;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static java.lang.Thread.currentThread;
@@ -57,10 +58,11 @@ public class ControllerSimulator implements Runnable {
 
         try {
             while(!currentThread().isInterrupted() && running) {
-                System.out.print("Waiting for packet...");
+                // System.out.print("Waiting for packet...");
                 packet = receivePacketFromPhone();
                 handleIncomingPacket(packet, packet.length, false);
-                System.out.println("Received!");
+                Thread.sleep(10);
+                 //System.out.println("Received!");
             }
             //Catch unhandled exceptions and cleanup
         } catch (Exception e) {
@@ -76,7 +78,9 @@ public class ControllerSimulator implements Runnable {
     	DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
     	try {
     		mServerSocket.receive(receivePacket);
-        } catch (IOException e) {
+        } catch (SocketException ex) {
+            ex.getMessage();
+        }  catch (IOException e) {
             e.printStackTrace();
         }
     	
@@ -85,6 +89,8 @@ public class ControllerSimulator implements Runnable {
     	// TODO: do we need to set this every time?
     	mPhonePort = receivePacket.getPort();
     	mPhoneIPAddress = receivePacket.getAddress();
+
+        packetsReceived++;
     	return receivePacket.getData();
     }
     
@@ -116,7 +122,20 @@ public class ControllerSimulator implements Runnable {
 
                 	cd.setMotorSpeed(1, m1);
                 	cd.setMotorSpeed(2, m2);
-                    mQueue.add(cd);
+                    for (int i=0; i<3; i++) {
+                        try {
+                            mQueue.add(cd);
+                            break;
+                        } catch (java.lang.IllegalStateException ex) {
+                            System.out.print("An error occurred while trying to add to queue. Retrying...");
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException interrupt) {
+                                Thread.currentThread().interrupt();
+                                break;
+                            }
+                        }
+                    }
 //                }
 //            }
 //        }
@@ -153,12 +172,17 @@ public class ControllerSimulator implements Runnable {
         }
     }
 
-    public int getPacketsReceived() {
+    public synchronized int getPacketsReceived() {
         return packetsReceived;
     }
 
-    public int getPacketsSent() {
+    public synchronized int getPacketsSent() {
         return packetsSent;
+    }
+
+    public synchronized void resetCount() {
+        packetsSent = 0;
+        packetsReceived = 0;
     }
 }
 
