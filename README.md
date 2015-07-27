@@ -61,6 +61,7 @@ In the repo you'll find the following directories and files.
 * Open Eclipse and import PC/Java/RobotSimulator
   * Compile and Run RobotSimulator  
     * Robot Simulator will listen on the socket selected in the GUI for incoming packets from the Phone and forward motor commands to the V-Rep simulator
+    * Press the "Start Simulator" button to start the simulation.
 * Open the Driver Control Station App on a 2nd Phone and start ether the TestOp or the TestTankOp commands.  
   * The TestTankOp Mode requires a joystick connected with a OTG cable.
   * The TestOp will increment both motors in a loop.  This will currently show the bug where the 2nd motor write will overwrite the first and the robot will drive in circles.
