@@ -9,6 +9,7 @@ The goal of this project is to create a standalone app that will replace the USB
   * Version: 1.2.1.1
 * Eclipse 
   * Version: Mars Release (4.5.0)
+  * Need JavaFX; use http://efxclipse.bestsolution.at/install.html#all-in-one for pre-packaged install.
 * V-Rep Pro EDU
   * Version: 3.2.1
   * Vendor: Coppelia Robotics
@@ -20,6 +21,11 @@ The goal of this project is to create a standalone app that will replace the USB
 ## Getting Started
 
 ### Download / Clone
+Windows: Download Git for Windows from:
+```bash
+https://windows.github.com
+```
+and follow the remaining steps in the Git Shell.
 
 Clone the repo using Git:
 
@@ -45,7 +51,7 @@ In the repo you'll find the following directories and files.
 ### Build
 
 * Use Android Studio to open existing project and point to Android/App.
-  * Change PC_IP_ADDRESS define to your PC's address in file: FtcRobotController/src/main/java/com/ftdi.j2xx/NetworkManager.java
+  * Change PC_IP_ADDRESS define to your PC's address in file: FtcRobotController/src/main/java/com/ftdi.j2xx/D2xxManager.java
   * Compile and run the app
     * Setup the newly found legacy controller with two motors "motor_1" and "motor_2"
     * Save configuration
@@ -54,7 +60,7 @@ In the repo you'll find the following directories and files.
 * Open V-Rep simulator and open scene file PC/V-rep/FTCRobot.ttt
 * Open Eclipse and import PC/Java/RobotSimulator
   * Compile and Run RobotSimulator  
-    * Robot Simulator will listen on socket 6500 for incoming packets from the Phone and forward motor commands to the V-Rep simulator
+    * Robot Simulator will listen on the socket selected in the GUI for incoming packets from the Phone and forward motor commands to the V-Rep simulator
 * Open the Driver Control Station App on a 2nd Phone and start ether the TestOp or the TestTankOp commands.  
   * The TestTankOp Mode requires a joystick connected with a OTG cable.
   * The TestOp will increment both motors in a loop.  This will currently show the bug where the 2nd motor write will overwrite the first and the robot will drive in circles.
