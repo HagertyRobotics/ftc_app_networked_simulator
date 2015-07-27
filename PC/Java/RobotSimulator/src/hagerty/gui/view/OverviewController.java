@@ -3,8 +3,6 @@ package hagerty.gui.view;
 import hagerty.gui.MainApp;
 import hagerty.simulator.RobotSimulator;
 import hagerty.simulator.modules.BrickSimulator;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
