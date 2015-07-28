@@ -1,24 +1,18 @@
 package hagerty.simulator.modules;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import hagerty.simulator.legacy.data.LegacyMotorSimData;
+import hagerty.simulator.legacy.data.SimData;
+import hagerty.simulator.legacy.data.SimDataFactory;
+import hagerty.simulator.legacy.data.SimDataType;
+import javafx.geometry.Insets;
+import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import javafx.geometry.Insets;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-
-import hagerty.simulator.legacy.data.SimData;
-import hagerty.simulator.legacy.data.LegacyMotorSimData;
-import hagerty.simulator.legacy.data.SimDataFactory;
-import hagerty.simulator.legacy.data.SimDataType;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.util.logging.Logger;
 
 
 /**
@@ -28,18 +22,23 @@ import hagerty.simulator.legacy.data.SimDataType;
  */
 @XmlRootElement(name="Legacy")
 public class LegacyBrickSimulator extends BrickSimulator {
-
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    protected final byte[] mCurrentStateBuffer = new byte[208];
+    /*
+     ** Packet types
+     */
+    protected final byte[] writeCmd = {85, -86, 0, 0, 0};
+    protected final byte[] readCmd = {85, -86, -128, 0, 0};
+    protected final byte[] recSyncCmd3 = {51, -52, 0, 0, 3};
+    protected final byte[] recSyncCmd0 = {51, -52, -128, 0, 0};
+    protected final byte[] recSyncCmd208 = {51, -52, -128, 0, (byte) 208};
+    protected final byte[] controllerTypeLegacy = {0, 77, 73};       // Controller type USBLegacyModule
     private final String name = "Core Legacy Module";
-
     @XmlElement
     private String[] portName = new String[6];
     @XmlElement
     private SimDataType[] portType = new SimDataType[6];
-
     private SimData[] portSimData = new SimData[6];
-
-    protected final byte[] mCurrentStateBuffer = new byte[208];
-
     /**
      * Default constructor.
      */
@@ -50,17 +49,6 @@ public class LegacyBrickSimulator extends BrickSimulator {
     		portSimData[i] = null;
     	}
     }
-
-    /*
-     ** Packet types
-     */
-	protected final byte[] writeCmd = { 85, -86, 0, 0, 0 };
-	protected final byte[] readCmd = { 85, -86, -128, 0, 0 };
-	protected final byte[] recSyncCmd3 = { 51, -52, 0, 0, 3};
-	protected final byte[] recSyncCmd0 = { 51, -52, -128, 0, 0};
-	protected final byte[] recSyncCmd208 = { 51, -52, -128, 0, (byte)208};
-	protected final byte[] controllerTypeLegacy = { 0, 77, 73};       // Controller type USBLegacyModule
-
 
     private void sendPacketToPhone(byte[] sendData) {
     	try {
@@ -186,12 +174,12 @@ public class LegacyBrickSimulator extends BrickSimulator {
     	return portName;
     }
 
-    public SimDataType[] getPortType() {
-    	return portType;
-    }
-
     public void setPortName(String[] s) {
     	portName = s;
+    }
+
+    public SimDataType[] getPortType() {
+        return portType;
     }
 
     public void setPortType(SimDataType[] type) {

@@ -1,5 +1,7 @@
 package org.ftccommunity.simulator;
 
+import hagerty.utils.ClientLogger;
+
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -39,7 +41,7 @@ class RobotSimulator
                 System.out.println("Done!");
                 simulatorThread.start();
 
-                Thread clientThread = new Thread(new ClientRunner(client));
+                Thread clientThread = new Thread(new CoppeliaApiClient(mQueue));
                 clientThread.start();
 
                 long totalPackets = 0;

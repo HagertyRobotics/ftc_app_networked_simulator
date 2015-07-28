@@ -1,7 +1,5 @@
 package hagerty.simulator;
 
-import java.util.List;
-
 import coppelia.IntW;
 import coppelia.IntWA;
 import coppelia.remoteApi;
@@ -9,37 +7,51 @@ import hagerty.simulator.legacy.data.LegacyMotorSimData;
 import hagerty.simulator.legacy.data.SimData;
 import hagerty.simulator.modules.BrickSimulator;
 
-public class CoppeliaApiClient implements Runnable {
+import java.util.List;
 
-	long mStartTime;
+public class CoppeliaApiClient implements Runnable {
+    public static final String LOCAL_HOST = "127.0.0.1";
+    public static final boolean WAIT_UNTIL_CONNECTED = true;
+    public static final boolean DO_NOT_RECONNECT_ONCE_DISCONNECTED = true;
+    public static final int THREAD_CYCLE_IN_MS = 50;
+    private static final int MILLI_SECOND_TIMEOUT = 5000;
+    final int CONNECT_PORT = 5000;
+    long mStartTime;
 	IntWA mObjectHandles;
 	IntW mLeftMotor;
 	IntW mRightMotor;
 	int mClientID;
 	remoteApi mVrep;
 	hagerty.gui.MainApp mMainApp;
+    private volatile boolean done;
 
 	public CoppeliaApiClient(hagerty.gui.MainApp mainApp) {
 		mMainApp = mainApp;
-	}
+        done = false;
+    }
 
 	public boolean init() {
 
 		mVrep = new remoteApi();
 		mVrep.simxFinish(-1); // just in case, close all opened connections
-		mClientID = mVrep.simxStart("127.0.0.1",5000,true,true,5000,5);
-		if (mClientID!=-1)
-		{
-			System.out.println("Connected to remote API server");
+
+
+        mClientID = mVrep.simxStart(LOCAL_HOST,
+                CONNECT_PORT, WAIT_UNTIL_CONNECTED,
+                DO_NOT_RECONNECT_ONCE_DISCONNECTED,
+                MILLI_SECOND_TIMEOUT, THREAD_CYCLE_IN_MS);
+        if (mClientID != -1) {
+            System.out.println("Connected to remote API server");
 
 			mObjectHandles = new IntWA(1);
 			mLeftMotor = new IntW(1);
 			mRightMotor = new IntW(1);
 
-			int ret=mVrep.simxGetObjects(mClientID,remoteApi.sim_handle_all,mObjectHandles,remoteApi.simx_opmode_oneshot_wait);
-			if (ret==remoteApi.simx_return_ok)
-				System.out.format("Number of objects in the scene: %d\n",mObjectHandles.getArray().length);
-			else
+            int ret = mVrep.simxGetObjects(mClientID, remoteApi.sim_handle_all, mObjectHandles,
+                    remoteApi.simx_opmode_oneshot_wait);
+            if (ret == remoteApi.simx_return_ok)
+                System.out.format("Number of objects in the scene: %d\n", mObjectHandles.getArray().length);
+            else
 				System.out.format("Remote API function call returned with error code: %d\n",ret);
 
 			try
@@ -65,8 +77,6 @@ public class CoppeliaApiClient implements Runnable {
 
 	}
 
-
-	@Override
 	public void run()
 	{
 		boolean done=false;
@@ -88,8 +98,7 @@ public class CoppeliaApiClient implements Runnable {
 			done = true;
 		}
 
-		while (!done)
-		{
+        while (!done && !Thread.currentThread().isInterrupted()) {
 			simData.lock.readLock().lock();
 			try {
 				leftMotorSpeed = ((LegacyMotorSimData)simData).getMotor1Speed() * 3.14f;
@@ -109,6 +118,11 @@ public class CoppeliaApiClient implements Runnable {
 
 		// Now close the connection to V-REP:
 		mVrep.simxFinish(mClientID);
-	}
+        System.out.println("Program ended");
+    }
+
+    public void requestTerminate() {
+        done = true;
+    }
 }
 

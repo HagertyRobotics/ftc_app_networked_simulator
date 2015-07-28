@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.logging.Logger;
 
 /**
  * Model class for a Motor Controller, called "Brick" to avoid confusion with "Controller"
@@ -23,6 +24,7 @@ import java.net.InetAddress;
  */
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class BrickSimulator implements Runnable {
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     protected final StringProperty alias;
     protected final StringProperty serial;

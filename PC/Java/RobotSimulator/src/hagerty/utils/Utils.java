@@ -6,9 +6,11 @@ import javafx.collections.ObservableList;
 import javax.xml.bind.*;
 import java.io.File;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 public final class Utils {
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public static String bufferToHexString(byte[] data, int start, int length) {
         int i;

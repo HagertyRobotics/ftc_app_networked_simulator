@@ -4,6 +4,7 @@ import hagerty.gui.view.*;
 import hagerty.simulator.RobotSimulator;
 import hagerty.simulator.modules.BrickSimulator;
 import hagerty.simulator.modules.LegacyBrickSimulator;
+import hagerty.utils.ClientLogger;
 import hagerty.utils.Utils;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -21,9 +22,11 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 public class MainApp extends Application {
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private Stage primaryStage;
     private BorderPane rootLayout;
 
@@ -34,6 +37,11 @@ public class MainApp extends Application {
 
     public MainApp() {
         brickList = FXCollections.observableArrayList();
+        try {
+            ClientLogger.setup();
+        } catch (IOException ex) {
+            System.out.println("Cannot setup the logger!");
+        }
     }
 
     public static void main(String[] args) {

@@ -11,9 +11,11 @@ import javafx.scene.text.Text;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 @XmlAccessorType(XmlAccessType.NONE)
 public class LegacyMotorSimData extends SimData {
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
 	volatile float mMotor1Speed=0.0f;
 	volatile float mMotor2Speed=0.0f;

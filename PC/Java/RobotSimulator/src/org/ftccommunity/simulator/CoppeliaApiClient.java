@@ -6,8 +6,8 @@ import coppelia.remoteApi;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class CoppeliaApiClient {
-    public static final String LOCAL_HOST = "127.0.0.1";
+public class CoppeliaApiClient implements Runnable {
+	public static final String LOCAL_HOST = "127.0.0.1";
     public static final boolean WAIT_UNTIL_CONNECTED = true;
     public static final boolean DO_NOT_RECONNECT_ONCE_DISCONNECTED = true;
     public static final int THREAD_CYCLE_IN_MS = 50;
@@ -90,9 +90,8 @@ public class CoppeliaApiClient {
 		}
 		
 	}
-	
-	public void loop()
-	{
+
+	public void run() {
 		while (!done && !Thread.currentThread().isInterrupted())
 		{
 			ControllerData cd;

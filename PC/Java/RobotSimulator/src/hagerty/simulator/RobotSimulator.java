@@ -5,9 +5,10 @@ import hagerty.simulator.modules.BrickSimulator;
 import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class RobotSimulator  {
-
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private static BrickListGenerator gBrickListGenerator;
     private static CoppeliaApiClient gCoppeliaApiClient;
     private static volatile boolean gThreadsAreRunning = true;
@@ -50,8 +51,8 @@ public class RobotSimulator  {
 		// Start the module info server
     	System.out.println("Starting Visualizer...");
     	gCoppeliaApiClient = new CoppeliaApiClient(mainApp); // Runnable
-    	Thread coppeliaThread = new Thread(gCoppeliaApiClient,"");
-    	if (gCoppeliaApiClient.init()) {
+        Thread coppeliaThread = new Thread(gCoppeliaApiClient);
+        if (gCoppeliaApiClient.init()) {
     		coppeliaThread.start();
     	} else {
     		System.out.println("Initialization of Visualizer failed");
