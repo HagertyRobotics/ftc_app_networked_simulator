@@ -31,8 +31,7 @@ public class NetworkManager {
             mSimulatorSocket = new DatagramSocket(PHONE_PORT);
             Log.v("D2xx::", "Local Port " + mSimulatorSocket.getLocalPort());
             NetworkSender myNetworkSender = new NetworkSender(mWriteToPcQueue,
-                    mSimulatorSocket,
-                    PC_IP_ADDRESS);  // Runnable
+                    PC_IP_ADDRESS, mSimulatorSocket, SENDING_PORT);  // Runnable
             Thread networkSenderThread = new Thread(myNetworkSender);
             networkSenderThread.start();
 
@@ -116,10 +115,10 @@ public class NetworkManager {
             this.mDestPort = destPort;
 
             try {
-                this.IPAddress = InetAddress.getByName(ip);
+                this.IPAddress = InetAddress.getByName(ipAddress);
             } catch (IOException e) {
                 Log.e("FTC Controller", "The following ip address is not invalid: " +
-                        ip + "Details: " + e.getMessage(), e);
+                        ipAddress + "Details: " + e.getMessage(), e);
                 throw new AssertionError("IP Address is invalid!");
             }
 
@@ -138,6 +137,10 @@ public class NetworkManager {
                     e.printStackTrace();
                 }
             }
+        }
+
+        public void buildConnection() {
+
         }
     }
 

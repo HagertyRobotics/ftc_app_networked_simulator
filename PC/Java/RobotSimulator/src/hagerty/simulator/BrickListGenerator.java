@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BrickListGenerator implements Runnable {
@@ -71,7 +72,7 @@ public class BrickListGenerator implements Runnable {
     	// Get the port and address of the sender from the incoming packet and set some global variables
     	// to be used when we reply back.
     	// TODO: do we need to set this every time?
-        RobotSimulator.GetPhoneConnectionDetails(receivePacket.getPort(), receivePacket.getAddress());
+        RobotSimulator.setPhoneConnectionDetails(receivePacket.getPort(), receivePacket.getAddress());
 
     	// Make a copy of the packet.  Not sure if we need to do this.  Might not hold on to it for long.
         // byte[] myPacket = new byte[receivePacket.getLength()];
@@ -84,7 +85,8 @@ public class BrickListGenerator implements Runnable {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
                     RobotSimulator.getPhoneIPAddress(), RobotSimulator.getPhonePort());
             mServerSocket.send(sendPacket);
-        	System.out.println("sendPacketToPhone: (" + Utils.bufferToHexString(sendData,0,sendData.length) + ") len=" + sendData.length);
+            logger.log(Level.FINER, "sendPacketToPhone: (" + Utils.bufferToHexString(sendData, 0, sendData.length) +
+                    ") len=" + sendData.length);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,8 +103,9 @@ public class BrickListGenerator implements Runnable {
 
     private byte[] getXmlModuleList(ObservableList<BrickSimulator> mBrickList) {
     	try {
-	    	JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class );
-	        Marshaller m = context.createMarshaller();
+            JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class, LegacyBrickSimulator.class,
+                    MotorBrickSimulator.class, ServoBrickSimulator.class);
+            Marshaller m = context.createMarshaller();
 	        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
 	        // Wrapping our controller data.

@@ -2,9 +2,13 @@ package hagerty.simulator;
 
 import hagerty.simulator.modules.BrickSimulator;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RobotSimulator  {
@@ -21,6 +25,25 @@ public class RobotSimulator  {
 
     static public void startSimulator(hagerty.gui.MainApp mainApp) {
     	simulatorStarted = true;
+        try {
+            System.out.println("Waiting for Robot Controller seeker...");
+            DatagramSocket mSeekerSocket = new DatagramSocket(7000);
+
+            byte[] seekerBytes = new byte[1024];
+            DatagramPacket mSeekerPacket = new DatagramPacket(seekerBytes, seekerBytes.length);
+            mSeekerSocket.receive(mSeekerPacket);
+            System.out.println("Robot Controller discovered at " + mSeekerPacket.getAddress());
+
+            System.out.println("Replying back...");
+            byte[] handShakeBytes = InetAddress.getLocalHost().toString().getBytes(StandardCharsets.US_ASCII);
+
+            DatagramPacket mHandshake = new DatagramPacket(handShakeBytes, handShakeBytes.length);
+            mSeekerSocket.send(mHandshake);
+            mSeekerSocket.close();
+        } catch (Exception ex) {
+            System.err.println(ex.toString());
+            logger.log(Level.SEVERE, ex.toString());
+        }
 
 		// Start the module info server
     	System.out.println("Starting Module Lister...");
@@ -33,8 +56,8 @@ public class RobotSimulator  {
         List<BrickSimulator> brickList = mainApp.getBrickData();
 
         for (BrickSimulator temp : brickList) {
-        	Thread t = new Thread(temp,temp.getAlias());  // Make a thread from the object and also set the process name
-        	t.start();
+            Thread t = new Thread(temp, temp.getAlias());  // Make a thread from the object and also set the process name
+            t.start();
             threadLinkedList.add(t);
             System.out.println(temp.getAlias() + " " + temp.getName());
 		}
@@ -45,8 +68,7 @@ public class RobotSimulator  {
     }
 
     static public void startVisualizer(hagerty.gui.MainApp mainApp) {
-
-    	visualizerStarted = true;
+        visualizerStarted = true;
 
 		// Start the module info server
     	System.out.println("Starting Visualizer...");
@@ -86,7 +108,7 @@ public class RobotSimulator  {
         return gPhoneIPAddress;
     }
 
-    public static void GetPhoneConnectionDetails(int phonePort, InetAddress phoneIpAddress) {
+    public static void setPhoneConnectionDetails(int phonePort, InetAddress phoneIpAddress) {
         gPhonePort = phonePort;
         gPhoneIPAddress = phoneIpAddress;
     }

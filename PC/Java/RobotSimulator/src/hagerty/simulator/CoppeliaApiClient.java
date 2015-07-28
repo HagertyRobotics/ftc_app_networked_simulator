@@ -86,8 +86,8 @@ public class CoppeliaApiClient implements Runnable {
 		/*
 		 * Read the current list of modules from the GUI MainApp class
 		 */
-		SimData simData=null;
-		List<BrickSimulator> brickList = mMainApp.getBrickData();
+        SimData simData = null;
+        List<BrickSimulator> brickList = mMainApp.getBrickData();
 		for (BrickSimulator currentBrick : brickList) {
 			simData = currentBrick.findSimDataName("Wheels");
 			if (simData != null) break;
