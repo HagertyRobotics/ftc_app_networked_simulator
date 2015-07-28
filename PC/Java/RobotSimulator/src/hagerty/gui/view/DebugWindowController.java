@@ -1,7 +1,5 @@
 package hagerty.gui.view;
 
-import java.util.List;
-
 import hagerty.gui.MainApp;
 import hagerty.simulator.modules.BrickSimulator;
 import javafx.application.Platform;
@@ -10,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 /**
  * Dialog to edit details of a Motor Controller.
@@ -57,18 +57,13 @@ public class DebugWindowController {
       	    int i = 0;
       	    while (!mDone) {
       	      final int finalI = i;
-      	      Platform.runLater(new Runnable() {
-      	        @Override
-      	        public void run() {
-      	        	brickDebugField.setText("" + finalI);
+                Platform.runLater(() -> {
+                    brickDebugField.setText("" + finalI);
 
-					// Read the current list of modules from the GUI MainApp class
-					List<BrickSimulator> brickList = mMainApp.getBrickData();
-					for (BrickSimulator currentBrick : brickList) {
-						currentBrick.populateDebugGuiVbox();
-					}
-      	        }
-      	      });
+                    // Read the current list of modules from the GUI MainApp class
+                    List<BrickSimulator> brickList = mMainApp.getBrickData();
+                    brickList.forEach(BrickSimulator::populateDebugGuiVbox);
+                });
       	      i++;
       	      Thread.sleep(500);
       	    }

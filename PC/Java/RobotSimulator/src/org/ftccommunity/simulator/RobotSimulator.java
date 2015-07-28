@@ -17,10 +17,10 @@ class RobotSimulator
 
         final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 		System.out.println("Program started");
-		
-		LinkedBlockingQueue<ControllerData> mQueue = new LinkedBlockingQueue<ControllerData>(100);
-		
-		CoppeliaApiClient client = new CoppeliaApiClient(mQueue);
+
+        LinkedBlockingQueue<ControllerData> mQueue = new LinkedBlockingQueue<>(100);
+
+        CoppeliaApiClient client = new CoppeliaApiClient(mQueue);
 		
 		// Start the network reader 
         ControllerSimulator simulator;

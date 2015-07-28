@@ -31,12 +31,17 @@ public class EditLegacyDialogController extends EditDialogController {
     @FXML
     private GridPane portGrid;
 
-    private ChoiceBox[] legacyChoiceBoxes = new ChoiceBox[6];
-    private TextField[] legacyPortNames = new TextField[6];
+    private ChoiceBox[] legacyChoiceBoxes;
+    private TextField[] legacyPortNames;
 
     private Stage dialogStage;
     private BrickSimulator brick;
     private boolean okClicked = false;
+
+    public EditLegacyDialogController() {
+        legacyChoiceBoxes = new ChoiceBox[6];
+        legacyPortNames = new TextField[6];
+    }
 
     /**
      * Initializes the controller class. This method is automatically called
@@ -45,11 +50,11 @@ public class EditLegacyDialogController extends EditDialogController {
     @FXML
     private void initialize() {
     	for (int i=0;i<6;i++) {
-    		legacyChoiceBoxes[i] = new ChoiceBox<SimDataType>(FXCollections.observableArrayList(
-    				SimDataType.NONE,
-    				SimDataType.LEGACY_MOTOR,
-    				SimDataType.LEGACY_LIGHT,
-    				SimDataType.LEGACY_TOUCH));
+            legacyChoiceBoxes[i] = new ChoiceBox<>(FXCollections.observableArrayList(
+                    SimDataType.NONE,
+                    SimDataType.LEGACY_MOTOR,
+                    SimDataType.LEGACY_LIGHT,
+                    SimDataType.LEGACY_TOUCH));
 
     		legacyChoiceBoxes[i].getSelectionModel().selectFirst();
     		portGrid.add(legacyChoiceBoxes[i], 1, i);
@@ -88,7 +93,6 @@ public class EditLegacyDialogController extends EditDialogController {
     /**
      * Sets the brick to be edited.
      *
-     * @param brick
      */
     public void fillFieldsWithCurrentValues() {
         brickNameField.setText(brick.getAlias());

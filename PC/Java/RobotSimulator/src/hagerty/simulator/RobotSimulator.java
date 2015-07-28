@@ -1,27 +1,24 @@
 package hagerty.simulator;
 
-import java.net.InetAddress;
-import java.util.List;
-
 import hagerty.simulator.modules.BrickSimulator;
+
+import java.net.InetAddress;
+import java.util.LinkedList;
+import java.util.List;
 
 public class RobotSimulator  {
 
-	static BrickListGenerator gBrickListGenerator;
-	static CoppeliaApiClient gCoppeliaApiClient;
-	static public volatile boolean gThreadsAreRunning = true;
-    static int gPhonePort;
-    static InetAddress gPhoneIPAddress;
-    
-    static boolean simulatorStarted = false;
-    static boolean visualizerStarted = false;
+    private static BrickListGenerator gBrickListGenerator;
+    private static CoppeliaApiClient gCoppeliaApiClient;
+    private static volatile boolean gThreadsAreRunning = true;
+    private static LinkedList<Thread> threadLinkedList = new LinkedList<>();
+    private static int gPhonePort;
+    private static InetAddress gPhoneIPAddress;
 
-    private RobotSimulator() {
-
-    }
+    private static boolean simulatorStarted = false;
+    private static boolean visualizerStarted = false;
 
     static public void startSimulator(hagerty.gui.MainApp mainApp) {
-
     	simulatorStarted = true;
 
 		// Start the module info server
@@ -37,9 +34,9 @@ public class RobotSimulator  {
         for (BrickSimulator temp : brickList) {
         	Thread t = new Thread(temp,temp.getAlias());  // Make a thread from the object and also set the process name
         	t.start();
-			System.out.println(temp.getAlias() + " " + temp.getName());
+            threadLinkedList.add(t);
+            System.out.println(temp.getAlias() + " " + temp.getName());
 		}
-
     }
 
     static public boolean simulatorStarted() {
@@ -63,5 +60,33 @@ public class RobotSimulator  {
 
     static public boolean visualizerStarted() {
     	return visualizerStarted;
+    }
+
+    public static boolean isgThreadsAreRunning() {
+        return gThreadsAreRunning;
+    }
+
+    public static void requestTermination() {
+        gThreadsAreRunning = false;
+        try {
+            Thread.currentThread().wait(50);
+        } catch (InterruptedException ex) {
+            ex.toString(); // Do nothing
+        }
+        threadLinkedList.forEach(Thread::interrupt);
+        Thread.currentThread().interrupt();
+    }
+
+    public static int getPhonePort() {
+        return gPhonePort;
+    }
+
+    public static InetAddress getPhoneIPAddress() {
+        return gPhoneIPAddress;
+    }
+
+    public static void GetPhoneConnectionDetails(int phonePort, InetAddress phoneIpAddress) {
+        gPhonePort = phonePort;
+        gPhoneIPAddress = phoneIpAddress;
     }
 }

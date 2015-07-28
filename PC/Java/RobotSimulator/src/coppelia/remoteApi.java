@@ -28,6 +28,7 @@
 
 package coppelia;
 
+@SuppressWarnings("ALL")
 public class remoteApi
 {
 	public static final int SIMX_HEADER_SIZE = 18;

@@ -1,5 +1,6 @@
 package hagerty.simulator.modules;
 
+import hagerty.simulator.legacy.data.SimData;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -7,16 +8,13 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-
-import hagerty.simulator.legacy.data.*;
 
 /**
  * Model class for a Motor Controller, called "Brick" to avoid confusion with "Controller"
@@ -27,9 +25,8 @@ import hagerty.simulator.legacy.data.*;
 public abstract class BrickSimulator implements Runnable {
 
     protected final StringProperty alias;
-    protected IntegerProperty mPort;
     protected final StringProperty serial;
-
+    protected IntegerProperty mPort;
     int mPhonePort;
     InetAddress mPhoneIPAddress;
     DatagramSocket mServerSocket;
@@ -53,8 +50,8 @@ public abstract class BrickSimulator implements Runnable {
         try {
         	mServerSocket = new DatagramSocket(mPort.intValue());
 
-            while (true) {
-            	packet = receivePacketFromPhone();
+            while (!Thread.currentThread().isInterrupted()) {
+                packet = receivePacketFromPhone();
             	handleIncomingPacket(packet, packet.length, false);
             }
             // Catch unhandled exceptions and cleanup
@@ -65,7 +62,6 @@ public abstract class BrickSimulator implements Runnable {
     }
 
     private byte[] receivePacketFromPhone() {
-
     	DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
     	try {
     		mServerSocket.receive(receivePacket);
@@ -118,22 +114,22 @@ public abstract class BrickSimulator implements Runnable {
         return alias.get();
     }
 
-    public Integer getPort() {
-    	return mPort.get();
-    }
-
-    public String getSerial() {
-        return serial.get();
-    }
-
     @XmlElement
     public void setAlias(String alias) {
         this.alias.set(alias);
     }
 
+    public Integer getPort() {
+    	return mPort.get();
+    }
+
     @XmlElement
     public void setPort(Integer port) {
     	mPort.set(port);
+    }
+
+    public String getSerial() {
+        return serial.get();
     }
 
     @XmlElement

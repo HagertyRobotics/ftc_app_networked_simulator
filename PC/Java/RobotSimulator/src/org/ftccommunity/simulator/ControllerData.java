@@ -6,7 +6,7 @@ public class ControllerData {
     LinkedList<Motor> motors;
 
     public ControllerData(int numberOfMotors) {
-        motors = new LinkedList<Motor>();
+        motors = new LinkedList<>();
         for (int i = 0; i < numberOfMotors; i++) {
             motors.add(new Motor());
         }
@@ -14,7 +14,7 @@ public class ControllerData {
 
     @Deprecated
     public ControllerData() {
-        motors = new LinkedList<Motor>();
+        motors = new LinkedList<>();
         for (int i = 0; i < 2; i++) {
             motors.add(new Motor());
         }

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.logging.*;
 
 public class ClientLogger {
-    static private FileHandler fileTxt;
 
     static public void setup() throws IOException {
         // get the global logger to configure it
@@ -20,7 +19,7 @@ public class ClientLogger {
         }
 
         logger.setLevel(Level.INFO);
-        fileTxt = new FileHandler("simulator_client.log");
+        FileHandler fileTxt = new FileHandler("simulator_client.log");
         // create a TXT formatter
         SimpleFormatter formatterTxt = new SimpleFormatter();
         fileTxt.setFormatter(formatterTxt);

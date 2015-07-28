@@ -95,8 +95,9 @@ public class ControllerSimulator implements Runnable {
 
     private byte[] receivePacketFromPhone() {
     	DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
-    	try {
-    		mServerSocket.receive(receivePacket);
+        //noinspection TryWithIdenticalCatches
+        try {
+            mServerSocket.receive(receivePacket);
         } catch (SocketException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
         }  catch (IOException e) {
@@ -195,7 +196,6 @@ public class ControllerSimulator implements Runnable {
         int i;
         int myStop;
         StringBuilder sb = new StringBuilder();
-        //byte [] subArray = Arrays.copyOfRange(a, 4, 6);
         myStop = (length > data.length) ? data.length : length;
         for (i=start; i<start+myStop; i++) {
             sb.append(String.format("%02x ", data[i]));

@@ -2,6 +2,7 @@
 
 package coppelia;
 
+@SuppressWarnings("ALL")
 public class FloatW
 {
     float w;
@@ -11,13 +12,13 @@ public class FloatW
         w = f;
     }
 
-    public void setValue(float i)
-    {
-        w = i;
-    }
-
     public float getValue()
     {
         return w;
+    }
+
+    public void setValue(float i)
+    {
+        w = i;
     }
 }

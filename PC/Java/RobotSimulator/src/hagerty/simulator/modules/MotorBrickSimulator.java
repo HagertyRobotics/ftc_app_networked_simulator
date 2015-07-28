@@ -1,25 +1,22 @@
 package hagerty.simulator.modules;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import hagerty.simulator.legacy.data.SimData;
-import hagerty.simulator.legacy.data.SimDataFactory;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Model class for a Motor Controller
  *
  * @author Hagerty High
  */
+@SuppressWarnings("ALL")
 @XmlRootElement(name="Motor")
 public class MotorBrickSimulator extends BrickSimulator {
 
     private final String name = "Core Motor Controller";
 
-    /**
-     * Default constructor.
-     */
     public MotorBrickSimulator() {
     }
 
@@ -35,8 +32,11 @@ public class MotorBrickSimulator extends BrickSimulator {
 
 	public void populateDetailsPane(Pane pane) {}
 
-	public SimData findSimDataName(String name) {return (SimData)null;}
+    public SimData findSimDataName(String name) {
+        return null;
+    }
 
-	public void handleIncomingPacket(byte[] data, int length, boolean wait) {};
+    public void handleIncomingPacket(byte[] data, int length, boolean wait) {
+    }
 
 }
