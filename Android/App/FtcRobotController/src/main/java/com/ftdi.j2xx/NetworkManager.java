@@ -18,9 +18,9 @@ public class NetworkManager {
     public static final String PC_IP_ADDRESS  = "192.168.2.189";
     public static final int SENDING_PORT = 6500;
 
-    DatagramSocket mSimulatorSocket;
-    LinkedBlockingQueue<byte[]> mWriteToPcQueue = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<byte[]> mReadFromPcQueue = new LinkedBlockingQueue<>();
+    private DatagramSocket mSimulatorSocket;
+    private LinkedBlockingQueue<byte[]> mWriteToPcQueue = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<byte[]> mReadFromPcQueue = new LinkedBlockingQueue<>();
 
 
     public NetworkManager() {
@@ -45,11 +45,11 @@ public class NetworkManager {
     }
 
 
-    LinkedBlockingQueue getWriteToPcQueue() {
+    LinkedBlockingQueue<byte[]> getWriteToPcQueue() {
         return mWriteToPcQueue;
     }
 
-    LinkedBlockingQueue getReadFromPcQueue() {
+    LinkedBlockingQueue<byte[]> getReadFromPcQueue() {
         return mReadFromPcQueue;
     }
 
