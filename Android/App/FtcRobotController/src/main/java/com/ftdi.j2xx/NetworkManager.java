@@ -13,15 +13,14 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  */
 public class NetworkManager {
-
     // the Server's Port
     public static final int PHONE_PORT  = 6000;
     public static final String PC_IP_ADDRESS  = "192.168.2.189";
     public static final int SENDING_PORT = 6500;
 
     DatagramSocket mSimulatorSocket;
-    LinkedBlockingQueue mWriteToPcQueue = new LinkedBlockingQueue();
-    LinkedBlockingQueue mReadFromPcQueue = new LinkedBlockingQueue();
+    LinkedBlockingQueue<byte[]> mWriteToPcQueue = new LinkedBlockingQueue<>();
+    LinkedBlockingQueue<byte[]> mReadFromPcQueue = new LinkedBlockingQueue<>();
 
 
     public NetworkManager() {
@@ -64,11 +63,11 @@ public class NetworkManager {
      *
      */
     public class NetworkReceiver implements Runnable {
-        private LinkedBlockingQueue queue;
+        private LinkedBlockingQueue<byte[]> queue;
         DatagramSocket mSocket;
         byte[] mReceiveData = new byte[1024];
 
-        public NetworkReceiver(LinkedBlockingQueue queue, DatagramSocket my_socket) {
+        public NetworkReceiver(LinkedBlockingQueue<byte[]> queue, DatagramSocket my_socket) {
             this.queue = queue;
             this.mSocket = my_socket;
         }
@@ -116,11 +115,9 @@ public class NetworkManager {
 
             try {
                 this.IPAddress = InetAddress.getByName(ip);
-
-                // TODO: add verfications to the IP
             } catch (IOException e) {
                 Log.e("FTC Controller", "The following ip address is not invalid: " +
-                    ip + "Details: " + e.getMessage(), e);
+                        ip + "Details: " + e.getMessage(), e);
                 throw new AssertionError("IP Address is invalid!");
             }
 

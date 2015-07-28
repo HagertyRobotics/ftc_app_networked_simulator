@@ -405,7 +405,7 @@ public class remoteApi
 	public static final int sim_simulation_stopped = 0;								/* Simulation is stopped */
 	public static final int sim_simulation_paused = 8;								/* Simulation is paused */
 	public static final int sim_simulation_advancing = 16;								/* Simulation is advancing */
-	public static final int sim_simulation_advancing_firstafterstop =16 |0;		/* First simulation pass (1x) */
+	public static final int sim_simulation_advancing_firstafterstop = 16;		/* First simulation pass (1x) */
 	public static final int sim_simulation_advancing_running = 16|1;		/* Normal simulation pass (>=1x) */
 	/* reserved									=sim_simulation_advancing|0x02, */
 	public static final int sim_simulation_advancing_lastbeforepause = 16|3;		/* Last simulation pass before pause (1x) */

@@ -6,10 +6,13 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.lang.Thread.currentThread;
 
 public class ControllerSimulator implements Runnable {
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     /*
      ** Packet types
      */
@@ -21,6 +24,7 @@ public class ControllerSimulator implements Runnable {
     protected final byte[] controllerTypeLegacy = {0, 77, 73};       // Controller type USBLegacyModule
     protected final byte[] mCurrentStateBuffer = new byte[208];
     private final int BIND_PORT_NUM = 6500;
+
     int mPhonePort;
     InetAddress mPhoneIPAddress;
     DatagramSocket mServerSocket;
@@ -52,7 +56,7 @@ public class ControllerSimulator implements Runnable {
             System.out.println("Sorry! I cannot bind to the port " + BIND_PORT_NUM);
             throw ex;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
             throw e;
         }
 
@@ -60,14 +64,14 @@ public class ControllerSimulator implements Runnable {
 
     @Override
     public void run() {
-        System.out.print("Controller Sim. Started");
+        logger.log(Level.FINE, "Controller Sim. Started");
     	byte[] packet;
 
         try {
             while(!currentThread().isInterrupted() && running) {
                 packet = receivePacketFromPhone();
                 handleIncomingPacket(packet, packet.length, false);
-                Thread.sleep(10);
+                logger.log(Level.INFO, "Received packet.");
             }
             //Catch unhandled exceptions and cleanup
         } catch (Exception e) {
@@ -94,9 +98,9 @@ public class ControllerSimulator implements Runnable {
     	try {
     		mServerSocket.receive(receivePacket);
         } catch (SocketException ex) {
-            ex.getMessage();
+            logger.log(Level.SEVERE, ex.getMessage());
         }  catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
         }
 
     	// Get the port and address of the sender from the incoming packet and set some global variables
@@ -114,7 +118,7 @@ public class ControllerSimulator implements Runnable {
         try {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
             mServerSocket.send(sendPacket);
-            System.out.println("sendPacketToPhone: (" + bufferToHexString(sendData,0,sendData.length) + ") len=" + sendData.length);
+            logger.log(Level.FINER, "sendPacketToPhone: (" + bufferToHexString(sendData,0,sendData.length) + ") length=" + sendData.length);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,7 +126,7 @@ public class ControllerSimulator implements Runnable {
 
 
     public void handleIncomingPacket(byte[] data, int length, boolean wait) {
-        System.out.println("Receive Buffer: (" + bufferToHexString(data, 0, 25) + ") len=" + data.length);
+        logger.log(Level.FINER, "Receive Buffer: (" + bufferToHexString(data, 0, 25) + ") length=" + data.length);
 
         if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte) 208) { // readCmd
             sendPacketToPhone(mCurrentStateBuffer);
@@ -151,7 +155,7 @@ public class ControllerSimulator implements Runnable {
                     System.arraycopy(data, p, mCurrentStateBuffer, p, 32);
 
 
-                    ControllerData cd = new ControllerData();
+                    ControllerData cd = new ControllerData(2);
                     if (mCurrentStateBuffer[p + 4 + 5] == (byte) 0x80) {
                         cd.setFloatMode(1, true);
                     } else {

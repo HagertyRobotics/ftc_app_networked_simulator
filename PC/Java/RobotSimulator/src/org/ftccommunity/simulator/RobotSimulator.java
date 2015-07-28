@@ -1,11 +1,21 @@
 package org.ftccommunity.simulator;
 
+import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class RobotSimulator
+class RobotSimulator
 {	
 	public static void main(String[] args)
 	{
+        try {
+            ClientLogger.setup();
+        } catch (IOException ex) {
+            System.out.println("Cannot setup the logger!");
+        }
+
+        final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 		System.out.println("Program started");
 		
 		LinkedBlockingQueue<ControllerData> mQueue = new LinkedBlockingQueue<ControllerData>(100);
@@ -18,7 +28,7 @@ public class RobotSimulator
             simulator = new ControllerSimulator(mQueue);  // Runnable
         } catch (Exception ex) {
             System.out.println("Sorry, this application cannot continue.\nAborting! Details:");
-            ex.printStackTrace();
+            logger.log(Level.SEVERE, ex.getMessage());
             return;
         }
         Thread simulatorThread = new Thread(simulator);
@@ -59,8 +69,11 @@ public class RobotSimulator
         } catch (Exception ex) {
 
             simulator.close();
-            System.out.println("\nAn error occurred during execution. Stacktrace:");
-            ex.printStackTrace();
+            System.out.println("\nAn error occurred during execution! Please see the log.");
+            logger.log(Level.SEVERE, ex.getMessage());
+            for (StackTraceElement stack : ex.getStackTrace()) {
+                logger.log(Level.SEVERE,stack.toString());
+            }
 
             try {
                 Thread.sleep(25); // Wait a brief period for termination
@@ -84,7 +97,7 @@ public class RobotSimulator
         try {
             simulatorThread.join(300);
         } catch (InterruptedException e) {
-            System.out.println("Interrupted");
+            Thread.currentThread().interrupt();
         }
         System.out.println("Done!");
         System.out.println("Program ended");

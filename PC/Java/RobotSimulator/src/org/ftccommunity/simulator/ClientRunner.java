@@ -1,7 +1,7 @@
 package org.ftccommunity.simulator;
 
 public class ClientRunner implements Runnable {
-    private CoppeliaApiClient simClient;
+    private final CoppeliaApiClient simClient;
 
     public ClientRunner(CoppeliaApiClient newSimClient) {
         this.simClient = newSimClient;

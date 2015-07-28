@@ -197,7 +197,7 @@ public class FtcEventLoop implements EventLoop, BatteryChecker.BatteryWatcher {
   private void handleCommandRequestOpModeList() {
     String opModeList = "";
     for (String opModeName : opModeManager.getOpModes()) {
-      if (opModeList.isEmpty() == false) opModeList += Util.ASCII_RECORD_SEPARATOR;
+      if (!opModeList.isEmpty()) opModeList += Util.ASCII_RECORD_SEPARATOR;
       opModeList += opModeName;
     }
     ftcEventLoopHandler.sendCommand(new Command(CommandList.CMD_REQUEST_OP_MODE_LIST_RESP, opModeList));
