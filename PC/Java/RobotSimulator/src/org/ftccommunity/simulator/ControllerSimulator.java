@@ -71,7 +71,7 @@ public class ControllerSimulator implements Runnable {
             while(!currentThread().isInterrupted() && running) {
                 packet = receivePacketFromPhone();
                 handleIncomingPacket(packet, packet.length, false);
-                logger.log(Level.INFO, "Received packet.");
+                logger.log(Level.FINEST, "Received packet.");
             }
             //Catch unhandled exceptions and cleanup
         } catch (Exception e) {
