@@ -105,9 +105,7 @@ public class CoppeliaApiClient {
                 mVrep.simxSetJointTargetVelocity(mClientID, mRightMotor.getValue(),(float) rightMotorSpeed,remoteApi.simx_opmode_oneshot);
 
 			} catch (InterruptedException e) {
-                System.out.println("API Client Interrupted");
                 Thread.currentThread().interrupt();
-
 			}
 		}
 		

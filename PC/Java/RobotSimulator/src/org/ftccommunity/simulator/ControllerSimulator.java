@@ -65,7 +65,7 @@ public class ControllerSimulator implements Runnable {
     @Override
     public void run() {
         logger.log(Level.FINE, "Controller Sim. Started");
-    	byte[] packet;
+        byte[] packet;
 
         try {
             while(!currentThread().isInterrupted() && running) {
@@ -118,7 +118,7 @@ public class ControllerSimulator implements Runnable {
         try {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
             mServerSocket.send(sendPacket);
-            logger.log(Level.FINER, "sendPacketToPhone: (" + bufferToHexString(sendData,0,sendData.length) + ") length=" + sendData.length);
+            logger.log(Level.FINER, "sendPacketToPhone: (" + bufferToHexString(sendData, 0, sendData.length) + ") length=" + sendData.length);
         } catch (IOException e) {
             e.printStackTrace();
         }

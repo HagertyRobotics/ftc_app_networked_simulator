@@ -79,7 +79,7 @@ class RobotSimulator
                 Thread.sleep(25); // Wait a brief period for termination
                 simulatorThread.join(); // Get the thread to join
             } catch (InterruptedException e) {
-                System.out.println("Interruption acknowledged!");
+                logger.log(Level.WARNING, "Interruption acknowledged!");
             }
         } catch (UnsatisfiedLinkError libraryNotFound){
             System.out.println("I could not find the 'remoteApiJava.dll' in the system PATH or the current directory.");
@@ -88,7 +88,7 @@ class RobotSimulator
                 Thread.sleep(25); // Wait a brief period for termination
                 simulatorThread.join(); // Get the thread to join
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
         }
     }
         System.out.print("Cleaning up...");

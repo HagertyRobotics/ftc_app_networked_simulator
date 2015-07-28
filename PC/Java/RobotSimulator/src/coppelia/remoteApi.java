@@ -30,119 +30,6 @@ package coppelia;
 
 public class remoteApi
 {
-	static {
-		System.loadLibrary("remoteApiJava");
-	}
-
-	public native int simxStart(final String connectionAddress, int connectionPort, boolean waitUntilConnected, boolean doNotReconnectOnceDisconnected, int timeOutInMs, int commThreadCycleInMs);
-	public native void simxFinish(int clientID);
-	public native int simxGetConnectionId(int clientID);
-	public native int simxGetObjectHandle(int clientID,final String objectName, IntW handle, int operationMode);
-	public native int simxGetJointPosition(int clientID,int jointHandle, FloatW position, int operationMode);
-	public native int simxSetJointPosition(int clientID,int jointHandle, float position, int operationMode);
-	public native int simxGetObjectPosition(int clientID,int objectHandle, int relativeToObjectHandle, FloatWA position, int operationMode);
-	public native int simxSetObjectPosition(int clientID,int objectHandle, int relativeToObjectHandle, final FloatWA position, int operationMode);
-	public native int simxGetVisionSensorImage(int clientID,int sensorHandle, IntWA resolution, CharWA image, int options, int operationMode);
-	public native int simxSetVisionSensorImage(int clientID,int sensorHandle, CharWA image, int bufferSize, int options, int operationMode);
-	public native int simxGetJointMatrix(int clientID,int jointHandle, FloatWA matrix, int operationMode);
-	public native int simxSetSphericalJointMatrix(int clientID,int jointHandle,FloatWA matrix,int operationMode);
-	public native int simxSetJointTargetVelocity(int clientID,int jointHandle,float targetVelocity,int operationMode);
-	public native int simxSetJointTargetPosition(int clientID,int jointHandle,float targetPosition,int operationMode);
-	public native int simxJointGetForce(int clientID,int jointHandle,FloatW force,int operationMode);
-	public native int simxGetJointForce(int clientID,int jointHandle,FloatW force,int operationMode);
-	public native int simxSetJointForce(int clientID,int jointHandle,float force,int operationMode);
-	public native int simxReadForceSensor(int clientID,int forceSensorHandle, IntW state,FloatWA forceVector,FloatWA torqueVector,int operationMode);
-	public native int simxBreakForceSensor(int clientID,int forceSensorHandle,int operationMode);
-	public native int simxReadVisionSensor(int clientID,int sensorHandle,BoolW detectionState, FloatWAA auxValues, int operationMode);
-	public native int simxGetObjectFloatParameter(int clientID,int objectHandle,int parameterID,FloatW parameterValue,int operationMode);
-	public native int simxSetObjectFloatParameter(int clientID,int objectHandle,int parameterID,float parameterValue,int operationMode);
-	public native int simxGetObjectIntParameter(int clientID,int objectHandle,int parameterID,IntW parameterValue,int operationMode);
-	public native int simxSetObjectIntParameter(int clientID,int objectHandle,int parameterID,int parameterValue,int operationMode);
-	public native int simxGetModelProperty(int clientID,int objectHandle,IntW prop,int operationMode);
-	public native int simxSetModelProperty(int clientID,int objectHandle,int prop,int operationMode);
-	public native int simxGetVisionSensorDepthBuffer(int clientID,int sensorHandle,IntWA resolution,FloatWA buffer,int operationMode);
-	public native int simxGetObjectChild(int clientID,int parentObjectHandle,int childIndex,IntW childObjectHandle,int operationMode);
-	public native int simxGetObjectParent(int clientID,int childObjectHandle,IntW parentObjectHandle,int operationMode);
-	public native int simxStartSimulation(int clientID,int operationMode);
-	public native int simxPauseSimulation(int clientID,int operationMode);
-	public native int simxStopSimulation(int clientID,int operationMode);
-	public native int simxGetUISlider(int clientID,int uiHandle,int uiButtonID,IntW position,int operationMode);
-	public native int simxSetUISlider(int clientID,int uiHandle,int uiButtonID,int position,int operationMode);
-	public native int simxGetUIEventButton(int clientID,int uiHandle,IntW uiEventButtonID,IntWA auxValues,int operationMode);
-	public native int simxGetUIButtonProperty(int clientID,int uiHandle,int uiButtonID,IntW prop,int operationMode);
-	public native int simxSetUIButtonProperty(int clientID,int uiHandle,int uiButtonID,int prop,int operationMode);
-	public native int simxAuxiliaryConsoleClose(int clientID,int consoleHandle,int operationMode);
-	public native int simxAuxiliaryConsoleShow(int clientID,int consoleHandle,boolean showState,int operationMode);
-	public native int simxGetObjectOrientation(int clientID,int objectHandle,int relativeToObjectHandle,FloatWA eulerAngles,int operationMode);
-	public native int simxSetObjectParent(int clientID,int objectHandle,int parentObject,boolean keepInPlace,int operationMode);
-	public native int simxGetArrayParameter(int clientID,int paramIdentifier,FloatWA paramValues,int operationMode);
-	public native int simxSetArrayParameter(int clientID,int paramIdentifier,FloatWA paramValues,int operationMode);
-	public native int simxGetIntegerParameter(int clientID,int paramIdentifier,IntW paramValue,int operationMode);
-	public native int simxSetIntegerParameter(int clientID,int paramIdentifier,int paramValue,int operationMode);
-	public native int simxGetBooleanParameter(int clientID,int paramIdentifier,BoolW paramValue,int operationMode);
-	public native int simxGetDialogResult(int clientID,int dialogHandle,IntW result,int operationMode);
-	public native int simxSetFloatingParameter(int clientID,int paramIdentifier,float paramValue,int operationMode);
-	public native int simxRemoveObject(int clientID,int objectHandle,int operationMode);
-	public native int simxRemoveModel(int clientID,int objectHandle,int operationMode);
-	public native int simxRemoveUI(int clientID,int uiHandle,int operationMode);
-	public native int simxCloseScene(int clientID,int operationMode);
-	public native int simxEndDialog(int clientID,int dialogHandle,int operationMode);
-	public native int simxReadDistance(int clientID,int distanceObjectHandle,FloatW minimumDistance,int operationMode);
-	public native int simxGetFloatingParameter(int clientID,int paramIdentifier,FloatW paramValue,int operationMode);
-	public native int simxSetObjectOrientation(int clientID,int objectHandle,int relativeToObjectHandle,FloatWA eulerAngles,int operationMode);
-	public native int simxReadProximitySensor(int clientID,int sensorHandle, BoolW detectionState, FloatWA detectedPoint, IntW detectedObjectHandle, FloatWA detectedSurfaceNormalVector,int operationMode);
-
-	public native int simxLoadModel(int clientID,final String modelPathAndName, int options, IntW baseHandle, int operationMode);
-	public native int simxLoadUI(int clientID,final String uiPathAndName, int options, IntWA uiHandles, int operationMode);
-	public native int simxLoadScene(int clientID,final String scenePathAndName, int options, int operationMode);
-	public native int simxGetUIHandle(int clientID,final String uiName,IntW handle,int operationMode);
-	public native int simxAddStatusbarMessage(int clientID,final String message,int operationMode);
-	public native int simxAuxiliaryConsoleOpen(int clientID,final String title,int maxLines,int mode,IntWA position,IntWA size,FloatWA textColor,FloatWA backgroundColor,IntW consoleHandle,int operationMode);
-	public native int simxAuxiliaryConsolePrint(int clientID,int consoleHandle, final String txt,int operationMode);
-	public native int simxSetUIButtonLabel(int clientID,int uiHandle,int uiButtonID,final String upStateLabel,final String downStateLabel,int operationMode);
-	public native int simxGetLastErrors(int clientID,StringWA errorStrings,int operationMode);
-	public native int simxSetBooleanParameter(int clientID,int paramIdentifier,boolean paramValue,int operationMode);
-	public native int simxGetStringParameter(int clientID,int paramIdentifier,StringW paramValue,int operationMode);
-	public native int simxGetCollisionHandle(int clientID,final String collisionObjectName,IntW handle,int operationMode);
-	public native int simxGetDistanceHandle(int clientID,final String distanceObjectName,IntW handle,int operationMode);
-	public native int simxReadCollision(int clientID,int collisionObjectHandle,BoolW collisionState,int operationMode);
-	public native int simxGetObjects(int clientID,int objectType,IntWA objectHandles,int operationMode);
-	public native int simxDisplayDialog(int clientID,final String titleText,final String mainText,int dialogType,final String initialText,FloatWA titleColors,FloatWA dialogColors,IntW dialogHandle,IntW uiHandle,int operationMode);
-	public native int simxGetDialogInput(int clientID,int dialogHandle,StringW inputText,int operationMode);
-	public native int simxCopyPasteObjects(int clientID,IntWA objectHandles, IntWA newObjectHandles, int operationMode);
-	public native int simxGetObjectSelection(int clientID,IntWA objectHandles, int operationMode);
-	public native int simxSetObjectSelection(int clientID,IntWA objectHandles, int operationMode);
-	public native int simxClearFloatSignal(int clientID,final String signalName, int operationMode);
-	public native int simxClearStringSignal(int clientID,final String signalName,int operationMode);
-	public native int simxClearIntegerSignal(int clientID,final String signalName,int operationMode);
-	public native int simxGetFloatSignal(int clientID,final String signalName,FloatW signalValue,int operationMode);
-	public native int simxGetIntegerSignal(int clientID,final String signalName,IntW signalValue,int operationMode);
-	public native int simxGetStringSignal(int clientID,final String signalName,CharWA signalValue, int operationMode);
-	public native int simxGetAndClearStringSignal(int clientID,final String signalName, CharWA signalValue, int operationMode);
-	public native int simxReadStringStream(int clientID,final String signalName, CharWA signalValue, int operationMode);
-
-	public native int simxSetFloatSignal(int clientID,final String signalName,float signalValue,int operationMode);
-	public native int simxSetIntegerSignal(int clientID,final String signalName,int signalValue,int operationMode);
-	public native int simxSetStringSignal(int clientID,final String signalName, final CharWA signalValue, int operationMode);
-	public native int simxAppendStringSignal(int clientID,final String signalName, final String signalValue, int operationMode);
-	public native int simxWriteStringStream(int clientID,final String signalName, final CharWA signalValue, int operationMode);
-
-	public native int simxGetPingTime(int clientID,IntW pingTime);
-	public native int simxGetLastCmdTime(int clientID);
-	public native int simxSynchronousTrigger(int clientID);
-	public native int simxSynchronous(int clientID,boolean enable);
-	public native int simxPauseCommunication(int clientID,boolean enable);
-	public native int simxGetInMessageInfo(int clientID,int infoType, IntW info);
-	public native int simxGetOutMessageInfo(int clientID,int infoType, IntW info);
-	public native int simxTransferFile(int clientID,final String filePathAndName, final String fileName_serverSide, int timeOut, int operationMode);
-	public native int simxEraseFile(int clientID,final String fileName_serverSide, int operationMode);
-
-	public native int simxCreateDummy(int clientID,float size,CharWA color,IntW dummyHandle,int operationMode);
-	public native int simxQuery(int clientID,final String signalName, final CharWA signalValue,final String retSignalName, CharWA retSignalValue, int timeOutInMs);
-	public native int simxGetObjectGroupData(int clientID,int objectType,int dataType,IntWA handles,IntWA intData,FloatWA floatData,StringWA stringData,int operationMode);
-	public native int simxGetObjectVelocity(int clientID,int objectHandle, FloatWA linearVelocity, FloatWA angularVelocity, int operationMode);
-	
-	
 	public static final int SIMX_HEADER_SIZE = 18;
 	public static final int simx_headeroffset_crc = 0;				/* 1 simxUShort. Generated by the client or server. The CRC for the message */
 	public static final int simx_headeroffset_version = 2;			/* 1 byte. Generated by the client or server. The version of the remote API software */
@@ -150,8 +37,7 @@ public class remoteApi
 	public static final int simx_headeroffset_client_time = 7;		/* 1 simxInt. Client time stamp generated by the client (and sent back by the server) */
 	public static final int simx_headeroffset_server_time = 11;	/* 1 simxInt. Generated by the server when a reply is generated. The server timestamp */
 	public static final int simx_headeroffset_scene_id = 15;		/* 1 simxUShort. Generated by the server. A unique ID identifying the scene currently displayed */
-	public static final int simx_headeroffset_server_state = 17;	/* 1 byte. Generated by the server. Bit coded: 0 set --> simulation not stopped, 1 set --> simulation paused, 2 set --> real-time switch on, 3-5: edit mode type (0=no edit mode, 1=triangle, 2=vertex, 3=edge, 4=path, 5=UI) */ 
-
+	public static final int simx_headeroffset_server_state = 17;	/* 1 byte. Generated by the server. Bit coded: 0 set --> simulation not stopped, 1 set --> simulation paused, 2 set --> real-time switch on, 3-5: edit mode type (0=no edit mode, 1=triangle, 2=vertex, 3=edge, 4=path, 5=UI) */
 	/* Remote API command header: */
 	public static final int SIMX_SUBHEADER_SIZE = 26;
 	public static final int simx_cmdheaderoffset_mem_size = 0;			/* 1 simxInt. Generated by the client or server. The buffer size of the command. */
@@ -163,8 +49,6 @@ public class remoteApi
 	public static final int simx_cmdheaderoffset_sim_time = 20;		/* 1 simxInt. Generated by the server. The simulation time (in ms) when the command was executed (or 0 if simulation is not running) */
 	public static final int simx_cmdheaderoffset_status = 24;			/* 1 byte. Generated by the server. (1: bit 0 is set --> error in function execution on server side). The client writes bit 1 if command cannot be overwritten*/
 	public static final int simx_cmdheaderoffset_reserved = 25;		/* 1 byte. Not yet used */
-
-
 	public static final int sim_object_shape_type 					= 0;
 	public static final int sim_object_joint_type 						= 1;
 	public static final int sim_object_graph_type 					= 2;
@@ -175,13 +59,12 @@ public class remoteApi
 	public static final int sim_object_reserved2 						= 7;
 	public static final int sim_object_path_type 						= 8;
 	public static final int sim_object_visionsensor_type 				= 9;
-	public static final int sim_object_volume_type 					= 10; 
+	public static final int sim_object_volume_type = 10;
 	public static final int sim_object_mill_type 						= 11;
 	public static final int sim_object_forcesensor_type 				= 12;
 	public static final int sim_object_light_type 						= 13;
 	public static final int sim_object_mirror_type 						= 14;
 	public static final int sim_object_type_end 						= 108;
-
 	public static final int  sim_appobj_object_type  					= 109;
 	public static final int sim_appobj_collision_type 					= 110;
 	public static final int sim_appobj_distance_type 					= 111;
@@ -194,22 +77,18 @@ public class remoteApi
 	public static final int sim_appobj_pathplanning_type 			= 118;
 	public static final int sim_appobj_RESERVED_type 				= 119;
 	public static final int sim_appobj_texture_type 					= 120;
-
 	public static final int sim_ik_pseudo_inverse_method 			= 0;
 	public static final int sim_ik_damped_least_squares_method 	= 1;
 	public static final int sim_ik_jacobian_transpose_method		= 2;
-
 	public static final int sim_ik_x_constraint 						= 1;
 	public static final int sim_ik_y_constraint 						= 2;
 	public static final int sim_ik_z_constraint 						= 4;
 	public static final int sim_ik_alpha_beta_constraint 				= 8;
 	public static final int sim_ik_gamma_constraint 					= 16;
 	public static final int sim_ik_avoidance_constraint 				= 64;
-
 	public static final int sim_ikresult_not_performed 				= 0;
 	public static final int sim_ikresult_success 						= 1;
 	public static final int sim_ikresult_fail 							= 2;
-
 	/* Light sub-types: */
 	public static final int sim_light_omnidirectional_subtype 		= 1;
 	public static final int sim_light_spot_subtype 					= 2;
@@ -234,7 +113,6 @@ public class remoteApi
 	public static final int sim_mill_cone_subtype 					= 43;
 	/* No sub-type: */
 	public static final int sim_object_no_subtype 					= 200;
-
 	/* Scene object main properties (serialized): */
 	public static final int sim_objectspecialproperty_collidable 		= 0x0001;
 	public static final int sim_objectspecialproperty_measurable 	= 0x0002;
@@ -249,7 +127,6 @@ public class remoteApi
 	public static final int sim_objectspecialproperty_detectable_all = 16 | 32 | 64 | 128 | 256;
 	public static final int sim_objectspecialproperty_cuttable = 1024;
 	public static final int sim_objectspecialproperty_pathplanning_ignored = 2048;
-
 	public static final int sim_modelproperty_not_collidable = 1;
 	public static final int sim_modelproperty_not_measurable = 2;
 	public static final int sim_modelproperty_not_renderable = 4;
@@ -260,7 +137,6 @@ public class remoteApi
 	public static final int sim_modelproperty_not_reset = 128; /* Model is not reset at simulation end. This flag is cleared at simulation end */
 	public static final int sim_modelproperty_not_visible = 256; /* Whole model is invisible, independent of local visibility settings */
 	public static final int sim_modelproperty_not_model = 61440;  /* object is not a model */
-
 		/* Check the documentation instead of comments below!! */
 	/* Following messages are dispatched to the Lua-message container: */
 	public static final int sim_message_ui_button_state_change = 0;	/* a UI button, slider, etc. changed (due to a user's action). aux[0]=UI handle, aux[1]=button handle, aux[2]=button attributes, aux[3]=slider position (if slider) */
@@ -271,13 +147,11 @@ public class remoteApi
 	public static final int sim_message_reserved11 = 5;					/* do not use */
 	public static final int sim_message_keypress = 6;					/* a key was pressed while the focus was on a page (aux[0]=key, aux[1]=ctrl and shift key state) */
 	public static final int sim_message_bannerclicked = 7;				/* a banner was clicked (aux[0]=banner ID) */
-
 	/* Following messages are dispatched only to the C-API (not available from Lua): */
 	public static final int sim_message_for_c_api_only_start = 256;			/* Do not use */
 	public static final int sim_message_reserved1 = 257;								/* Do not use */
 	public static final int sim_message_reserved2 = 258;								/* Do not use */
 	public static final int sim_message_reserved3 = 259;								/* Do not use */
-
 	public static final int sim_message_eventcallback_scenesave = 260;				/* about to save a scene */
 	public static final int sim_message_eventcallback_modelsave = 261;			/* about to save a model (current selection will be saved) */
 	public static final int sim_message_eventcallback_moduleopen = 262;				/* called when simOpenModule in Lua is called */
@@ -288,32 +162,16 @@ public class remoteApi
 	public static final int sim_message_reserved6 = 267;								/* Do not use */
 	public static final int sim_message_reserved7 = 268;								/* Do not use */
 	public static final int sim_message_eventcallback_instancepass = 269;				/* Called once every main application loop pass. auxiliaryData[0] contains event flags of events that happened since last time: */
-															/* bit0 set: object(s) erased */
-															/* bit1 set: object(s) created */
-															/* bit2 set: model loaded */
-															/* bit3 set: scene loaded */
-															/* bit4 set: undo called */
-															/* bit5 set: redo called */
-															/* bit6 set: scene switched (similar to scene loaded, basically: scene content completely changed) */
-															/* bit7 set: edit mode active. This is not an event flag, but a state flag */
-															/* bit8 set: object(s) scaled */
-															/* bit9 set: selection state changed. (different objects are selected now) */
-															/* bit10 set: key pressed */
-															/* bit11 set: simulation started */
-															/* bit12 set: simulation ended */
-
 	public static final int sim_message_eventcallback_broadcast = 270;
 	public static final int sim_message_eventcallback_imagefilter_enumreset = 271;
 	public static final int sim_message_eventcallback_imagefilter_enumerate = 272;
 	public static final int sim_message_eventcallback_imagefilter_adjustparams = 273;
 	public static final int sim_message_eventcallback_imagefilter_reserved = 274;
 	public static final int sim_message_eventcallback_imagefilter_process = 275;
-
 	public static final int sim_message_eventcallback_reserved1 = 276; /* do not use */
 	public static final int sim_message_eventcallback_reserved2 = 277; /* do not use */
 	public static final int sim_message_eventcallback_reserved3 = 278; /* do not use */
 	public static final int sim_message_eventcallback_reserved4 = 279; /* do not use */
-
 	public static final int sim_message_eventcallback_abouttoundo = 280;		/* the undo button was hit and a previous state is about to be restored */
 	public static final int sim_message_eventcallback_undoperformed = 281;	/* the undo button was hit and a previous state restored */
 	public static final int sim_message_eventcallback_abouttoredo = 282;		/* the redo button was hit and a future state is about to be restored  */
@@ -321,11 +179,9 @@ public class remoteApi
 	public static final int sim_message_eventcallback_scripticondblclick = 284; /* scipt icon was double clicked.  (aux[0]=object handle associated with script, set replyData[0] to 1 if script should not be opened)  */
 	public static final int sim_message_eventcallback_simulationabouttostart = 285;
 	public static final int sim_message_eventcallback_simulationended = 286;
-
 	public static final int sim_message_eventcallback_reserved5 = 287;			/* do not use */
 	public static final int sim_message_eventcallback_keypress = 288;			/* a key was pressed while the focus was on a page (aux[0]=key, aux[1]=ctrl and shift key state) */
 	public static final int sim_message_eventcallback_modulehandleinsensingpart = 289; /* called when simHandleModule in Lua is called with argument true */
-
 	public static final int sim_message_eventcallback_renderingpass = 290; /* called just before the scene is rendered */
 	public static final int sim_message_eventcallback_bannerclicked = 291; /* called when a banner was clicked (aux[0]=banner ID) */
 	public static final int sim_message_eventcallback_menuitemselected = 292; /* auxiliaryData[0] indicates the handle of the item, auxiliaryData[1] indicates the state of the item */
@@ -333,16 +189,11 @@ public class remoteApi
 	public static final int sim_message_eventcallback_sceneloaded = 294;
 	public static final int sim_message_eventcallback_modelloaded = 295;
 	public static final int sim_message_eventcallback_instanceswitch = 296;
-
-
 	public static final int sim_message_eventcallback_guipass = 297;
 	public static final int sim_message_eventcallback_mainscriptabouttobecalled = 298;
-
-	public static final int sim_message_simulation_start_resume_request = 4096; 
+	public static final int sim_message_simulation_start_resume_request = 4096;
 	public static final int sim_message_simulation_pause_request = 4097;
 	public static final int sim_message_simulation_stop_request = 4098;
-		
-
 	public static final int sim_objectproperty_reserved1 = 0;
 	public static final int sim_objectproperty_reserved2 = 1;
 	public static final int sim_objectproperty_reserved3 = 2;
@@ -350,25 +201,21 @@ public class remoteApi
 	public static final int sim_objectproperty_reserved5 = 4; /* formely sim_objectproperty_visible */
 	public static final int sim_objectproperty_reserved6 = 8; /* formely sim_objectproperty_wireframe */
 	public static final int sim_objectproperty_collapsed = 16;
-	public static final int sim_objectproperty_selectable = 32; 
+	public static final int sim_objectproperty_selectable = 32;
 	public static final int sim_objectproperty_reserved7 = 64;
 	public static final int sim_objectproperty_selectmodelbaseinstead = 128;
 	public static final int sim_objectproperty_dontshowasinsidemodel = 256;
 	public static final int sim_objectproperty_canupdatedna = 1024;
-	public static final int sim_objectproperty_selectinvisible = 2048; 
-	public static final int sim_objectproperty_depthinvisible = 4096; 
-		
-
+	public static final int sim_objectproperty_selectinvisible = 2048;
+	public static final int sim_objectproperty_depthinvisible = 4096;
 	/* type of arguments (input and output) for custom lua commands */
-	public static final int sim_lua_arg_nil = 0;			
-	public static final int sim_lua_arg_bool = 1;		
+	public static final int sim_lua_arg_nil = 0;
+	public static final int sim_lua_arg_bool = 1;
 	public static final int sim_lua_arg_int = 2;
 	public static final int sim_lua_arg_float = 3;
 	public static final int sim_lua_arg_string = 4;
 	public static final int sim_lua_arg_invalid = 5;
 	public static final int sim_lua_arg_table = 8;
-		
-
 	/* custom user interface properties. Values are serialized. */
 	public static final int sim_ui_property_visible = 1;
 	public static final int sim_ui_property_visibleduringsimulationonly = 2;
@@ -381,8 +228,6 @@ public class remoteApi
 	public static final int sim_ui_property_rolledup = 256;
 	public static final int sim_ui_property_selectassociatedobject = 512;
 	public static final int sim_ui_property_visiblewhenobjectselected = 1024;
-		
-
 	/* button properties. Values are serialized. */
 	public static final int sim_buttonproperty_button = 0;
 	public static final int sim_buttonproperty_label = 1;
@@ -395,12 +240,11 @@ public class remoteApi
 	public static final int sim_buttonproperty_ignoremouse = 128;
 	public static final int sim_buttonproperty_isdown = 256;
 	public static final int sim_buttonproperty_transparent = 512 ;
-	public static final int sim_buttonproperty_nobackgroundcolor = 1024; 
+	public static final int sim_buttonproperty_nobackgroundcolor = 1024;
 	public static final int sim_buttonproperty_rollupaction = 2048;
 	public static final int sim_buttonproperty_closeaction = 4096;
 	public static final int sim_buttonproperty_verticallycentered = 8192;
 	public static final int sim_buttonproperty_downupevent = 16384;
-
 	/* Simulation status */
 	public static final int sim_simulation_stopped = 0;								/* Simulation is stopped */
 	public static final int sim_simulation_paused = 8;								/* Simulation is paused */
@@ -412,7 +256,6 @@ public class remoteApi
 	public static final int sim_simulation_advancing_firstafterpause = 16|4;		/* First simulation pass after pause (1x) */
 	public static final int sim_simulation_advancing_abouttostop = 16|5;		/* "Trying to stop" simulation pass (>=1x) */
 	public static final int sim_simulation_advancing_lastbeforestop = 16|6;		/* Last simulation pass (1x) */
-
 	/* Script execution result (first return value) */
 	public static final int sim_script_no_error = 0;
 	public static final int sim_script_main_script_nonexistent = 1;
@@ -420,22 +263,31 @@ public class remoteApi
 	public static final int sim_script_reentrance_error = 4;
 	public static final int sim_script_lua_error = 8;
 	public static final int sim_script_call_error = 16;
-
 	/* Script types (serialized!) */
 	public static final int sim_scripttype_mainscript = 0;
 	public static final int sim_scripttype_childscript = 1;
 	public static final int sim_scripttype_pluginscript = 2;
 	public static final int sim_scripttype_threaded = 240;		/* Combine with one of above's type values */
-		
-
 	/* API call error messages */
 	public static final int sim_api_errormessage_ignore = 0;	/* does not memorize nor output errors */
 	public static final int sim_api_errormessage_report = 1;	/* memorizes errors (default for C-API calls) */
 	public static final int sim_api_errormessage_output = 2;  /* memorizes and outputs errors (default for Lua-API calls) */
-
 	/* special argument of some functions: */
 	public static final int sim_handle_all = -2;
 	public static final int sim_handle_all_except_explicit = -3;
+	/* bit0 set: object(s) erased */
+															/* bit1 set: object(s) created */
+															/* bit2 set: model loaded */
+															/* bit3 set: scene loaded */
+															/* bit4 set: undo called */
+															/* bit5 set: redo called */
+															/* bit6 set: scene switched (similar to scene loaded, basically: scene content completely changed) */
+															/* bit7 set: edit mode active. This is not an event flag, but a state flag */
+															/* bit8 set: object(s) scaled */
+															/* bit9 set: selection state changed. (different objects are selected now) */
+															/* bit10 set: key pressed */
+															/* bit11 set: simulation started */
+															/* bit12 set: simulation ended */
 	public static final int sim_handle_self = -4;
 	public static final int sim_handle_main_script = -5;
 	public static final int sim_handle_tree = -6;
@@ -444,11 +296,9 @@ public class remoteApi
 	public static final int sim_handle_default = -9;
 	public static final int sim_handle_all_except_self = -10;
 	public static final int sim_handle_parent = -11;
-	
 	/* special handle flags: */
 	public static final int sim_handleflag_assembly	= 4194304;
 	public static final int sim_handleflag_model = 8388608;
-
 	/* distance calculation methods: (serialized) */
 	public static final int sim_distcalcmethod_dl = 0;
 	public static final int sim_distcalcmethod_dac = 1;
@@ -457,7 +307,6 @@ public class remoteApi
 	public static final int sim_distcalcmethod_sqrt_dl2_and_dac2 =4;
 	public static final int sim_distcalcmethod_dl_if_nonzero = 5;
 	public static final int sim_distcalcmethod_dac_if_nonzero = 6;
-
 	/* Generic dialog styles: */
 	public static final int sim_dlgstyle_message = 0;
 	public static final int	sim_dlgstyle_input = 1;
@@ -465,14 +314,12 @@ public class remoteApi
 	public static final int sim_dlgstyle_ok_cancel = 3;
 	public static final int sim_dlgstyle_yes_no = 4;
 	public static final int sim_dlgstyle_dont_center = 32; /* can be combined with one of above values. Only with this flag can the position of the related UI be set just after dialog creation  */
-		
 	/* Generic dialog return values: */
 	public static final int sim_dlgret_still_open = 0;
 	public static final int sim_dlgret_ok = 1;
 	public static final int sim_dlgret_cancel = 2;
 	public static final int sim_dlgret_yes = 3;
 	public static final int sim_dlgret_no = 4;
-
 	/* Path properties: */
 	public static final int sim_pathproperty_show_line = 1;
 	public static final int sim_pathproperty_show_orientation = 2;
@@ -486,7 +333,6 @@ public class remoteApi
 	public static final int sim_pathproperty_auto_velocity_profile_rotation = 512;
 	public static final int sim_pathproperty_endpoints_at_zero = 1024;
 	public static final int sim_pathproperty_keep_x_up = 2048;
-
 	/* drawing objects: */
 	/* following are mutually exclusive: */
 	public static final int sim_drawing_points = 0;			/* 3 values per point (point size in pixels) */
@@ -497,7 +343,6 @@ public class remoteApi
 	public static final int sim_drawing_discpoints = 5;			/* 6 values per point (3 for disc position, 3 for disc normal vector) (disc size in meters) */
 	public static final int sim_drawing_cubepoints = 6;			/* 6 values per point (3 for cube position, 3 for cube normal vector) (cube size in meters) */
 	public static final int sim_drawing_spherepoints = 7;			/* 3 values per point (sphere size in meters) */
-
 	/* following can be or-combined: */
 	public static final int sim_drawing_itemcolors = 32; /* +3 values per item (each item has its own ambient color (r,g,b values)). Mutually exclusive with sim_drawing_vertexcolors */
 	public static final int sim_drawing_vertexcolors = 64; /* +3 values per vertex (each vertex has its own ambient color (r,g,b values). Only for sim_drawing_lines (+6) and for sim_drawing_triangles(+9)). Mutually exclusive with sim_drawing_itemcolors */
@@ -514,7 +359,6 @@ public class remoteApi
 	public static final int sim_drawing_facingcamera = 131072; /* Only for trianglepoints, quadpoints, discpoints and cubepoints. If specified, the normal verctor is calculated to face the camera (each item data requires 3 values less) */
 	public static final int sim_drawing_overlay = 262144; /* When specified, objects are always drawn on top of "regular objects" */
 	public static final int sim_drawing_itemtransparency= 524288;  /* +1 value per item (each item has its own transparency value (0-1)). Not compatible with sim_drawing_vertexcolors */
-		
 	/* banner values: */
 	/* following can be or-combined: */
 	public static final int sim_banner_left	= 1; /* Banners display on the left of the specified point */
@@ -529,7 +373,6 @@ public class remoteApi
 	public static final int sim_banner_backfaceculling = 512; /* If specified, the banner will only be visible from one side */
 	public static final int sim_banner_keepsamesize = 1024; /* If specified, the banner will always appear in the same size. In that case size represents the character height in pixels */
 	public static final int sim_banner_bitmapfont = 2048; /* If specified, a fixed-size bitmap font is used. The text will also always fully face the camera and be right to the specified position. Bitmap fonts are not clickable */
-	
 	/* particle objects: */
 	/* following are mutually exclusive: */
 	public static final int sim_particle_points1 = 0;			/* 6 values per point (pt1 and pt2. Pt1 is start position, pt2-pt1 is the initial velocity vector). Point is 1 pixel big. Only appearance is a point, internally handled as a perfect sphere */
@@ -537,7 +380,6 @@ public class remoteApi
 	public static final int sim_particle_points4 = 2;			/* 6 values per point. Point is 4 pixel big. Only appearance is a point, internally handled as a perfect sphere */
 	public static final int sim_particle_roughspheres = 3;		/* 6 values per sphere. Only appearance is rough. Internally a perfect sphere */
 	public static final int sim_particle_spheres =4;			/* 6 values per sphere. Internally a perfect sphere */
-
 	/* following can be or-combined: */
 	public static final int sim_particle_respondable1to4 = 32; /* the particles are respondable against shapes (against all objects that have at least one bit 1-4 activated in the global respondable mask) */
 	public static final int sim_particle_respondable5to8 = 64; /* the particles are respondable against shapes (against all objects that have at least one bit 5-8 activated in the global respondable mask) */
@@ -551,14 +393,11 @@ public class remoteApi
 	public static final int sim_particle_emissioncolor = 16384; /* When used in combination with sim_particle_itemcolors, then the specified colors will be for the emissive component */
 	public static final int sim_particle_water = 32768; /* the particles are water particles (no weight in the water (i.e. when z<0)). Not compatible with sim_particle_ignoresgravity */
 	public static final int sim_particle_painttag = 65536; /* The particles can be seen by vision sensors (sim_particle_invisible must not be set) */
-		
-
 	/* custom user interface menu attributes: */
 	public static final int sim_ui_menu_title = 1;
 	public static final int sim_ui_menu_minimize = 2;
 	public static final int sim_ui_menu_close = 4;
 	public static final int sim_ui_menu_systemblock = 8;
-		
 	/* Boolean parameters: */
 	public static final int	sim_boolparam_hierarchy_visible = 0;
 	public static final int	sim_boolparam_console_visible = 1;
@@ -589,7 +428,6 @@ public class remoteApi
 	public static final int	sim_boolparam_force_show_wireless_emission = 27;
 	public static final int	sim_boolparam_force_show_wireless_reception = 28;
 	public static final int	sim_boolparam_video_recording_triggered = 29;
-	
 	public static final int	sim_boolparam_threaded_rendering_enabled = 32;
 	public static final int	sim_boolparam_fullscreen = 33;
 	public static final int	sim_boolparam_headless = 34;
@@ -603,8 +441,6 @@ public class remoteApi
 	public static final int	sim_boolparam_play_toolbarbutton_enabled = 42;
 	public static final int	sim_boolparam_pause_toolbarbutton_enabled = 43;
 	public static final int	sim_boolparam_stop_toolbarbutton_enabled = 44;
-
-
 	/* Integer parameters: */
 	public static final int sim_intparam_error_report_mode = 0; /* Check sim_api_errormessage_... constants above for valid values */
 	public static final int sim_intparam_program_version = 1;		/* e.g Version 2.1.4 --> 20104. Can only be read */
@@ -642,12 +478,10 @@ public class remoteApi
 	public static final int	sim_intparam_simulation_warning_disabled_mask = 33;
 	public static final int	sim_intparam_scene_index = 34;
 	public static final int	sim_intparam_motionplanning_seed = 35;
-
 	/* Float parameters: */
 	public static final int sim_floatparam_rand = 0; /* random value (0.0-1.0) */
-	public static final int sim_floatparam_simulation_time_step = 1; 
-	public static final int coppelia_remoteApi_sim_floatparam_stereo_distance = 2; 
-		
+	public static final int sim_floatparam_simulation_time_step = 1;
+	public static final int coppelia_remoteApi_sim_floatparam_stereo_distance = 2;
 	/* String parameters: */
 	public static final int	sim_stringparam_application_path = 0; /* path of V-REP's executable */
 	public static final int	sim_stringparam_video_filename = 1;
@@ -661,16 +495,14 @@ public class remoteApi
 	public static final int	sim_stringparam_app_arg8 = 9;
 	public static final int	sim_stringparam_app_arg9 = 10;
 	public static final int	sim_stringparam_scene_path_and_name = 13;
-		
 	/* Array parameters: */
 	public static final int sim_arrayparam_gravity = 0;
 	public static final int sim_arrayparam_fog = 1;
 	public static final int sim_arrayparam_fog_color = 2;
 	public static final int sim_arrayparam_background_color1 = 3;
 	public static final int sim_arrayparam_background_color2 = 4;
-	public static final int sim_arrayparam_ambient_light = 5; 
-	public static final int sim_arrayparam_random_euler = 6; 
-
+	public static final int sim_arrayparam_ambient_light = 5;
+	public static final int sim_arrayparam_random_euler = 6;
 	/* User interface elements: */
 	public static final int sim_gui_menubar = 1;
 	public static final int sim_gui_popups = 2;
@@ -684,7 +516,6 @@ public class remoteApi
 	public static final int sim_gui_dialogs = 512;
 	public static final int sim_gui_browser = 1024;
 	public static final int	sim_gui_all = 65535;
-		
 	/* Joint modes: */
 	public static final int	sim_jointmode_passive = 0;
 	public static final int	sim_jointmode_motion = 1;
@@ -692,8 +523,6 @@ public class remoteApi
 	public static final int	sim_jointmode_ikdependent = 3;
 	public static final int	sim_jointmode_dependent = 4;
 	public static final int	sim_jointmode_force = 5;
-		
-
 	/* Navigation and selection modes with the mouse. Lower byte values are mutually exclusive, upper byte bits can be combined */
 	public static final int sim_navigation_passive = 0;
 	public static final int sim_navigation_camerashift = 1;
@@ -716,7 +545,6 @@ public class remoteApi
 	public static final int sim_navigation_shiftselection = 2048;
 	public static final int sim_navigation_camerazoomwheel = 4096;
 	public static final int sim_navigation_camerarotaterightbutton = 8192;
-
 	/* Command return codes */
 	public static final int simx_return_ok = 0;
 	public static final int simx_return_novalue_flag = 1;		/* input buffer doesn't contain the specified command */
@@ -726,7 +554,6 @@ public class remoteApi
 	public static final int simx_return_split_progress_flag = 16;		/* previous similar command not yet fully processed (applies to simx_opmode_oneshot_split operation modes) */
 	public static final int simx_return_local_error_flag = 32;		/* command caused an error on the client side */
 	public static final int simx_return_initialize_error_flag = 64;		/* simxStart was not yet called */
-
 	/* Following for backward compatibility (same as above) */
 	public static final int simx_error_noerror = 0;
 	public static final int simx_error_novalue_flag = 1;		/* input buffer doesn't contain the specified command */
@@ -736,22 +563,228 @@ public class remoteApi
 	public static final int simx_error_split_progress_flag = 16;		/* previous similar command not yet fully processed (applies to simx_opmode_oneshot_split operation modes) */
 	public static final int simx_error_local_error_flag = 32;		/* command caused an error on the client side */
 	public static final int simx_error_initialize_error_flag = 64;		/* simxStart was not yet called */
-
-
 			/* Regular operation modes */
 	public static final int	simx_opmode_oneshot = 0;		/* sends command as one chunk. Reply will also come as one chunk. Doesn't wait for the reply. */
 	public static final int	simx_opmode_oneshot_wait = 65536;		/* sends command as one chunk. Reply will also come as one chunk. Waits for the reply (_REPLY_WAIT_TIMEOUT_IN_MS is the timeout). */
 	public static final int	simx_opmode_streaming = 131072;
 	public static final int	simx_opmode_continuous = 131072;
-
 			/* Operation modes for heavy data */
-	public static final int	simx_opmode_oneshot_split = 196608;		/* sends command as several chunks (max chunk size is x bytes, where x can be _MIN_SPLIT_AMOUNT_IN_BYTES-65535. Just add x to simx_opmode_oneshot_split). Reply will also come as several chunks. Doesn't wait for the reply. */	 
+			public static final int simx_opmode_oneshot_split = 196608;		/* sends command as several chunks (max chunk size is x bytes, where x can be _MIN_SPLIT_AMOUNT_IN_BYTES-65535. Just add x to simx_opmode_oneshot_split). Reply will also come as several chunks. Doesn't wait for the reply. */
 	public static final int simx_opmode_streaming_split = 262144;
 	public static final int simx_opmode_continuous_split = 262144;
-
 			/* Special operation modes */
 	public static final int simx_opmode_discontinue = 327680;		/* removes and cancels all commands stored on the client or server side (also continuous commands) */
 	public static final int simx_opmode_buffer = 393216;	/* doesn't send anything, but checks if a reply for the given command is available in the input buffer (i.e. previously received from the server) */
 	public static final int simx_opmode_remove = 458752;		/* doesn't send anything and doesn't return any specific value. It just erases a similar command reply in the inbox (to free some memory) */
+
+	static {
+		System.loadLibrary("remoteApiJava");
+	}
+
+	public native int simxStart(final String connectionAddress, int connectionPort, boolean waitUntilConnected, boolean doNotReconnectOnceDisconnected, int timeOutInMs, int commThreadCycleInMs);
+
+	public native void simxFinish(int clientID);
+
+	public native int simxGetConnectionId(int clientID);
+
+	public native int simxGetObjectHandle(int clientID, final String objectName, IntW handle, int operationMode);
+
+	public native int simxGetJointPosition(int clientID, int jointHandle, FloatW position, int operationMode);
+
+	public native int simxSetJointPosition(int clientID, int jointHandle, float position, int operationMode);
+
+	public native int simxGetObjectPosition(int clientID, int objectHandle, int relativeToObjectHandle, FloatWA position, int operationMode);
+
+	public native int simxSetObjectPosition(int clientID, int objectHandle, int relativeToObjectHandle, final FloatWA position, int operationMode);
+
+	public native int simxGetVisionSensorImage(int clientID, int sensorHandle, IntWA resolution, CharWA image, int options, int operationMode);
+
+	public native int simxSetVisionSensorImage(int clientID, int sensorHandle, CharWA image, int bufferSize, int options, int operationMode);
+
+	public native int simxGetJointMatrix(int clientID, int jointHandle, FloatWA matrix, int operationMode);
+
+	public native int simxSetSphericalJointMatrix(int clientID, int jointHandle, FloatWA matrix, int operationMode);
+
+	public native int simxSetJointTargetVelocity(int clientID, int jointHandle, float targetVelocity, int operationMode);
+
+	public native int simxSetJointTargetPosition(int clientID, int jointHandle, float targetPosition, int operationMode);
+
+	public native int simxJointGetForce(int clientID, int jointHandle, FloatW force, int operationMode);
+
+	public native int simxGetJointForce(int clientID, int jointHandle, FloatW force, int operationMode);
+
+	public native int simxSetJointForce(int clientID, int jointHandle, float force, int operationMode);
+
+	public native int simxReadForceSensor(int clientID, int forceSensorHandle, IntW state, FloatWA forceVector, FloatWA torqueVector, int operationMode);
+
+	public native int simxBreakForceSensor(int clientID, int forceSensorHandle, int operationMode);
+
+	public native int simxReadVisionSensor(int clientID, int sensorHandle, BoolW detectionState, FloatWAA auxValues, int operationMode);
+
+	public native int simxGetObjectFloatParameter(int clientID, int objectHandle, int parameterID, FloatW parameterValue, int operationMode);
+
+	public native int simxSetObjectFloatParameter(int clientID, int objectHandle, int parameterID, float parameterValue, int operationMode);
+
+	public native int simxGetObjectIntParameter(int clientID, int objectHandle, int parameterID, IntW parameterValue, int operationMode);
+
+	public native int simxSetObjectIntParameter(int clientID, int objectHandle, int parameterID, int parameterValue, int operationMode);
+
+	public native int simxGetModelProperty(int clientID, int objectHandle, IntW prop, int operationMode);
+
+	public native int simxSetModelProperty(int clientID, int objectHandle, int prop, int operationMode);
+
+	public native int simxGetVisionSensorDepthBuffer(int clientID, int sensorHandle, IntWA resolution, FloatWA buffer, int operationMode);
+
+	public native int simxGetObjectChild(int clientID, int parentObjectHandle, int childIndex, IntW childObjectHandle, int operationMode);
+
+	public native int simxGetObjectParent(int clientID, int childObjectHandle, IntW parentObjectHandle, int operationMode);
+
+	public native int simxStartSimulation(int clientID, int operationMode);
+
+	public native int simxPauseSimulation(int clientID, int operationMode);
+
+	public native int simxStopSimulation(int clientID, int operationMode);
+
+	public native int simxGetUISlider(int clientID, int uiHandle, int uiButtonID, IntW position, int operationMode);
+
+	public native int simxSetUISlider(int clientID, int uiHandle, int uiButtonID, int position, int operationMode);
+
+	public native int simxGetUIEventButton(int clientID, int uiHandle, IntW uiEventButtonID, IntWA auxValues, int operationMode);
+
+	public native int simxGetUIButtonProperty(int clientID, int uiHandle, int uiButtonID, IntW prop, int operationMode);
+
+	public native int simxSetUIButtonProperty(int clientID, int uiHandle, int uiButtonID, int prop, int operationMode);
+
+	public native int simxAuxiliaryConsoleClose(int clientID, int consoleHandle, int operationMode);
+
+	public native int simxAuxiliaryConsoleShow(int clientID, int consoleHandle, boolean showState, int operationMode);
+
+	public native int simxGetObjectOrientation(int clientID, int objectHandle, int relativeToObjectHandle, FloatWA eulerAngles, int operationMode);
+
+	public native int simxSetObjectParent(int clientID, int objectHandle, int parentObject, boolean keepInPlace, int operationMode);
+
+	public native int simxGetArrayParameter(int clientID, int paramIdentifier, FloatWA paramValues, int operationMode);
+
+	public native int simxSetArrayParameter(int clientID, int paramIdentifier, FloatWA paramValues, int operationMode);
+
+	public native int simxGetIntegerParameter(int clientID, int paramIdentifier, IntW paramValue, int operationMode);
+
+	public native int simxSetIntegerParameter(int clientID, int paramIdentifier, int paramValue, int operationMode);
+
+	public native int simxGetBooleanParameter(int clientID, int paramIdentifier, BoolW paramValue, int operationMode);
+
+	public native int simxGetDialogResult(int clientID, int dialogHandle, IntW result, int operationMode);
+
+	public native int simxSetFloatingParameter(int clientID, int paramIdentifier, float paramValue, int operationMode);
+
+	public native int simxRemoveObject(int clientID, int objectHandle, int operationMode);
+
+	public native int simxRemoveModel(int clientID, int objectHandle, int operationMode);
+
+	public native int simxRemoveUI(int clientID, int uiHandle, int operationMode);
+
+	public native int simxCloseScene(int clientID, int operationMode);
+
+	public native int simxEndDialog(int clientID, int dialogHandle, int operationMode);
+
+	public native int simxReadDistance(int clientID, int distanceObjectHandle, FloatW minimumDistance, int operationMode);
+
+	public native int simxGetFloatingParameter(int clientID, int paramIdentifier, FloatW paramValue, int operationMode);
+
+	public native int simxSetObjectOrientation(int clientID, int objectHandle, int relativeToObjectHandle, FloatWA eulerAngles, int operationMode);
+
+	public native int simxReadProximitySensor(int clientID, int sensorHandle, BoolW detectionState, FloatWA detectedPoint, IntW detectedObjectHandle, FloatWA detectedSurfaceNormalVector, int operationMode);
+
+	public native int simxLoadModel(int clientID, final String modelPathAndName, int options, IntW baseHandle, int operationMode);
+
+	public native int simxLoadUI(int clientID, final String uiPathAndName, int options, IntWA uiHandles, int operationMode);
+
+	public native int simxLoadScene(int clientID, final String scenePathAndName, int options, int operationMode);
+
+	public native int simxGetUIHandle(int clientID, final String uiName, IntW handle, int operationMode);
+
+	public native int simxAddStatusbarMessage(int clientID, final String message, int operationMode);
+
+	public native int simxAuxiliaryConsoleOpen(int clientID, final String title, int maxLines, int mode, IntWA position, IntWA size, FloatWA textColor, FloatWA backgroundColor, IntW consoleHandle, int operationMode);
+
+	public native int simxAuxiliaryConsolePrint(int clientID, int consoleHandle, final String txt, int operationMode);
+
+	public native int simxSetUIButtonLabel(int clientID, int uiHandle, int uiButtonID, final String upStateLabel, final String downStateLabel, int operationMode);
+
+	public native int simxGetLastErrors(int clientID, StringWA errorStrings, int operationMode);
+
+	public native int simxSetBooleanParameter(int clientID, int paramIdentifier, boolean paramValue, int operationMode);
+
+	public native int simxGetStringParameter(int clientID, int paramIdentifier, StringW paramValue, int operationMode);
+
+	public native int simxGetCollisionHandle(int clientID, final String collisionObjectName, IntW handle, int operationMode);
+
+	public native int simxGetDistanceHandle(int clientID, final String distanceObjectName, IntW handle, int operationMode);
+
+	public native int simxReadCollision(int clientID, int collisionObjectHandle, BoolW collisionState, int operationMode);
+
+	public native int simxGetObjects(int clientID, int objectType, IntWA objectHandles, int operationMode);
+
+	public native int simxDisplayDialog(int clientID, final String titleText, final String mainText, int dialogType, final String initialText, FloatWA titleColors, FloatWA dialogColors, IntW dialogHandle, IntW uiHandle, int operationMode);
+
+	public native int simxGetDialogInput(int clientID, int dialogHandle, StringW inputText, int operationMode);
+
+	public native int simxCopyPasteObjects(int clientID, IntWA objectHandles, IntWA newObjectHandles, int operationMode);
+
+	public native int simxGetObjectSelection(int clientID, IntWA objectHandles, int operationMode);
+
+	public native int simxSetObjectSelection(int clientID, IntWA objectHandles, int operationMode);
+
+	public native int simxClearFloatSignal(int clientID, final String signalName, int operationMode);
+
+	public native int simxClearStringSignal(int clientID, final String signalName, int operationMode);
+
+	public native int simxClearIntegerSignal(int clientID, final String signalName, int operationMode);
+
+	public native int simxGetFloatSignal(int clientID, final String signalName, FloatW signalValue, int operationMode);
+
+	public native int simxGetIntegerSignal(int clientID, final String signalName, IntW signalValue, int operationMode);
+
+	public native int simxGetStringSignal(int clientID, final String signalName, CharWA signalValue, int operationMode);
+
+	public native int simxGetAndClearStringSignal(int clientID, final String signalName, CharWA signalValue, int operationMode);
+
+	public native int simxReadStringStream(int clientID, final String signalName, CharWA signalValue, int operationMode);
+
+	public native int simxSetFloatSignal(int clientID, final String signalName, float signalValue, int operationMode);
+
+	public native int simxSetIntegerSignal(int clientID, final String signalName, int signalValue, int operationMode);
+
+	public native int simxSetStringSignal(int clientID, final String signalName, final CharWA signalValue, int operationMode);
+
+	public native int simxAppendStringSignal(int clientID, final String signalName, final String signalValue, int operationMode);
+
+	public native int simxWriteStringStream(int clientID, final String signalName, final CharWA signalValue, int operationMode);
+
+	public native int simxGetPingTime(int clientID, IntW pingTime);
+
+	public native int simxGetLastCmdTime(int clientID);
+
+	public native int simxSynchronousTrigger(int clientID);
+
+	public native int simxSynchronous(int clientID, boolean enable);
+
+	public native int simxPauseCommunication(int clientID, boolean enable);
+
+	public native int simxGetInMessageInfo(int clientID, int infoType, IntW info);
+
+	public native int simxGetOutMessageInfo(int clientID, int infoType, IntW info);
+
+	public native int simxTransferFile(int clientID, final String filePathAndName, final String fileName_serverSide, int timeOut, int operationMode);
+
+	public native int simxEraseFile(int clientID, final String fileName_serverSide, int operationMode);
+
+	public native int simxCreateDummy(int clientID, float size, CharWA color, IntW dummyHandle, int operationMode);
+
+	public native int simxQuery(int clientID, final String signalName, final CharWA signalValue, final String retSignalName, CharWA retSignalValue, int timeOutInMs);
+
+	public native int simxGetObjectGroupData(int clientID, int objectType, int dataType, IntWA handles, IntWA intData, FloatWA floatData, StringWA stringData, int operationMode);
+
+	public native int simxGetObjectVelocity(int clientID, int objectHandle, FloatWA linearVelocity, FloatWA angularVelocity, int operationMode);
 
 }
