@@ -23,7 +23,7 @@ public class NetworkManager {
     private LinkedBlockingQueue<byte[]> mReadFromPcQueue = new LinkedBlockingQueue<>();
 
 
-    public NetworkManager() {
+    public NetworkManager(String ipAddress, int port) {
         // Start the Network Sender thread
         // This thread will read from the mWriteToPcQueue and send packets to the PC application
         // The mWriteToPcQueue will get packets from the FT_Device write call
@@ -39,7 +39,7 @@ public class NetworkManager {
             NetworkReceiver myNetworkReceiver = new NetworkReceiver(mReadFromPcQueue, mSimulatorSocket);
             Thread networkReceiverThread = new Thread(myNetworkReceiver);
             networkReceiverThread.start();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -107,11 +107,13 @@ public class NetworkManager {
         private LinkedBlockingQueue queue;
 
         DatagramSocket mSocket;
+        int mDestPort;
         private InetAddress IPAddress;
 
-        public NetworkSender(LinkedBlockingQueue queue, DatagramSocket mySocket, final String ip) {
+        public NetworkSender(LinkedBlockingQueue queue, String ipAddress, DatagramSocket mySocket, int destPort) {
             this.queue = queue;
             this.mSocket = mySocket;
+            this.mDestPort = destPort;
 
             try {
                 this.IPAddress = InetAddress.getByName(ip);

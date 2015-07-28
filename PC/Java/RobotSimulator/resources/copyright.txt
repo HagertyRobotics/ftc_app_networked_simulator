@@ -1,0 +1,3 @@
+Copyright by Jan Jan Kovařík - http://glyphicons.com/
+- calendar.png
+- edit.png
