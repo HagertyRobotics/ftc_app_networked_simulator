@@ -45,7 +45,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
      */
     public LegacyBrickSimulator() {
     	for (int i=0;i<6;i++) {
-    		portName[i] = null;
+    		portName[i] = "";
     		portType[i] = SimDataType.NONE;
     		portSimData[i] = null;
     	}
