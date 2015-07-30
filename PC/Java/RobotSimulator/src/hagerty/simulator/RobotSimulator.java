@@ -25,6 +25,8 @@ public class RobotSimulator  {
 
     static public void startSimulator(hagerty.gui.MainApp mainApp) {
     	simulatorStarted = true;
+
+        /* Old Seeker
         try {
             System.out.println("Waiting for Robot Controller seeker...");
             DatagramSocket mSeekerSocket = new DatagramSocket(7000);
@@ -44,8 +46,9 @@ public class RobotSimulator  {
             System.err.println(ex.toString());
             logger.log(Level.SEVERE, ex.toString());
         }
-
+*/
 		// Start the module info server
+
     	System.out.println("Starting Module Lister...");
         gBrickListGenerator = new BrickListGenerator(mainApp);  // Runnable
         Thread moduleListerThread = new Thread(gBrickListGenerator,"");

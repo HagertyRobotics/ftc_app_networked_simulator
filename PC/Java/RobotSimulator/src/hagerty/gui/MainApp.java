@@ -101,7 +101,7 @@ public class MainApp extends Application {
         }
 
         // Try to load last opened controller file.
-        File file = Utils.getBrickFilePath(Preferences.userNodeForPackage(this.getClass()));
+        java.io.File file = Utils.getBrickFilePath(Preferences.userNodeForPackage(this.getClass()));
         if (file != null) {
             try {
                 Utils.loadBrickDataFromFile(file, brickList);

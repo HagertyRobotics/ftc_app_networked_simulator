@@ -1,0 +1,48 @@
+package org.ftccommunity.simulator;
+
+option java_package = "org.ftccommunity.simulator.protobuf";
+option java_outer_classname = "SimulatorData";
+
+message Data {
+    required Type type = 1;
+    required Modules module = 2;
+    repeated string info = 3;
+    optional int32 port = 4 [default = 1];
+    optional string dataName = 5 [default = ""];
+
+    enum Modules {
+        LEGACY_CONTROLLER = 1;
+        LEGACY_MOTOR = 2;
+        LEGACY_SENSOR = 3;
+    }
+}
+
+message DeviceListOld {
+    required Type type = 1;
+    required string serialized = 2;
+}
+
+message DeviceList {
+    required Type type = 1;
+    repeated BrickInfo bricks = 2;
+}
+
+message BrickInfo {
+    required Type type = 1;
+    optional string alias = 2;
+    optional string serial = 3;
+}
+
+message Type {
+    required Types type = 1;
+    enum Types {
+        NONE = 1;
+        LEGACY_MOTOR = 2;
+        LEGACY_LIGHT = 3;
+        LEGACY_TOUCH = 4;
+        USB_MOTOR= 5;
+        USB_SERVO = 6;
+        DEVICE_LIST = 7;
+        BRICK_INFO = 8;
+    }
+}

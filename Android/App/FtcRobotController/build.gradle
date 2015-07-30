@@ -5,8 +5,8 @@ android {
     buildToolsVersion = '21.1.2'
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 19
+        minSdkVersion 19
+        targetSdkVersion 22
     }
 }
 
@@ -18,10 +18,12 @@ repositories {
 
 dependencies {
     compile files('libs/android-support-v4.jar')
- //   compile (name:'d2xx', ext:'jar')
-    compile (name:'RobotCore-release', ext:'aar')
-    compile (name:'ModernRobotics-release', ext:'aar')
-    compile (name:'FtcCommon-release', ext:'aar')
-    compile (name:'WirelessP2p-release', ext:'aar')
-    compile (name:'Analytics-release', ext:'aar')
+    //   compile (name:'d2xx', ext:'jar')
+    compile(name: 'RobotCore-release', ext: 'aar')
+    compile(name: 'ModernRobotics-release', ext: 'aar')
+    compile(name: 'FtcCommon-release', ext: 'aar')
+    compile(name: 'WirelessP2p-release', ext: 'aar')
+    compile(name: 'Analytics-release', ext: 'aar')
+    compile files('libs/netty-all-4.0.30.Final.jar')
+    compile files('libs/protobuf.jar')
 }

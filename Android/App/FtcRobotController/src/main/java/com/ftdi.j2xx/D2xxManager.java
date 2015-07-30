@@ -3,6 +3,7 @@ package com.ftdi.j2xx;
 import android.content.Context;
 import android.util.Log;
 
+import org.ftccommunity.simulator.Server;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,6 +33,7 @@ public class D2xxManager
     private static final String TAG = "D2xx::";
     protected static final String ACTION_USB_PERMISSION = "com.ftdi.j2xx";
     private ArrayList<FT_Device> mFtdiDevices;
+    private Server server;
 
 
     public static final int PHONEPORT  = 7000;
@@ -45,7 +47,9 @@ public class D2xxManager
             throws D2xxManager.D2xxException
     {
         Log.v("D2xx::", "Start constructor");
-
+        server = new Server(7002);
+        Thread serverThread = new Thread(server);
+        serverThread.start();
 
         try {
             mModuleListerSocket = new DatagramSocket(PHONEPORT);

@@ -4,6 +4,7 @@ import hagerty.gui.MainApp;
 import hagerty.simulator.modules.*;
 import hagerty.utils.Utils;
 import javafx.collections.ObservableList;
+import org.ftccommunity.simulator.protobuf.SimulatorData;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -85,6 +86,8 @@ public class BrickListGenerator implements Runnable {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
                     RobotSimulator.getPhoneIPAddress(), RobotSimulator.getPhonePort());
             mServerSocket.send(sendPacket);
+
+            NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST, SimulatorData.Data.Modules.LEGACY_CONTROLLER, sendData);
             logger.log(Level.FINER, "sendPacketToPhone: (" + Utils.bufferToHexString(sendData, 0, sendData.length) +
                     ") len=" + sendData.length);
         } catch (IOException e) {
