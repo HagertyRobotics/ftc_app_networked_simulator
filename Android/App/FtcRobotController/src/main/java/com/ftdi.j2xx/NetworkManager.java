@@ -13,14 +13,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  */
 public class NetworkManager {
-    // the Server's Port
-    public static final int PHONE_PORT  = 6000;
-    public static final String PC_IP_ADDRESS  = "192.168.2.189";
-    public static final int SENDING_PORT = 6500;
 
-    private DatagramSocket mSimulatorSocket;
-    private LinkedBlockingQueue<byte[]> mWriteToPcQueue = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<byte[]> mReadFromPcQueue = new LinkedBlockingQueue<>();
+    DatagramSocket mSocket;
+    LinkedBlockingQueue mWriteToPcQueue = new LinkedBlockingQueue();
+    LinkedBlockingQueue mReadFromPcQueue = new LinkedBlockingQueue();
 
 
     public NetworkManager(String ipAddress, int port) {
@@ -28,15 +24,13 @@ public class NetworkManager {
         // This thread will read from the mWriteToPcQueue and send packets to the PC application
         // The mWriteToPcQueue will get packets from the FT_Device write call
         try {
-            mSimulatorSocket = new DatagramSocket(PHONE_PORT);
-            Log.v("D2xx::", "Local Port " + mSimulatorSocket.getLocalPort());
-            NetworkSender myNetworkSender = new NetworkSender(mWriteToPcQueue,
-                    mSimulatorSocket,
-                    PC_IP_ADDRESS);  // Runnable
+            mSocket = new DatagramSocket(port);
+            Log.v("D2xx::", "Local Port " + mSocket.getLocalPort());
+            NetworkSender myNetworkSender = new NetworkSender(mWriteToPcQueue, ipAddress, mSocket, port);  // Runnable
             Thread networkSenderThread = new Thread(myNetworkSender);
             networkSenderThread.start();
 
-            NetworkReceiver myNetworkReceiver = new NetworkReceiver(mReadFromPcQueue, mSimulatorSocket);
+            NetworkReceiver myNetworkReceiver = new NetworkReceiver(mReadFromPcQueue, mSocket);
             Thread networkReceiverThread = new Thread(myNetworkReceiver);
             networkReceiverThread.start();
         } catch (IOException e) {
@@ -45,11 +39,11 @@ public class NetworkManager {
     }
 
 
-    LinkedBlockingQueue<byte[]> getWriteToPcQueue() {
+    LinkedBlockingQueue getWriteToPcQueue() {
         return mWriteToPcQueue;
     }
 
-    LinkedBlockingQueue<byte[]> getReadFromPcQueue() {
+    LinkedBlockingQueue getReadFromPcQueue() {
         return mReadFromPcQueue;
     }
 
@@ -63,11 +57,11 @@ public class NetworkManager {
      *
      */
     public class NetworkReceiver implements Runnable {
-        private LinkedBlockingQueue<byte[]> queue;
+        private LinkedBlockingQueue queue;
         DatagramSocket mSocket;
         byte[] mReceiveData = new byte[1024];
 
-        public NetworkReceiver(LinkedBlockingQueue<byte[]> queue, DatagramSocket my_socket) {
+        public NetworkReceiver(LinkedBlockingQueue queue, DatagramSocket my_socket) {
             this.queue = queue;
             this.mSocket = my_socket;
         }
@@ -75,7 +69,8 @@ public class NetworkManager {
 
         @Override
         public void run() {
-            while (!Thread.currentThread().isInterrupted()) {
+
+            while (true) {
                 DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
                 try {
                     mSocket.receive(receivePacket);
@@ -85,7 +80,7 @@ public class NetworkManager {
                     Log.v("D2xx::", "Receive: " + readBuffer[0] + "Len: " + receivePacket.getLength());
                     queue.put(readBuffer);
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -107,8 +102,8 @@ public class NetworkManager {
         private LinkedBlockingQueue queue;
 
         DatagramSocket mSocket;
+        InetAddress IPAddress;
         int mDestPort;
-        private InetAddress IPAddress;
 
         public NetworkSender(LinkedBlockingQueue queue, String ipAddress, DatagramSocket mySocket, int destPort) {
             this.queue = queue;
@@ -116,11 +111,9 @@ public class NetworkManager {
             this.mDestPort = destPort;
 
             try {
-                this.IPAddress = InetAddress.getByName(ip);
+                IPAddress = InetAddress.getByName(ipAddress);
             } catch (IOException e) {
-                Log.e("FTC Controller", "The following ip address is not invalid: " +
-                        ip + "Details: " + e.getMessage(), e);
-                throw new AssertionError("IP Address is invalid!");
+                e.printStackTrace();
             }
 
         }
@@ -129,12 +122,14 @@ public class NetworkManager {
         public void run() {
             byte[] writeBuf;
 
-            while (!Thread.currentThread().isInterrupted()) {
+            while (true) {
                 try {
                     writeBuf = (byte[])queue.take();
-                    DatagramPacket send_packet = new DatagramPacket(writeBuf,writeBuf.length, IPAddress, SENDING_PORT);
+                    DatagramPacket send_packet = new DatagramPacket(writeBuf,writeBuf.length, IPAddress, mDestPort);
                     mSocket.send(send_packet);
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
