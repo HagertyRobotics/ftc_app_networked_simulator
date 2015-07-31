@@ -1,9 +1,11 @@
 package hagerty.simulator.legacy.data;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class SimDataFactory {
 	public static SimData buildSimData(SimDataType type) {
-		SimData simData = null;
-		switch (type) {
+        SimData simData;
+        switch (type) {
 		case NONE:
 			simData = null;
 			break;
@@ -11,17 +13,16 @@ public class SimDataFactory {
 			simData = new LegacyMotorSimData();
 			break;
 		case LEGACY_LIGHT:
-			break;
-		case LEGACY_TOUCH:
-			break;
-		case USB_MOTOR:
-			break;
-		case USB_SERVO:
-			break;
-		default:
-			// throw exception
-			break;
-		}
-		return simData;
+            // fall through
+            case LEGACY_TOUCH:
+            // fallthrough
+            case USB_MOTOR:
+            // fallthrough
+            case USB_SERVO:
+            throw new NotImplementedException();
+            default:
+                throw new AssertionError("You did not specify a valid type");
+        }
+        return simData;
 	}
 }

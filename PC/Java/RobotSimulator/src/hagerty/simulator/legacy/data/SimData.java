@@ -1,21 +1,20 @@
 package hagerty.simulator.legacy.data;
 
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class SimData {
 
-    protected StringProperty simDataName = null;
-    private SimDataType mType=null;
-
 	public final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+	protected StringProperty simDataName = null;
+    private SimDataType mType=null;
 
 	public SimData(SimDataType type) {
 		mType=type;
@@ -42,7 +41,7 @@ public abstract class SimData {
 
 	abstract public void setupDebugGuiVbox(VBox vbox);
 
-	abstract public void populateDebugGuiVbox();
+	abstract public LinkedList<?> populateDebugGuiVbox();
 	
 
 }

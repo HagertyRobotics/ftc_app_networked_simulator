@@ -40,7 +40,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Enables control of the robot via the gamepad
  */
 public class TestOp extends OpMode {
-
 	/*
 	 * Note: the configuration of the servos is such that
 	 * as the arm servo approaches 0, the arm position moves up (away from the floor).
@@ -53,11 +52,16 @@ public class TestOp extends OpMode {
 	double right;
 	double left;
 
+    // TODO: this is a workaround for overwriting
+    boolean isOddRun;
+
 	/**
 	 * Constructor
 	 */
 	public TestOp() {
-
+        right = 0.0;
+        left = 0.0;
+        isOddRun = true;
 	}
 
 	/*
@@ -67,8 +71,6 @@ public class TestOp extends OpMode {
 	 */
 	@Override
 	public void start() {
-
-
 		/*
 		 * Use the hardwareMap to get the dc motors and servos by name. Note
 		 * that the names of the devices must match the names used when you
@@ -86,8 +88,6 @@ public class TestOp extends OpMode {
 		motorLeft = hardwareMap.dcMotor.get("motor_1");
 		motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
-		right = 0.0;
-		left = 0.0;
 	}
 
 	/*
@@ -97,16 +97,20 @@ public class TestOp extends OpMode {
 	 */
 	@Override
 	public void loop() {
-
-
-
-
-		// write the values to the motors
-		motorRight.setPower(right);
-		motorLeft.setPower(left);
-
 		right += .01;  if (right > 1.0) right = 0.0;
 		left += .01;   if (left > 1.0) left = 0.0;
+
+        // write the values to the motors, flipping which run is written first
+        if (isOddRun) {
+            motorRight.setPower(right);
+            motorLeft.setPower(left);
+        } else {
+            motorLeft.setPower(left);
+            motorRight.setPower(right);
+        }
+
+        // Flip the value of isOddRun
+        isOddRun = !isOddRun;
 
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
@@ -126,6 +130,7 @@ public class TestOp extends OpMode {
 	 */
 	@Override
 	public void stop() {
-
+		motorRight.setPower(0);
+        motorLeft.setPower(0);
 	}
 }

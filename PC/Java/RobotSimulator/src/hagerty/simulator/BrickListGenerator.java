@@ -1,45 +1,36 @@
 package hagerty.simulator;
 
-import hagerty.utils.*;
-import hagerty.simulator.modules.BrickListWrapper;
-import hagerty.simulator.modules.BrickSimulator;
-import hagerty.simulator.modules.LegacyBrickSimulator;
-import hagerty.simulator.modules.MotorBrickSimulator;
-import hagerty.simulator.modules.ServoBrickSimulator;
+import hagerty.gui.MainApp;
+import hagerty.simulator.modules.*;
+import hagerty.utils.Utils;
 import javafx.collections.ObservableList;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.util.logging.Logger;
 
 public class BrickListGenerator implements Runnable {
-
-
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     DatagramSocket mServerSocket;
 
     byte[] mReceiveData = new byte[1024];
     byte[] mSendData = new byte[1024];
 
-    hagerty.gui.MainApp mMainApp;
+    MainApp mMainApp;
 
-    /** Default Constructor.
-     *
-     */
-    public BrickListGenerator(hagerty.gui.MainApp mainApp) {
-
-    	mMainApp = mainApp;
+    public BrickListGenerator(MainApp mainApp) {
+        mMainApp = mainApp;
 
         try {
         	mServerSocket = new DatagramSocket(7000);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -47,10 +38,10 @@ public class BrickListGenerator implements Runnable {
     	byte[] packet;
 
     	try {
-            while (RobotSimulator.gThreadsAreRunning) {
-            	packet = receivePacketFromPhone();
-            	handleIncomingPacket(packet, packet.length, false);
-            	System.out.println("ModuleLister");
+            while (!Thread.currentThread().isInterrupted()) {
+                packet = receivePacketFromPhone();
+                handleIncomingPacket(packet, false);
+                // System.out.println("ModuleLister");
             }
             // Catch unhandled exceptions and cleanup
     	} catch (Exception e) {
@@ -70,7 +61,6 @@ public class BrickListGenerator implements Runnable {
 
 
     private byte[] receivePacketFromPhone() {
-
     	DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
     	try {
     		mServerSocket.receive(receivePacket);
@@ -81,27 +71,26 @@ public class BrickListGenerator implements Runnable {
     	// Get the port and address of the sender from the incoming packet and set some global variables
     	// to be used when we reply back.
     	// TODO: do we need to set this every time?
-    	RobotSimulator.gPhonePort = receivePacket.getPort();
-    	RobotSimulator.gPhoneIPAddress = receivePacket.getAddress();
+        RobotSimulator.GetPhoneConnectionDetails(receivePacket.getPort(), receivePacket.getAddress());
 
     	// Make a copy of the packet.  Not sure if we need to do this.  Might not hold on to it for long.
-    	byte[] mypacket = new byte[receivePacket.getLength()];
-    	System.arraycopy(receivePacket.getData(), 0, mypacket, 0, receivePacket.getLength());
-
-    	return mypacket;
+        // byte[] myPacket = new byte[receivePacket.getLength()];
+        // System.arraycopy(receivePacket.getData(), 0, myPacket, 0, receivePacket.getLength());
+        return receivePacket.getData();
     }
 
     private void sendPacketToPhone(byte[] sendData) {
     	try {
-    		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, RobotSimulator.gPhoneIPAddress, RobotSimulator.gPhonePort);
-        	mServerSocket.send(sendPacket);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
+                    RobotSimulator.getPhoneIPAddress(), RobotSimulator.getPhonePort());
+            mServerSocket.send(sendPacket);
         	System.out.println("sendPacketToPhone: (" + Utils.bufferToHexString(sendData,0,sendData.length) + ") len=" + sendData.length);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void handleIncomingPacket(byte[] data, int length, boolean wait)
+    public void handleIncomingPacket(byte[] data, boolean wait)
     {
     	System.out.println("Receive Buffer: (" + Utils.bufferToHexString(data,0,25) + ") len=" + data.length);
 
@@ -126,10 +115,9 @@ public class BrickListGenerator implements Runnable {
 			m.marshal(wrapper, outputStream);
 			return outputStream.toByteArray();
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return null;
-		}
+            throw new AssertionError("JAXB should not be throwing", e.getCause());
+        }
 
     }
 

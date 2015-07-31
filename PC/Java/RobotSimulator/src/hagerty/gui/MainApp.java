@@ -1,18 +1,17 @@
 package hagerty.gui;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.prefs.Preferences;
-
+import hagerty.gui.view.*;
+import hagerty.simulator.RobotSimulator;
+import hagerty.simulator.modules.BrickSimulator;
+import hagerty.simulator.modules.LegacyBrickSimulator;
+import hagerty.utils.ClientLogger;
+import hagerty.utils.Utils;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -20,40 +19,38 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javax.xml.bind.*;
-
-import hagerty.gui.view.DebugWindowController;
-import hagerty.gui.view.EditDialogController;
-import hagerty.gui.view.NewDialogController;
-import hagerty.gui.view.OverviewController;
-import hagerty.gui.view.RootLayoutController;
-import hagerty.simulator.RobotSimulator;
-import hagerty.simulator.modules.BrickListWrapper;
-import hagerty.simulator.modules.BrickSimulator;
-import hagerty.simulator.modules.LegacyBrickSimulator;
-import hagerty.simulator.modules.MotorBrickSimulator;
-import hagerty.simulator.modules.ServoBrickSimulator;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 public class MainApp extends Application {
-
-
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private Stage primaryStage;
     private BorderPane rootLayout;
 
     /**
      * The data as an observable list of Controllers.
      */
-    private ObservableList<BrickSimulator> brickList = FXCollections.observableArrayList();
+    private ObservableList<BrickSimulator> brickList;
 
-    /**
-     * Constructor
-     */
     public MainApp() {
+        brickList = FXCollections.observableArrayList();
+        try {
+            ClientLogger.setup();
+        } catch (IOException ex) {
+            System.out.println("Cannot setup the logger!");
+        }
+    }
 
+    public static void main(String[] args) {
+        launch(args);
     }
 
     /**
      * Returns the data as an observable list of Controller Simulators.
+     *
      * @return
      */
     public ObservableList<BrickSimulator> getBrickData() {
@@ -62,23 +59,20 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
-    	Runtime.getRuntime().addShutdownHook(new Thread("shutdown thread") {
+        Runtime.getRuntime().addShutdownHook(new Thread("shutdown thread") {
             public void run() {
                 System.out.println("***** Threads Exiting *****");
-                RobotSimulator.gThreadsAreRunning = false;
-
+                RobotSimulator.isgThreadsAreRunning();
             }
         });
 
         this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("SimulatorApp");
+        this.primaryStage.setTitle("Simulator App");
 
         // Set the application icon.
         this.primaryStage.getIcons().add(new Image("file:resources/images/robot.png"));
 
         initRootLayout();
-
         showBrickOverview();
     }
 
@@ -90,8 +84,8 @@ public class MainApp extends Application {
         try {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
-            rootLayout = (BorderPane) loader.load();
+            loader.setLocation(this.getClass().getResource("view/RootLayout.fxml"));
+            rootLayout = loader.load();
 
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
@@ -107,21 +101,25 @@ public class MainApp extends Application {
         }
 
         // Try to load last opened controller file.
-        File file = getBrickFilePath();
+        File file = Utils.getBrickFilePath(Preferences.userNodeForPackage(this.getClass()));
         if (file != null) {
-            loadBrickDataFromFile(file);
+            try {
+                Utils.loadBrickDataFromFile(file, brickList);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     /**
      * Shows the controller overview inside the root layout.
      */
-    public void showBrickOverview() {
+    private void showBrickOverview() {
         try {
             // Load controller overview.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/Overview.fxml"));
-            AnchorPane controllerOverview = (AnchorPane) loader.load();
+            loader.setLocation(this.getClass().getResource("view/Overview.fxml"));
+            AnchorPane controllerOverview = loader.load();
 
             // Set controller overview into the center of root layout.
             rootLayout.setCenter(controllerOverview);
@@ -148,10 +146,10 @@ public class MainApp extends Application {
             // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
             if (brick instanceof LegacyBrickSimulator)
-            	loader.setLocation(MainApp.class.getResource("view/EditLegacyDialog.fxml"));
+                loader.setLocation(this.getClass().getResource("view/EditLegacyDialog.fxml"));
             else
-            	loader.setLocation(MainApp.class.getResource("view/EditDialog.fxml"));
-            AnchorPane page = (AnchorPane) loader.load();
+                loader.setLocation(this.getClass().getResource("view/EditDialog.fxml"));
+            AnchorPane page = loader.load();
 
             // Create the dialog Stage.
             Stage dialogStage = new Stage();
@@ -185,15 +183,14 @@ public class MainApp extends Application {
      * clicks OK, the changes are saved into the provided brick object and true
      * is returned.
      *
-     * @param brick the controller object to be edited
      * @return true if the user clicked OK, false otherwise.
      */
-    public void showBrickDebugWindow() {
+    public boolean showBrickDebugWindow() {
         try {
             // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/DebugWindow.fxml"));
-            AnchorPane page = (AnchorPane) loader.load();
+            loader.setLocation(this.getClass().getResource("view/DebugWindow.fxml"));
+            AnchorPane page = loader.load();
 
             VBox vbox = new VBox();
             vbox.setPadding(new Insets(10));
@@ -203,8 +200,8 @@ public class MainApp extends Application {
             List<BrickSimulator> brickList = this.getBrickData();
 
             for (BrickSimulator currentBrick : brickList) {
-            	currentBrick.setupDebugGuiVbox(vbox);
-    		}
+                currentBrick.setupDebugGuiVbox(vbox);
+            }
             page.getChildren().add(vbox);
 
             // Create the dialog Stage.
@@ -225,10 +222,11 @@ public class MainApp extends Application {
 
             // Show the dialog and wait until the user closes it
             dialogStage.showAndWait();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return true;
     }
 
     /**
@@ -241,8 +239,8 @@ public class MainApp extends Application {
         try {
             // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/NewDialog.fxml"));
-            AnchorPane page = (AnchorPane) loader.load();
+            loader.setLocation(this.getClass().getResource("view/NewDialog.fxml"));
+            AnchorPane page = loader.load();
 
             // Create the dialog Stage.
             Stage dialogStage = new Stage();
@@ -272,133 +270,12 @@ public class MainApp extends Application {
         }
     }
 
-
-
-    /**
-     * Returns the controller file preference, i.e. the file that was last opened.
-     * The preference is read from the OS specific registry. If no such
-     * preference can be found, null is returned.
-     *
-     * @return
-     */
-    public File getBrickFilePath() {
-        Preferences prefs = Preferences.userNodeForPackage(MainApp.class);
-        String filePath = prefs.get("filePath", null);
-        if (filePath != null) {
-            return new File(filePath);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Sets the file path of the currently loaded file. The path is persisted in
-     * the OS specific registry.
-     *
-     * @param file the file or null to remove the path
-     */
-    public void setBrickFilePath(File file) {
-        Preferences prefs = Preferences.userNodeForPackage(MainApp.class);
-        if (file != null) {
-            prefs.put("filePath", file.getPath());
-
-            // Update the stage title.
-            primaryStage.setTitle("FTC Simulator - " + file.getName());
-        } else {
-            prefs.remove("filePath");
-
-            // Update the stage title.
-            primaryStage.setTitle("FTC Simulator");
-        }
-    }
-
-    /**
-     * Loads controller data from the specified file. The current controller data will
-     * be replaced.
-     *
-     * @param file
-     */
-    public void loadBrickDataFromFile(File file) {
-        try {
-            JAXBContext context = JAXBContext
-                    .newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class );
-            Unmarshaller um = context.createUnmarshaller();
-            try {
-            // Reading XML from the file and unmarshalling to a Wrapper class that just contains a single List
-            // of Simulator objects.
-            BrickListWrapper wrapper = (BrickListWrapper) um.unmarshal(file);
-
-            // Add the list from the Wrapper class into the local member variable "brickList"
-            // This list will be returned from the method getBrickData()
-            brickList.clear();
-            brickList.addAll(wrapper.getBricks());
-
-            // For the LegacyBrickSimulator objects, since we couldn't get the marshaler to handle the list of small
-            // SimData objects(6), we need to create the objects by hand using the returned list of portTypes.
-            for (BrickSimulator currentBrick : brickList) {
-            	currentBrick.fixupUnMarshaling();
-    		}
-
-            // Save the file path to the registry.
-            setBrickFilePath(file);
-
-            } catch (UnmarshalException e) {
-            	System.err.println("UnmarshalExcemption: " + e);
-            } catch (JAXBException e) {
-            	System.err.println("UnmarshalExcemption: " + e);
-            }
-
-        } catch (Exception e) { // catches ANY exception
-        	Alert alert = new Alert(AlertType.ERROR);
-        	alert.setTitle("Error");
-        	alert.setHeaderText("Could not load data");
-        	alert.setContentText("Could not load data from file:\n" + file.getPath() + "  " + e);
-
-        	alert.showAndWait();
-        }
-    }
-
-    /**
-     * Saves the current controller data to the specified file.
-     *
-     * @param file
-     */
-    public void saveBrickDataToFile(File file) {
-        try {
-            JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class );
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-            // Wrapping our controller data.
-            BrickListWrapper wrapper = new BrickListWrapper();
-            wrapper.setBricks(brickList);
-
-            // Marshalling and saving XML to the file.
-            m.marshal(wrapper, file);
-            //m.marshal(wrapper, System.out);
-
-            // Save the file path to the registry.
-            setBrickFilePath(file);
-        } catch (Exception e) { // catches ANY exception
-        	Alert alert = new Alert(AlertType.ERROR);
-        	alert.setTitle("Error");
-        	alert.setHeaderText("Could not save data");
-        	alert.setContentText("Could not save data to file:\n" + file.getPath() + "\n" + e);
-
-        	alert.showAndWait();
-        }
-    }
-
-
     /**
      * Returns the main stage.
-     * @return
+     *
+     * @return the primary stage
      */
     public Stage getPrimaryStage() {
         return primaryStage;
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

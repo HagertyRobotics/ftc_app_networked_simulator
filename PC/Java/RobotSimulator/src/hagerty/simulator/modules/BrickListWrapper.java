@@ -1,9 +1,9 @@
 package hagerty.simulator.modules;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Helper class to wrap a list of bricks. This is used for saving the
@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "bricks")
 public class BrickListWrapper {
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     private List<BrickSimulator> bricks;
 
