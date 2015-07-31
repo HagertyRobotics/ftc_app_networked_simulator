@@ -1,31 +1,33 @@
 package hagerty.simulator.legacy.data;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import java.util.LinkedList;
-import java.util.logging.Logger;
-
 @XmlAccessorType(XmlAccessType.NONE)
 public class LegacyMotorSimData extends SimData {
-    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
 	volatile float mMotor1Speed=0.0f;
 	volatile float mMotor2Speed=0.0f;
 	volatile boolean mMotor1FloatMode=false;
 	volatile boolean mMotor2FloatMode=false;
 
-    /*// GUI stuff for the Debug windows
+	// GUI stuff for the Debug windows
+	public Label mMotor1SpeedDebugLabel;
+	public Label mMotor2SpeedDebugLabel;
 
-*/
-    public LegacyMotorSimData() {
+	public LegacyMotorSimData() {
 		super(SimDataType.LEGACY_MOTOR);
 		construct();
 	}
@@ -60,15 +62,15 @@ public class LegacyMotorSimData extends SimData {
 	                		mMotor1FloatMode=true;
 	                		mMotor1Speed=0.0f;
 	                	} else {
-                            mMotor1Speed = (float) mCurrentStateBuffer[p + 4 + 5] / 100.0f;
-                        }
+		                	mMotor1Speed = (float)mCurrentStateBuffer[p+4+5]/100.0f;
+	                	}
 
 	                	if (mCurrentStateBuffer[p+4+6] == (byte)0x80) {
 	                		mMotor2FloatMode=true;
 	                		mMotor2Speed=0.0f;
 	                	} else {
-                            mMotor2Speed = (float) mCurrentStateBuffer[p + 4 + 6] / 100.0f;
-                        }
+		                	mMotor2Speed = (float)mCurrentStateBuffer[p+4+6]/100.0f;
+	                	}
                     } finally {
                     	super.lock.writeLock().unlock();
                     }
@@ -82,23 +84,13 @@ public class LegacyMotorSimData extends SimData {
 // GUI Routines
 //
 
-    public LinkedList<Label> populateDebugGuiVbox() {
-        LinkedList<Label> labels = new LinkedList<>();
-
-        Label mMotor1SpeedDebugLabel = new Label("");
-        Label mMotor2SpeedDebugLabel = new Label("");
-
+	public void populateDebugGuiVbox() {
 		mMotor1SpeedDebugLabel.setText("" + mMotor1Speed);
 		mMotor2SpeedDebugLabel.setText("" + mMotor2Speed);
-
-        labels.add(mMotor1SpeedDebugLabel);
-        labels.add(mMotor2SpeedDebugLabel);
-        return labels;
-    }
+		//System.out.println("Populate Debug Gui VBox " + mMotor1Speed + " " + mMotor2Speed);
+	}
 
 	public void setupDebugGuiVbox(VBox vbox) {
-        LinkedList<Label> labels = populateDebugGuiVbox();
-
     	vbox.setPadding(new Insets(10));
     	vbox.setSpacing(8);
 
@@ -114,8 +106,10 @@ public class LegacyMotorSimData extends SimData {
 		VBox.setMargin(motor1Text, new Insets(0, 0, 0, 8));
 		hboxMotor1.getChildren().add(motor1Text);
 
-        hboxMotor1.getChildren().add(labels.get(0));
-        vbox.getChildren().add(hboxMotor1);
+		Label mMotor1SpeedDebugLabel = new Label("label");
+		this.mMotor1SpeedDebugLabel = mMotor1SpeedDebugLabel;
+		hboxMotor1.getChildren().add(mMotor1SpeedDebugLabel);
+		vbox.getChildren().add(hboxMotor1);
 
 		HBox hboxMotor2 = new HBox();
 		hboxMotor2.setPadding(new Insets(5, 12, 5, 12));
@@ -125,8 +119,10 @@ public class LegacyMotorSimData extends SimData {
 	 	VBox.setMargin(motor2Text, new Insets(0, 0, 0, 8));
 	 	hboxMotor2.getChildren().add(motor2Text);
 
-        hboxMotor2.getChildren().add(labels.get(1));
-        vbox.getChildren().add(hboxMotor2);
+	 	Label mMotor2SpeedDebugLabel = new Label("label");
+	 	this.mMotor2SpeedDebugLabel = mMotor2SpeedDebugLabel;
+	 	hboxMotor2.getChildren().add(mMotor2SpeedDebugLabel);
+	 	vbox.getChildren().add(hboxMotor2);
 	}
 
 
