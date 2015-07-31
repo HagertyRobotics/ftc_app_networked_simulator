@@ -55,6 +55,7 @@ public abstract class BrickSimulator implements Runnable {
             while (!Thread.currentThread().isInterrupted()) {
                 packet = receivePacketFromPhone();
             	handleIncomingPacket(packet, packet.length, false);
+            	System.out.println("received packet");
             }
             // Catch unhandled exceptions and cleanup
     	} catch (Exception e) {

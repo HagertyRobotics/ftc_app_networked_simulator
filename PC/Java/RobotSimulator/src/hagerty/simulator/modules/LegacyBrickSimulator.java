@@ -4,6 +4,7 @@ import hagerty.simulator.legacy.data.LegacyMotorSimData;
 import hagerty.simulator.legacy.data.SimData;
 import hagerty.simulator.legacy.data.SimDataFactory;
 import hagerty.simulator.legacy.data.SimDataType;
+import hagerty.utils.Utils;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
@@ -54,7 +55,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
     	try {
     		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
         	mServerSocket.send(sendPacket);
-        	//System.out.println("sendPacketToPhone: (" + bufferToHexString(sendData,0,sendData.length) + ") len=" + sendData.length);
+        	System.out.println("sendPacketToPhone: (" + Utils.bufferToHexString(sendData,0,sendData.length) + ") len=" + sendData.length);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,7 +64,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
 
     public void handleIncomingPacket(byte[] data, int length, boolean wait)
     {
-    	//System.out.println("Receive Buffer: (" + bufferToHexString(data,0,25) + ") len=" + data.length);
+    	System.out.println("Receive Buffer: (" + Utils.bufferToHexString(data,0,25) + ") len=" + data.length);
 
     	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
     		sendPacketToPhone(mCurrentStateBuffer);

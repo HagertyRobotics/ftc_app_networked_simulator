@@ -36,7 +36,7 @@ public class RobotSimulator  {
         	Thread t = new Thread(temp,temp.getAlias());  // Make a thread from the object and also set the process name
         	t.start();
             threadLinkedList.add(t);
-            System.out.println(temp.getAlias() + " " + temp.getName());
+            System.out.println("Starting: " + temp.getName() + "  \"" + temp.getAlias() + "\"");
 		}
     }
 
