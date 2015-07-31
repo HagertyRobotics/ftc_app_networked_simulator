@@ -200,11 +200,11 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		}
 	}
 
-	public void populateDebugGuiVbox() {
+	public void updateDebugGuiVbox() {
 
 		for (int i=0;i<6;i++) {
 			if (portSimData[i] != null) {
-				portSimData[i].populateDebugGuiVbox();
+				portSimData[i].updateDebugGuiVbox();
 			}
 		}
 	}

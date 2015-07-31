@@ -62,7 +62,7 @@ public class DebugWindowController {
 
                     // Read the current list of modules from the GUI MainApp class
                     List<BrickSimulator> brickList = mMainApp.getBrickData();
-                    brickList.forEach(BrickSimulator::populateDebugGuiVbox);
+                    brickList.forEach(BrickSimulator::updateDebugGuiVbox);
                 });
       	      i++;
       	      Thread.sleep(500);

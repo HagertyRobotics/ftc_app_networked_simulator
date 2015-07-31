@@ -28,7 +28,7 @@ public class ServoBrickSimulator extends BrickSimulator {
 
 	public void setupDebugGuiVbox(VBox vbox) {}
 
-	public void populateDebugGuiVbox() {}
+	public void updateDebugGuiVbox() {}
 
 	public void populateDetailsPane(Pane pane) {}
 

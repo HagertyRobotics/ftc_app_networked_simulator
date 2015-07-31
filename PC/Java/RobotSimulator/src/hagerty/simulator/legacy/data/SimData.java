@@ -41,7 +41,7 @@ public abstract class SimData {
 
 	abstract public void setupDebugGuiVbox(VBox vbox);
 
-	abstract public LinkedList<?> populateDebugGuiVbox();
+	abstract public void updateDebugGuiVbox();
 	
 
 }

@@ -97,7 +97,7 @@ public abstract class BrickSimulator implements Runnable {
 
 	public abstract void setupDebugGuiVbox(VBox vbox);
 
-	public abstract void populateDebugGuiVbox();
+	public abstract void updateDebugGuiVbox();
 
 	public abstract void fixupUnMarshaling();
 
