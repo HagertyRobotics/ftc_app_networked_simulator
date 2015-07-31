@@ -36,7 +36,7 @@ public class D2xxManager
 
     public static final int PHONEPORT  = 7000;
     public static final int MODULE_LISTER_PORT = 7000;
-    public static final String PC_IP_ADDRESS  = "192.168.1.119" ; // "10.0.1.193";
+    public static final String PC_IP_ADDRESS  = "10.0.1.193";
     InetAddress mIPAddress;
 
     DatagramSocket mModuleListerSocket;
