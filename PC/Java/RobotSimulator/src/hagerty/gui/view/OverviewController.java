@@ -29,17 +29,9 @@ public class OverviewController {
     @FXML
     private Pane detailsPane;
 
-
-
     // Reference to the main application.
     private MainApp mainApp;
-
-    /**
-     * The constructor.
-     * The constructor is called before the initialize() method.
-     */
-    public OverviewController() {
-    }
+    private RobotSimulator simulator;
 
     /**
      * Initializes the controller class. This method is automatically called
@@ -49,6 +41,7 @@ public class OverviewController {
     private void initialize() {
         // Initialize the brick table with the two columns.
         //controllerNameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
+        //noinspection Convert2Diamond
         brickNameColumn.setCellValueFactory(new PropertyValueFactory<BrickSimulator,String>("name"));
         brickAliasColumn.setCellValueFactory(cellData -> cellData.getValue().aliasProperty());
 
@@ -58,6 +51,8 @@ public class OverviewController {
         // Listen for selection changes and show the brick details when changed.
         brickTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> showBrickDetails(newValue));
+
+        simulator = new RobotSimulator();
     }
 
 
@@ -180,7 +175,6 @@ public class OverviewController {
      */
     @FXML
     private void handleStartDebugButton() {
-
             mainApp.showBrickDebugWindow();
     }
 

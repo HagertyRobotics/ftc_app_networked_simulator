@@ -1,12 +1,14 @@
 package hagerty.gui.view;
 
-import java.io.File;
-
 import hagerty.gui.MainApp;
+import hagerty.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
+
+import java.io.File;
+import java.util.prefs.Preferences;
 
 /**
  * The controller for the root layout. The root layout provides the basic
@@ -23,7 +25,7 @@ public class RootLayoutController {
     /**
      * Is called by the main application to give a reference back to itself.
      *
-     * @param mainApp
+     * @param mainApp the main application
      */
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
@@ -35,7 +37,7 @@ public class RootLayoutController {
     @FXML
     private void handleNew() {
         mainApp.getBrickData().clear();
-        mainApp.setBrickFilePath(null);
+        Utils.setBrickFilePath(null, Preferences.userNodeForPackage(mainApp.getClass()));
     }
 
     /**
@@ -54,7 +56,11 @@ public class RootLayoutController {
         File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
 
         if (file != null) {
-            mainApp.loadBrickDataFromFile(file);
+            try {
+                Utils.loadBrickDataFromFile(file, mainApp.getBrickData());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -64,9 +70,13 @@ public class RootLayoutController {
      */
     @FXML
     private void handleSave() {
-        File brickFile = mainApp.getBrickFilePath();
+        File brickFile = Utils.getBrickFilePath(Preferences.userNodeForPackage(mainApp.getClass()));
         if (brickFile != null) {
-            mainApp.saveBrickDataToFile(brickFile);
+            try {
+                Utils.saveBrickDataToFile(brickFile, mainApp.getBrickData());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         } else {
             handleSaveAs();
         }
@@ -92,7 +102,11 @@ public class RootLayoutController {
             if (!file.getPath().endsWith(".xml")) {
                 file = new File(file.getPath() + ".xml");
             }
-            mainApp.saveBrickDataToFile(file);
+            try {
+                Utils.saveBrickDataToFile(file, mainApp.getBrickData());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

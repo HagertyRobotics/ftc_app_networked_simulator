@@ -2,6 +2,7 @@
 
 package coppelia;
 
+@SuppressWarnings("ALL")
 public class StringW
 {
     String w;
@@ -11,13 +12,13 @@ public class StringW
         w = new String(s);
     }
 
-    public void setValue(String s)
-    {
-        w = new String(s);
-    }
-
     public String getValue()
     {
         return w;
+    }
+
+    public void setValue(String s)
+    {
+        w = new String(s);
     }
 }

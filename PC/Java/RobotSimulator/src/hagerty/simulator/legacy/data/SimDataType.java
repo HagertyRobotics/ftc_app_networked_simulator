@@ -3,7 +3,7 @@ package hagerty.simulator.legacy.data;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlType(name = "myEnum")
+@XmlType(name = "SimulationDataType")
 @XmlEnum
 public enum SimDataType {
 	NONE("None"),

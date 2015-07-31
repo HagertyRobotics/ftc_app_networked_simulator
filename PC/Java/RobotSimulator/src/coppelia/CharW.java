@@ -2,6 +2,7 @@
 
 package coppelia;
 
+@SuppressWarnings("ALL")
 public class CharW
 {
     char w;
@@ -11,13 +12,13 @@ public class CharW
         w = c;
     }
 
-    public void setValue(char c)
-    {
-        w = c;
-    }
-
     public char getValue()
     {
         return w;
+    }
+
+    public void setValue(char c)
+    {
+        w = c;
     }
 }

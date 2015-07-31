@@ -1,6 +1,7 @@
 package com.ftdi.j2xx;
 
-import java.util.Queue;
+import android.util.Log;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -20,8 +21,8 @@ abstract public class FT_Device
     long mDeltaWriteTime=0;
 
     NetworkManager mNetworkManager;
-    LinkedBlockingQueue mWriteToPcQueue;
-    LinkedBlockingQueue mReadFromPcQueue;
+    LinkedBlockingQueue<byte[]> mWriteToPcQueue;
+    LinkedBlockingQueue<byte[]> mReadFromPcQueue;
 
     protected final byte[] mCurrentStateBuffer = new byte[208];
 
@@ -30,7 +31,7 @@ abstract public class FT_Device
     // Queue used to pass packets between writes and reads in the onboard simulator.
     // Read and Writes come from the ftc_app when it thinks it is talking to the
     // FTDI driver.
-    protected final Queue<CacheWriteRecord> readQueue = new ConcurrentLinkedQueue();
+    protected final ConcurrentLinkedQueue<CacheWriteRecord> readQueue = new ConcurrentLinkedQueue<>();
     protected volatile boolean writeLocked = false;
 
     public FT_Device(String serialNumber, String description, String ipAddress, int port)
@@ -58,7 +59,7 @@ abstract public class FT_Device
         byte[] packet;
 
         try {
-            packet = (byte[])mReadFromPcQueue.poll(wait_ms, TimeUnit.MILLISECONDS);
+            packet = mReadFromPcQueue.poll(wait_ms, TimeUnit.MILLISECONDS);
 
             // If timed out waiting for packet then return the last packet that was read
             if (packet==null) {
