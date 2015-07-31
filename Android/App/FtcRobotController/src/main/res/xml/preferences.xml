@@ -44,12 +44,4 @@
         android:targetClass="com.qualcomm.ftcrobotcontroller.AutoConfigureActivity" />
     </PreferenceScreen>
   </PreferenceCategory>
-
-  <PreferenceCategory
-    android:title="Simulation">
-      <SwitchPreference
-          android:title="Use Simulator"
-          android:key="simulator_enabled"
-          android:defaultValue="true"/>
-  </PreferenceCategory>
 </PreferenceScreen>
