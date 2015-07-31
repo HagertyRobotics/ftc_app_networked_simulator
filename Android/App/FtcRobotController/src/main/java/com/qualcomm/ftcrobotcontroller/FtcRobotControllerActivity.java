@@ -82,14 +82,19 @@ import java.io.FileNotFoundException;
 
 public class FtcRobotControllerActivity extends Activity {
 
-  protected static final String VIEW_LOGS_ACTION = "com.qualcomm.ftcrobotcontroller.VIEW_LOGS";
   private static final int REQUEST_CONFIG_WIFI_CHANNEL = 1;
   private static final boolean USE_MOCK_HARDWARE_FACTORY = false;
   private static final int NUM_GAMEPADS = 2;
+
+  protected static final String VIEW_LOGS_ACTION = "com.qualcomm.ftcrobotcontroller.VIEW_LOGS";
+
   protected SharedPreferences preferences;
 
   protected UpdateUI.Callback callback;
   protected Context context;
+  private Utility utility;
+  private boolean launched;
+
   protected TextView textDeviceName;
   protected TextView textWifiDirectStatus;
   protected TextView textRobotStatus;
@@ -97,14 +102,24 @@ public class FtcRobotControllerActivity extends Activity {
   protected TextView textOpMode;
   protected TextView textErrorMessage;
   protected ImmersiveMode immersion;
+
   protected UpdateUI updateUI;
   protected BatteryChecker batteryChecker;
   protected Dimmer dimmer;
   protected LinearLayout entireScreenLayout;
+
   protected FtcRobotControllerService controllerService;
+
   protected FtcEventLoop eventLoop;
-  private Utility utility;
-  private boolean launched;
+
+  protected class RobotRestarter implements Restarter {
+
+    public void requestRestart() {
+      requestRobotRestart();
+    }
+
+  }
+
   protected ServiceConnection connection = new ServiceConnection() {
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
@@ -179,11 +194,11 @@ public class FtcRobotControllerActivity extends Activity {
     callback.wifiDirectUpdate(WifiDirectAssistant.Event.DISCONNECTED);
 
     entireScreenLayout.setOnTouchListener(new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            dimmer.handleDimTimer();
-            return false;
-        }
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        dimmer.handleDimTimer();
+        return false;
+      }
     });
   }
 
@@ -221,6 +236,7 @@ public class FtcRobotControllerActivity extends Activity {
       immersion.cancelSystemUIHide();
     }
   }
+
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -260,7 +276,6 @@ public class FtcRobotControllerActivity extends Activity {
     super.onConfigurationChanged(newConfig);
     // don't destroy assets on screen rotation
   }
-
   @Override
   protected void onActivityResult(int request, int result, Intent intent) {
     if (request == REQUEST_CONFIG_WIFI_CHANNEL) {
@@ -406,13 +421,4 @@ public class FtcRobotControllerActivity extends Activity {
       }
     });
   }
-
-  protected class RobotRestarter implements Restarter {
-
-    public void requestRestart() {
-      requestRobotRestart();
-    }
-
-  }
-
 }
