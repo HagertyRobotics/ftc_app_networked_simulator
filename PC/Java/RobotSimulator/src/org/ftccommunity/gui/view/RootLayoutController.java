@@ -38,7 +38,7 @@ public class RootLayoutController {
     @FXML
     private void handleNew() {
         mainApp.getBrickData().clear();
-        Utils.setBrickFilePath(null, Preferences.userNodeForPackage(mainApp.getClass()));
+        Utils.setBrickFilePath(null);
     }
 
     /**

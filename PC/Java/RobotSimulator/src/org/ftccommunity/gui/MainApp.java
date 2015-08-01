@@ -28,7 +28,7 @@ import org.ftccommunity.utils.Utils;
 
 public class MainApp extends Application {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    private Stage primaryStage;
+    private static Stage primaryStage;
     private BorderPane rootLayout;
 
     /**
@@ -67,8 +67,8 @@ public class MainApp extends Application {
             }
         });
 
-        this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("Simulator App");
+        MainApp.primaryStage = primaryStage;
+        MainApp.primaryStage.setTitle("Simulator App");
 
         // Set the application icon.
         this.primaryStage.getIcons().add(new Image("file:resources/images/robot.png"));
@@ -102,7 +102,8 @@ public class MainApp extends Application {
         }
 
         // Try to load last opened controller file.
-        File file = Utils.getBrickFilePath(Preferences.userNodeForPackage(this.getClass()));
+        //File file = Utils.getBrickFilePath(Preferences.userNodeForPackage(this.getClass()));
+        File file = Utils.getBrickFilePath(Preferences.userNodeForPackage(MainApp.class));
         if (file != null) {
             try {
                 Utils.loadBrickDataFromFile(file, brickList);
@@ -276,7 +277,7 @@ public class MainApp extends Application {
      *
      * @return the primary stage
      */
-    public Stage getPrimaryStage() {
+    public static Stage getPrimaryStage() {
         return primaryStage;
     }
 }

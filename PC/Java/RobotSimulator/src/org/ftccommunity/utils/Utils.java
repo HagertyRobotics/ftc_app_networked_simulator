@@ -4,6 +4,7 @@ import javafx.collections.ObservableList;
 
 import javax.xml.bind.*;
 
+import org.ftccommunity.gui.MainApp;
 import org.ftccommunity.simulator.modules.*;
 
 import java.io.File;
@@ -45,7 +46,7 @@ public final class Utils {
         m.marshal(wrapper, file);
 
         // Save the file path to the registry.
-        // setBrickFilePath(file);
+        setBrickFilePath(file);
     }
 
     /**
@@ -55,17 +56,17 @@ public final class Utils {
      * @param file        the file or null to remove the path
      * @param preferences
      */
-    public static void setBrickFilePath(File file, Preferences preferences) {
-        // Preferences prefs = Preferences.userNodeForPackage(MainApp.class);
+    public static void setBrickFilePath(File file) {
+         Preferences prefs = Preferences.userNodeForPackage(MainApp.class);
         if (file != null) {
-            preferences.put("filePath", file.getPath());
-            // Update the stage title.
-            // primaryStage.setTitle("FTC Simulator - " + file.getName());
+            prefs.put("filePath", file.getPath());
+            //Update the stage title.
+            MainApp.getPrimaryStage().setTitle("FTC Simulator - " + file.getName());
         } else {
-            preferences.remove("filePath");
+            prefs.remove("filePath");
 
             // Update the stage title.
-            // primaryStage.setTitle("FTC Simulator");
+            MainApp.getPrimaryStage().setTitle("FTC Simulator");
         }
     }
 
@@ -94,7 +95,7 @@ public final class Utils {
             brickList.forEach(BrickSimulator::fixupUnMarshaling);
 
             // Save the file path to the registry.
-            // setBrickFilePath(file, Preferences.userNodeForPackage(MainApp.class));
+            setBrickFilePath(file);
 
         } catch (UnmarshalException e) {
             System.err.println("UnmarshalExcemption: " + e);
