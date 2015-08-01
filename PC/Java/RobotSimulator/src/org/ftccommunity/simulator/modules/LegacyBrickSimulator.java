@@ -57,7 +57,6 @@ public class LegacyBrickSimulator extends BrickSimulator {
     	try {
     		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
         	mServerSocket.send(sendPacket);
-        	System.out.println("sendPacketToPhone: (" + Utils.bufferToHexString(sendData,0,sendData.length) + ") len=" + sendData.length);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,8 +65,6 @@ public class LegacyBrickSimulator extends BrickSimulator {
 
     public void handleIncomingPacket(byte[] data, int length, boolean wait)
     {
-    	System.out.println("Receive Buffer: (" + Utils.bufferToHexString(data,0,25) + ") len=" + data.length);
-
     	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
     		sendPacketToPhone(mCurrentStateBuffer);
     		// Set the Port S0 ready bit in the global part of the Current State Buffer

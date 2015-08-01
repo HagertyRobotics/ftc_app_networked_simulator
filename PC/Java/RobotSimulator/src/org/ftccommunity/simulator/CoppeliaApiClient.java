@@ -66,7 +66,6 @@ public class CoppeliaApiClient implements Runnable {
 
 			mVrep.simxGetObjectHandle(mClientID,"remoteApiControlledBubbleRobLeftMotor",mLeftMotorHandle,remoteApi.simx_opmode_oneshot_wait);
 			mVrep.simxGetObjectHandle(mClientID,"remoteApiControlledBubbleRobRightMotor",mRightMotorHandle,remoteApi.simx_opmode_oneshot_wait);
-			System.out.println("Left = " + mLeftMotorHandle.getValue() + " Right = " + mRightMotorHandle.getValue());
 
 			mStartTime=System.currentTimeMillis();
 			return true;

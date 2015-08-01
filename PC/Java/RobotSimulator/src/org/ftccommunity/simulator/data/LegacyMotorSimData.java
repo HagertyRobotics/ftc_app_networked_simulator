@@ -87,7 +87,6 @@ public class LegacyMotorSimData extends SimData {
 	public void updateDebugGuiVbox() {
 		mMotor1SpeedDebugLabel.setText("" + mMotor1Speed);
 		mMotor2SpeedDebugLabel.setText("" + mMotor2Speed);
-		//System.out.println("Populate Debug Gui VBox " + mMotor1Speed + " " + mMotor2Speed);
 	}
 
 	public void setupDebugGuiVbox(VBox vbox) {

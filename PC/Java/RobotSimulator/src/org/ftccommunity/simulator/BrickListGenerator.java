@@ -43,7 +43,6 @@ public class BrickListGenerator implements Runnable {
             while (!Thread.currentThread().isInterrupted()) {
                 packet = receivePacketFromPhone();
                 handleIncomingPacket(packet, false);
-                // System.out.println("ModuleLister");
             }
             // Catch unhandled exceptions and cleanup
     	} catch (Exception e) {
@@ -86,7 +85,6 @@ public class BrickListGenerator implements Runnable {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
                     RobotSimulator.getPhoneIPAddress(), RobotSimulator.getPhonePort());
             mServerSocket.send(sendPacket);
-        	System.out.println("sendPacketToPhone: (" + Utils.bufferToHexString(sendData,0,sendData.length) + ") len=" + sendData.length);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,8 +92,6 @@ public class BrickListGenerator implements Runnable {
 
     public void handleIncomingPacket(byte[] data, boolean wait)
     {
-    	System.out.println("Receive Buffer: (" + Utils.bufferToHexString(data,0,25) + ") len=" + data.length);
-
     	if (data[0] == '?') { // infoCmd
     		sendPacketToPhone(getXmlModuleList(mMainApp.getBrickData()));
         }
