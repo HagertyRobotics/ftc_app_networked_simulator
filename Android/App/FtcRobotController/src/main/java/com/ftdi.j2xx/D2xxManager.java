@@ -51,6 +51,8 @@ public class D2xxManager
         Thread serverThread = new Thread(server);
         serverThread.start();
 
+        server.
+
         try {
             mModuleListerSocket = new DatagramSocket(PHONEPORT);
             mIPAddress = InetAddress.getByName(PC_IP_ADDRESS);

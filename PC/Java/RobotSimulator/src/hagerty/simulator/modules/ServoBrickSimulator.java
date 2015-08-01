@@ -1,8 +1,10 @@
 package hagerty.simulator.modules;
 
+import hagerty.simulator.NetworkManager;
 import hagerty.simulator.legacy.data.SimData;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import org.ftccommunity.simulator.net.SimulatorData;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.logging.Logger;
@@ -18,6 +20,11 @@ public class ServoBrickSimulator extends BrickSimulator {
     private final String name = "Core Servo Controller";
 
     public ServoBrickSimulator() {
+    }
+
+    @Override
+    protected byte[] receivePacketFromPhone() {
+        return NetworkManager.getLatestData(SimulatorData.Type.Types.USB_SERVO);
     }
 
     public String getName() {

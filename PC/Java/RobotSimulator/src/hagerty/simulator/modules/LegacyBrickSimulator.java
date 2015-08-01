@@ -1,17 +1,17 @@
 package hagerty.simulator.modules;
 
+import hagerty.simulator.NetworkManager;
 import hagerty.simulator.legacy.data.LegacyMotorSimData;
 import hagerty.simulator.legacy.data.SimData;
 import hagerty.simulator.legacy.data.SimDataFactory;
-import hagerty.simulator.legacy.data.SimDataType;
+// import hagerty.simulator.legacy.data.SimDataType;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.SimulatorData;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.IOException;
-import java.net.DatagramPacket;
 import java.util.logging.Logger;
 
 
@@ -37,7 +37,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
     @XmlElement
     private String[] portName = new String[6];
     @XmlElement
-    private SimDataType[] portType = new SimDataType[6];
+    private SimulatorData.Type.Types[] portType = new SimulatorData.Type.Types[6];
     private SimData[] portSimData = new SimData[6];
     /**
      * Default constructor.
@@ -45,19 +45,26 @@ public class LegacyBrickSimulator extends BrickSimulator {
     public LegacyBrickSimulator() {
     	for (int i=0;i<6;i++) {
     		portName[i] = null;
-    		portType[i] = SimDataType.NONE;
+    		portType[i] = SimulatorData.Type.Types.NONE;
     		portSimData[i] = null;
     	}
     }
 
+    @Override
+    protected byte[] receivePacketFromPhone() {
+        return NetworkManager.getLatestData(SimulatorData.Type.Types.SIM_DATA);
+    }
+
     private void sendPacketToPhone(byte[] sendData) {
-    	try {
-    		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
-        	mServerSocket.send(sendPacket);
-        	//System.out.println("sendPacketToPhone: (" + bufferToHexString(sendData,0,sendData.length) + ") len=" + sendData.length);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        NetworkManager.requestSend(SimulatorData.Type.Types.LEGACY_MOTOR,
+                                          SimulatorData.Data.Modules.LEGACY_CONTROLLER,
+                                          sendData);
+    }
+
+    private void sendPacketToPhone(byte[] sendData, SimulatorData.Type.Types type) {
+        NetworkManager.requestSend(type,
+                                          SimulatorData.Data.Modules.LEGACY_CONTROLLER,
+                                          sendData);
     }
 
 
@@ -77,20 +84,23 @@ public class LegacyBrickSimulator extends BrickSimulator {
 	        // If set then copy the 32 bytes for the port into the CurrentStateBuffer
 
 	        for (int i=0;i<6;i++) {
+                NetworkManager.getLatestData(SimulatorData.Type.Types.LEGACY_MOTOR);
 	        	switch (portType[i]) {
-	        	case LEGACY_MOTOR:
-	        		((LegacyMotorSimData) portSimData[i]).processBuffer(i, data, mCurrentStateBuffer );
-	        		break;
-	        	case LEGACY_LIGHT:
-	        		break;
-	        	case LEGACY_TOUCH:
-	        		break;
-	        	default:
-	        		break;
-	        	}
+                    case LEGACY_MOTOR:
+                        ((LegacyMotorSimData) portSimData[i]).processBuffer(i, data, mCurrentStateBuffer );
+                        break;
+                    case LEGACY_LIGHT:
+                        break;
+                    case LEGACY_TOUCH:
+                        break;
+                    default:
+                        break;
+                    }
 	        }
         }
     }
+
+
 
 
     /**
@@ -148,7 +158,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		for (int i=0;i<6;i++) {
 			Text portText = new Text("Port " + i);
 			grid.add(portText, 0, i);
-			Text typeText = new Text(portType[i].getName());
+			Text typeText = new Text(portType[i].toString());
 			grid.add(typeText, 1,  i);
 			Text nameText = new Text(portName[i]);
 			grid.add(nameText, 2,  i);
@@ -178,11 +188,11 @@ public class LegacyBrickSimulator extends BrickSimulator {
     	portName = s;
     }
 
-    public SimDataType[] getPortType() {
+    public SimulatorData.Type.Types[] getPortType() {
         return portType;
     }
 
-    public void setPortType(SimDataType[] type) {
+    public void setPortType(SimulatorData.Type.Types[] type) {
     	portType = type;
     }
 

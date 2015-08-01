@@ -1,8 +1,9 @@
 package hagerty.gui.view;
 
-import hagerty.simulator.legacy.data.SimDataType;
 import hagerty.simulator.modules.BrickSimulator;
 import hagerty.simulator.modules.LegacyBrickSimulator;
+import org.ftccommunity.simulator.net.SimulatorData.Type.Types;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
@@ -21,8 +22,6 @@ public class EditLegacyDialogController extends EditDialogController {
 
     @FXML
     private TextField brickNameField;
-    @FXML
-    private TextField brickIPAddressField;
     @FXML
     private TextField brickPortField;
     @FXML
@@ -51,10 +50,10 @@ public class EditLegacyDialogController extends EditDialogController {
     private void initialize() {
     	for (int i=0;i<6;i++) {
             legacyChoiceBoxes[i] = new ChoiceBox<>(FXCollections.observableArrayList(
-                    SimDataType.NONE,
-                    SimDataType.LEGACY_MOTOR,
-                    SimDataType.LEGACY_LIGHT,
-                    SimDataType.LEGACY_TOUCH));
+                    Types.NONE,
+                    Types.LEGACY_MOTOR,
+                    Types.LEGACY_LIGHT,
+                    Types.LEGACY_TOUCH));
 
     		legacyChoiceBoxes[i].getSelectionModel().selectFirst();
     		portGrid.add(legacyChoiceBoxes[i], 1, i);
@@ -121,7 +120,7 @@ public class EditLegacyDialogController extends EditDialogController {
             LegacyBrickSimulator lb = (LegacyBrickSimulator)brick;
 
             for (int i=0;i<6;i++) {
-            	lb.getPortType()[i] = (SimDataType)legacyChoiceBoxes[i].getSelectionModel().getSelectedItem();
+            	lb.getPortType()[i] = (Types)legacyChoiceBoxes[i].getSelectionModel().getSelectedItem();
             	lb.getPortName()[i] = legacyPortNames[i].getText();
         	}
 

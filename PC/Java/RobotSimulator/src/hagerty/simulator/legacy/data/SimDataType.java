@@ -1,3 +1,4 @@
+/*
 package hagerty.simulator.legacy.data;
 
 import javax.xml.bind.annotation.XmlEnum;
@@ -22,3 +23,4 @@ public enum SimDataType {
 		return mName;
 	}
 }
+*/

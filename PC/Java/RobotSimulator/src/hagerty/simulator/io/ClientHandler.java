@@ -1,9 +1,10 @@
 package hagerty.simulator.io;
 
+import com.google.common.base.Charsets;
 import hagerty.simulator.NetworkManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import org.ftccommunity.simulator.protobuf.SimulatorData;
+import org.ftccommunity.simulator.net.SimulatorData;
 
 import java.nio.charset.StandardCharsets;
 
@@ -12,7 +13,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(io.netty.channel.ChannelHandlerContext ctx, Object msg) {
         SimulatorData.Data data = (SimulatorData.Data) msg;
 
-        for (byte test : data.getInfo(0).getBytes(StandardCharsets.US_ASCII)) {
+        for (byte test : data.getInfo(0).getBytes(Charsets.US_ASCII)) {
             System.out.print(String.format("0x%02X ", test));
         }
 

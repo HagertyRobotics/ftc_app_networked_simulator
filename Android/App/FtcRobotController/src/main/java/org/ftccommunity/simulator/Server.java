@@ -38,7 +38,8 @@ public class Server implements Runnable {
             // Bind and start to accept incoming connections.
             ChannelFuture f = null;
             try {
-                f = b.bind(port).sync(); // (7)
+                f = b.bind(port).sync();
+
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             } finally {

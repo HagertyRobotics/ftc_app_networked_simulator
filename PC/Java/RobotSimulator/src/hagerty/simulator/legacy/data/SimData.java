@@ -3,6 +3,7 @@ package hagerty.simulator.legacy.data;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.layout.VBox;
+import org.ftccommunity.simulator.net.SimulatorData;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -14,9 +15,9 @@ public abstract class SimData {
 
 	public final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 	protected StringProperty simDataName = null;
-    private SimDataType mType=null;
+    private SimulatorData.Type.Types mType=null;
 
-	public SimData(SimDataType type) {
+	public SimData(SimulatorData.Type.Types type) {
 		mType=type;
 	}
 
@@ -31,11 +32,11 @@ public abstract class SimData {
 		this.simDataName = new SimpleStringProperty(name);
 	}
 
-	public SimDataType getType() {
+	public SimulatorData.Type.Types getType() {
 		return mType;
 	}
 
-	public void setType(SimDataType type) {
+	public void setType(SimulatorData.Type.Types type) {
 		mType = type;
 	}
 

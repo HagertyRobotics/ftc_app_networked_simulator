@@ -2,11 +2,15 @@ package com.ftdi.j2xx;
 
 import android.util.Log;
 
+import org.ftccommunity.simulator.protobuf.SimulatorData;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import io.netty.channel.PendingWriteQueue;
 
 
 /**
@@ -17,10 +21,13 @@ public class NetworkManager {
     public static final int PHONE_PORT  = 6000;
     public static final String PC_IP_ADDRESS  = "192.168.2.189";
     public static final int SENDING_PORT = 6500;
+    public static PendingWriteQueue mWriteToPcQueueNew;
 
     private DatagramSocket mSimulatorSocket;
-    private LinkedBlockingQueue<byte[]> mWriteToPcQueue = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<byte[]> mReadFromPcQueue = new LinkedBlockingQueue<>();
+    private static LinkedBlockingQueue<SimulatorData.Data> mWriteToPcQueue = new LinkedBlockingQueue<>();
+    private static LinkedBlockingQueue<SimulatorData.Data> mReadFromPcQueue = new LinkedBlockingQueue<>();
+
+    private static boolean serverWorking;
 
 
     public NetworkManager(String ipAddress, int port) {
@@ -43,13 +50,25 @@ public class NetworkManager {
         }
     }
 
+    public static boolean isServerWorking() {
+        return serverWorking;
+    }
 
-    LinkedBlockingQueue<byte[]> getWriteToPcQueue() {
+    public static void setServerWorking(boolean serverWorking) {
+        NetworkManager.serverWorking = serverWorking;
+    }
+
+
+    public static LinkedBlockingQueue<SimulatorData.Data> getWriteToPcQueue() {
         return mWriteToPcQueue;
     }
 
-    LinkedBlockingQueue<byte[]> getReadFromPcQueue() {
+    public static LinkedBlockingQueue<SimulatorData.Data> getReadFromPcQueue() {
         return mReadFromPcQueue;
+    };
+
+    public static SimulatorData.Data[] getWriteData() {
+        return (SimulatorData.Data[]) mWriteToPcQueue.toArray() ;
     }
 
 
@@ -62,11 +81,11 @@ public class NetworkManager {
      *
      */
     public class NetworkReceiver implements Runnable {
-        private LinkedBlockingQueue<byte[]> queue;
+        private LinkedBlockingQueue<SimulatorData.Data> queue;
         DatagramSocket mSocket;
         byte[] mReceiveData = new byte[1024];
 
-        public NetworkReceiver(LinkedBlockingQueue<byte[]> queue, DatagramSocket my_socket) {
+        public NetworkReceiver(LinkedBlockingQueue<SimulatorData.Data> queue, DatagramSocket my_socket) {
             this.queue = queue;
             this.mSocket = my_socket;
         }

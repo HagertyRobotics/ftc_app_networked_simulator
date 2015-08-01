@@ -2,10 +2,7 @@ package hagerty.simulator;
 
 import hagerty.simulator.modules.BrickSimulator;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,29 +22,6 @@ public class RobotSimulator  {
 
     static public void startSimulator(hagerty.gui.MainApp mainApp) {
     	simulatorStarted = true;
-
-        /* Old Seeker
-        try {
-            System.out.println("Waiting for Robot Controller seeker...");
-            DatagramSocket mSeekerSocket = new DatagramSocket(7000);
-
-            byte[] seekerBytes = new byte[1024];
-            DatagramPacket mSeekerPacket = new DatagramPacket(seekerBytes, seekerBytes.length);
-            mSeekerSocket.receive(mSeekerPacket);
-            System.out.println("Robot Controller discovered at " + mSeekerPacket.getAddress());
-
-            System.out.println("Replying back...");
-            byte[] handShakeBytes = InetAddress.getLocalHost().toString().getBytes(StandardCharsets.US_ASCII);
-
-            DatagramPacket mHandshake = new DatagramPacket(handShakeBytes, handShakeBytes.length);
-            mSeekerSocket.send(mHandshake);
-            mSeekerSocket.close();
-        } catch (Exception ex) {
-            System.err.println(ex.toString());
-            logger.log(Level.SEVERE, ex.toString());
-        }
-*/
-		// Start the module info server
 
     	System.out.println("Starting Module Lister...");
         gBrickListGenerator = new BrickListGenerator(mainApp);  // Runnable
@@ -97,7 +71,7 @@ public class RobotSimulator  {
         try {
             Thread.currentThread().wait(50);
         } catch (InterruptedException ex) {
-            ex.toString(); // Do nothing
+            logger.log(Level.SEVERE, ex.toString());
         }
         threadLinkedList.forEach(Thread::interrupt);
         Thread.currentThread().interrupt();

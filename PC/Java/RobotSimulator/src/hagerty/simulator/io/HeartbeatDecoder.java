@@ -2,15 +2,15 @@ package hagerty.simulator.io;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.ftccommunity.simulator.net.SimulatorData;
 
 import java.util.List;
 
-
-public class Decoder extends ByteToMessageDecoder { // (1)
+public class HeartbeatDecoder extends ByteToMessageDecoder {
     @Override
-    protected void decode(io.netty.channel.ChannelHandlerContext ctx, ByteBuf in, List<Object> out) { // (2)
+    protected void decode(ChannelHandlerContext context, ByteBuf in, List<Object> list) throws Exception {
         long size = 0;
         if (in.readableBytes() < 4) {
             return;
@@ -31,8 +31,7 @@ public class Decoder extends ByteToMessageDecoder { // (1)
             return;
         }
         if (test != null) {
-            out.add(test);
+            list.add(test);
         }
     }
 }
-

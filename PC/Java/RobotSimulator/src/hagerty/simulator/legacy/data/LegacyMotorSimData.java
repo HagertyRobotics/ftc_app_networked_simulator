@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.SimulatorData;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -26,7 +27,7 @@ public class LegacyMotorSimData extends SimData {
 
 */
     public LegacyMotorSimData() {
-		super(SimDataType.LEGACY_MOTOR);
+		super(SimulatorData.Type.Types.LEGACY_MOTOR);
 		construct();
 	}
 

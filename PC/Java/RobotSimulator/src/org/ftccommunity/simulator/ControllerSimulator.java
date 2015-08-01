@@ -1,13 +1,13 @@
 package org.ftccommunity.simulator;
 
+import hagerty.simulator.NetworkManager;
+
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ftccommunity.simulator.net.SimulatorData;
 
 import static java.lang.Thread.currentThread;
 
@@ -23,11 +23,9 @@ public class ControllerSimulator implements Runnable {
     protected final byte[] recSyncCmd208 = {51, -52, -128, 0, (byte) 208};
     protected final byte[] controllerTypeLegacy = {0, 77, 73};       // Controller type USBLegacyModule
     protected final byte[] mCurrentStateBuffer = new byte[208];
-    private final int BIND_PORT_NUM = 6500;
 
     int mPhonePort;
     InetAddress mPhoneIPAddress;
-    DatagramSocket mServerSocket;
 
     ControllerData mDataPacket;
     byte[] mReceiveData = new byte[1024];
@@ -38,10 +36,6 @@ public class ControllerSimulator implements Runnable {
     private int packetsReceived;
     private int packetsSent;
 
-
-    /** Default Constructor.
-     *
-     */
     public ControllerSimulator(LinkedBlockingQueue<ControllerData> queue) throws
             IOException {
 
@@ -49,17 +43,6 @@ public class ControllerSimulator implements Runnable {
         packetsSent = 0;
 
         mQueue = queue;
-
-        try {
-        	mServerSocket = new DatagramSocket(BIND_PORT_NUM);
-        } catch (java.net.BindException ex) {
-            System.out.println("Sorry! I cannot bind to the port " + BIND_PORT_NUM);
-            throw ex;
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            throw e;
-        }
-
     }
 
     @Override
@@ -70,63 +53,28 @@ public class ControllerSimulator implements Runnable {
         try {
             while(!currentThread().isInterrupted() && running) {
                 packet = receivePacketFromPhone();
-                handleIncomingPacket(packet, packet.length, false);
+                handleIncomingPacket(packet);
                 logger.log(Level.FINEST, "Received packet.");
             }
             //Catch unhandled exceptions and cleanup
         } catch (Exception e) {
-            e.printStackTrace();
-            close();
-        }
-
-        //Thread interrupted; close session
-        close();
-    }
-
-    public void close() {
-        try {
-            mServerSocket.close();
-            mQueue.clear();
-        } catch (Exception ex) {
-            System.out.println("An error occurred while closing!");
-            ex.printStackTrace();
+            logger.log(Level.SEVERE, e.toString());
         }
     }
 
     private byte[] receivePacketFromPhone() {
-    	DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
-        //noinspection TryWithIdenticalCatches
-        try {
-            mServerSocket.receive(receivePacket);
-        } catch (SocketException ex) {
-            logger.log(Level.SEVERE, ex.getMessage());
-        }  catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-        }
-
-    	// Get the port and address of the sender from the incoming packet and set some global variables
-    	// to be used when we reply back.
-    	// TODO: do we need to set this every time?
-    	mPhonePort = receivePacket.getPort();
-    	mPhoneIPAddress = receivePacket.getAddress();
-
         packetsReceived++;
-    	return receivePacket.getData();
+    	return NetworkManager.getLatestData(SimulatorData.Type.Types.SIM_DATA);
     }
 
 
     private void sendPacketToPhone(byte[] sendData) {
-        try {
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
-            mServerSocket.send(sendPacket);
-            logger.log(Level.FINER, "sendPacketToPhone: (" + bufferToHexString(sendData, 0, sendData.length) + ") length=" + sendData.length);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        NetworkManager.requestSend(SimulatorData.Type.Types.SIM_DATA, SimulatorData.Data.Modules.LEGACY_CONTROLLER, sendData);
+        logger.log(Level.FINER, "sendPacketToPhone: (" + bufferToHexString(sendData, 0, sendData.length) + ") length=" + sendData.length);
     }
 
 
-    public void handleIncomingPacket(byte[] data, int length, boolean wait) {
+    public void handleIncomingPacket(byte[] data) {
         logger.log(Level.FINER, "Receive Buffer: (" + bufferToHexString(data, 0, 25) + ") length=" + data.length);
 
         if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte) 208) { // readCmd

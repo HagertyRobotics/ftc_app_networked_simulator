@@ -1,9 +1,10 @@
 package hagerty.simulator.legacy.data;
 
+import org.ftccommunity.simulator.net.SimulatorData;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class SimDataFactory {
-	public static SimData buildSimData(SimDataType type) {
+	public static SimData buildSimData(SimulatorData.Type.Types type) {
         SimData simData;
         switch (type) {
 		case NONE:

@@ -65,12 +65,9 @@ class RobotSimulator
                 }
             } else {
                 System.out.println("Failed!");
-                simulator.close();
             }
 
         } catch (Exception ex) {
-
-            simulator.close();
             System.out.println("\nAn error occurred during execution! Please see the log.");
             logger.log(Level.SEVERE, ex.getMessage());
             for (StackTraceElement stack : ex.getStackTrace()) {
@@ -85,7 +82,6 @@ class RobotSimulator
             }
         } catch (UnsatisfiedLinkError libraryNotFound){
             System.out.println("I could not find the 'remoteApiJava.dll' in the system PATH or the current directory.");
-            simulator.close();
             try {
                 Thread.sleep(25); // Wait a brief period for termination
                 simulatorThread.join(); // Get the thread to join
@@ -95,7 +91,6 @@ class RobotSimulator
     }
         System.out.print("Cleaning up...");
 		simulator.requestTerminate();
-        simulator.close();
         try {
             simulatorThread.join(300);
         } catch (InterruptedException e) {
