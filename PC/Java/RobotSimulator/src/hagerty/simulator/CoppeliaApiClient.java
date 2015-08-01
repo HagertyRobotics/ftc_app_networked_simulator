@@ -18,8 +18,8 @@ public class CoppeliaApiClient implements Runnable {
     final int CONNECT_PORT = 5000;
     long mStartTime;
 	IntWA mObjectHandles;
-	IntW mLeftMotor;
-	IntW mRightMotor;
+	IntW mLeftMotorHandle;
+	IntW mRightMotorHandle;
 	int mClientID;
 	remoteApi mVrep;
 	hagerty.gui.MainApp mMainApp;
@@ -44,8 +44,8 @@ public class CoppeliaApiClient implements Runnable {
             System.out.println("Connected to remote API server");
 
 			mObjectHandles = new IntWA(1);
-			mLeftMotor = new IntW(1);
-			mRightMotor = new IntW(1);
+			mLeftMotorHandle = new IntW(1);
+			mRightMotorHandle = new IntW(1);
 
             int ret = mVrep.simxGetObjects(mClientID, remoteApi.sim_handle_all, mObjectHandles,
                     remoteApi.simx_opmode_oneshot_wait);
@@ -63,9 +63,9 @@ public class CoppeliaApiClient implements Runnable {
 				Thread.currentThread().interrupt();
 			}
 
-			mVrep.simxGetObjectHandle(mClientID,"remoteApiControlledBubbleRobLeftMotor",mLeftMotor,remoteApi.simx_opmode_oneshot_wait);
-			mVrep.simxGetObjectHandle(mClientID,"remoteApiControlledBubbleRobRightMotor",mRightMotor,remoteApi.simx_opmode_oneshot_wait);
-			System.out.println("Left = " + mLeftMotor.getValue() + " Right = " + mRightMotor.getValue());
+			mVrep.simxGetObjectHandle(mClientID,"remoteApiControlledBubbleRobLeftMotor",mLeftMotorHandle,remoteApi.simx_opmode_oneshot_wait);
+			mVrep.simxGetObjectHandle(mClientID,"remoteApiControlledBubbleRobRightMotor",mRightMotorHandle,remoteApi.simx_opmode_oneshot_wait);
+			System.out.println("Left = " + mLeftMotorHandle.getValue() + " Right = " + mRightMotorHandle.getValue());
 
 			mStartTime=System.currentTimeMillis();
 			return true;
@@ -107,8 +107,8 @@ public class CoppeliaApiClient implements Runnable {
 				simData.lock.readLock().unlock();
 			}
 
-			mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotor.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
-			mVrep.simxSetJointTargetVelocity(mClientID,mRightMotor.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);
+			mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotorHandle.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
+			mVrep.simxSetJointTargetVelocity(mClientID,mRightMotorHandle.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);
 		}
 
 
