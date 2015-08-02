@@ -1,22 +1,19 @@
 package org.ftccommunity.simulator;
 
 import com.ftdi.j2xx.NetworkManager;
+import com.google.common.base.Charsets;
 
 import org.ftccommunity.simulator.protobuf.SimulatorData;
-
-import java.nio.charset.StandardCharsets;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.PendingWriteQueue;
 
 public class ServerHandler extends ChannelInboundHandlerAdapter {
-    private ChannelHandlerContext ctx;
-
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) { // (2)
+        SimulatorData.Data receiveData = (SimulatorData.Data) msg;
         try {
             Thread.sleep(2);
         } catch (InterruptedException ex) {
@@ -27,7 +24,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
         // TODO: write heartbeat
         // ctx.executor().scheduleAtFixedRate()
-        NetworkManager.getReadFromPcQueue().add((SimulatorData.Data)msg);
+        NetworkManager.add(receiveData);
 
         for (SimulatorData.Data data: NetworkManager.getWriteData()) {
             ctx.writeAndFlush(data);
@@ -37,15 +34,15 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(final ChannelHandlerContext ctx) {
-        NetworkManager.mWriteToPcQueueNew = new PendingWriteQueue(ctx);
-        this.ctx = ctx;
+        // NetworkManager.mWriteToPcQueueNew = new PendingWriteQueue(ctx);
+        //this.ctx = ctx;
         SimulatorData.Data.Builder dataBuilder = SimulatorData.Data.newBuilder()
                 .setType(SimulatorData.Type.newBuilder().setType(SimulatorData.Type.Types.LEGACY_MOTOR))
                 .setModule(SimulatorData.Data.Modules.LEGACY_CONTROLLER)
                 .setDataName("info")
                 .addInfo(new String(new byte[]{
                         34, 43, 90
-                }, StandardCharsets.US_ASCII));
+                }, Charsets.US_ASCII));
         SimulatorData.Data data = dataBuilder.build();
 
         final ByteBuf time = ctx.alloc().buffer(4 + data.getSerializedSize());

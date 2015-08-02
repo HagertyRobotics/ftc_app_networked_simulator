@@ -5,14 +5,11 @@ import hagerty.simulator.BrickListGenerator;
 import hagerty.simulator.NetworkManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 public class Client {
     public static void main(String[] args) throws Exception {

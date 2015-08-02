@@ -26,4 +26,7 @@ dependencies {
     compile(name: 'Analytics-release', ext: 'aar')
     compile files('libs/netty-all-4.0.30.Final.jar')
     compile files('libs/protobuf.jar')
+    compile files('libs/guava-18.0.jar')
+
+    compile 'com.intellij:annotations:12.0'
 }

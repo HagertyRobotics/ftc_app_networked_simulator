@@ -1,14 +1,18 @@
 package com.ftdi.j2xx;
 
-import android.util.Log;
+import org.ftccommunity.simulator.protobuf.SimulatorData;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 abstract public class FT_Device
 {
     private static final String TAG = "FTDI_Device::";
+    protected final byte[] mCurrentStateBuffer = new byte[208];
+    // Queue used to pass packets between writes and reads in the onboard simulator.
+    // Read and Writes come from the ftc_app when it thinks it is talking to the
+    // FTDI driver.
+    protected final ConcurrentLinkedQueue<CacheWriteRecord> readQueue = new ConcurrentLinkedQueue<>();
+    protected volatile boolean writeLocked = false;
     D2xxManager.FtDeviceInfoListNode mDeviceInfoNode;
     String mFT_DeviceDescription;
     String mySerialNumber;
@@ -17,22 +21,12 @@ abstract public class FT_Device
     double mMotor1TotalError;
     double mMotor2TotalError;
     long mTimeInMilliseconds=0;
+    // LinkedBlockingQueue<SimulatorData.Data> mWriteToPcQueue;
+    // LinkedBlockingQueue<SimulatorData.Data> mReadFromPcQueue;
     long mOldTimeInMilliseconds=0;
     long mDeltaWriteTime=0;
-
     NetworkManager mNetworkManager;
-    LinkedBlockingQueue<byte[]> mWriteToPcQueue;
-    LinkedBlockingQueue<byte[]> mReadFromPcQueue;
-
-    protected final byte[] mCurrentStateBuffer = new byte[208];
-
     int mPacketCount=0;
-
-    // Queue used to pass packets between writes and reads in the onboard simulator.
-    // Read and Writes come from the ftc_app when it thinks it is talking to the
-    // FTDI driver.
-    protected final ConcurrentLinkedQueue<CacheWriteRecord> readQueue = new ConcurrentLinkedQueue<>();
-    protected volatile boolean writeLocked = false;
 
     public FT_Device(String serialNumber, String description, String ipAddress, int port)
     {
@@ -44,45 +38,33 @@ abstract public class FT_Device
         mFT_DeviceDescription = description;  // for use in log
 
         mNetworkManager = new NetworkManager(ipAddress, port);
-        mReadFromPcQueue = mNetworkManager.getReadFromPcQueue();
-        mWriteToPcQueue = mNetworkManager.getWriteToPcQueue();
-    }
-
-
-    public synchronized void close()
-    {
-
+        //mReadFromPcQueue = mNetworkManager.getReadFromPcQueue();
+        // mWriteToPcQueue = mNetworkManager.getWriteToPcQueue();
     }
 
     private int getPacketFromPC(byte[] data, int length, long wait_ms) {
-        int rc = 0;
+        int rc;
         byte[] packet;
 
-        try {
-            packet = mReadFromPcQueue.poll(wait_ms, TimeUnit.MILLISECONDS);
+        packet = NetworkManager.getLatestData(SimulatorData.Type.Types.DEVICE_LIST);
 
-            // If timed out waiting for packet then return the last packet that was read
-            if (packet==null) {
-                System.arraycopy(mCurrentStateBuffer, 0, data, 0, length);
-                rc = length;
-            } else {
-                System.arraycopy(packet, 0, data, 0, length);                   // return the packet
-                System.arraycopy(packet, 0, mCurrentStateBuffer, 0, length);    // Save in case we lose a packet
-                rc = length;
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        // If timed out waiting for packet then return the last packet that was read
+        if (packet == null) {
+            System.arraycopy(mCurrentStateBuffer, 0, packet, 0, length);
+            rc = length;
+        } else {
+            System.arraycopy(packet, 0, packet, 0, length);                   // return the packet
+            System.arraycopy(packet, 0, mCurrentStateBuffer, 0, length);    // Save in case we lose a packet
+            rc = length;
         }
 
         return rc;
     }
 
     protected void sendPacketToPC(byte[] data, int start, int length) {
-        byte[] tempBytes = new byte[length];
-        System.arraycopy(data, start, tempBytes, 0, length);
-        tempBytes[1] =(byte)mPacketCount;   // Add a counter so we can see lost packets
         mPacketCount++;
-        mWriteToPcQueue.add(tempBytes);
+        NetworkManager.requestSend(SimulatorData.Type.Types.BRICK_INFO,
+                SimulatorData.Data.Modules.LEGACY_CONTROLLER, data);
     }
 
     public int read(byte[] data, int length, long wait_ms)
