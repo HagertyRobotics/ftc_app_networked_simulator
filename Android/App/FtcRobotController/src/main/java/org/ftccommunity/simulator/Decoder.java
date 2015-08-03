@@ -14,6 +14,7 @@ public class Decoder extends ByteToMessageDecoder { // (1)
     @Override
     protected void decode(io.netty.channel.ChannelHandlerContext ctx, ByteBuf in, List<Object> out) { // (2)
         long size = 0;
+
         if (in.readableBytes() < 4) {
             return;
         }

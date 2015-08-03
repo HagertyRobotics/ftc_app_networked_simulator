@@ -1,5 +1,13 @@
 package org.ftccommunity.simulator;
 
+import com.qualcomm.robotcore.util.RobotLog;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Enumeration;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -35,13 +43,36 @@ public class Server implements Runnable {
                     .option(ChannelOption.SO_BACKLOG, 128)          // (5)
                     .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
 
+
+            // Log all IP addresses
+
+            try {
+                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                while (interfaces.hasMoreElements()){
+                    NetworkInterface current = interfaces.nextElement();
+                    RobotLog.i(current.toString());
+                    if (!current.isUp() || current.isLoopback() || current.isVirtual()) continue;
+                    Enumeration<InetAddress> addresses = current.getInetAddresses();
+                    while (addresses.hasMoreElements()){
+                        InetAddress current_addr = addresses.nextElement();
+                        if (current_addr.isLoopbackAddress()) continue;
+                        RobotLog.i(current_addr.getHostAddress());
+                    }
+                }
+            } catch (SocketException e) {
+                RobotLog.e(e.toString());
+            }
+
             // Bind and start to accept incoming connections.
             ChannelFuture f = null;
             try {
+                RobotLog.w("Starting Server on " + port + "@" + InetAddress.getLocalHost().getHostAddress());
                 f = b.bind(port).sync();
 
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
+            } catch (UnknownHostException e) {
+                RobotLog.e("Something Bad happened " + e.toString());
             } finally {
                 if (f != null) {
                     try {
@@ -59,6 +90,7 @@ public class Server implements Runnable {
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
+            RobotLog.i("Shutdown Server");
         }
     }
 }

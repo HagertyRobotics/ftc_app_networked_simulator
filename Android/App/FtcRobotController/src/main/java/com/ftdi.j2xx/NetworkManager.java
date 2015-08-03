@@ -1,14 +1,22 @@
 package com.ftdi.j2xx;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
+
 import com.google.common.base.Charsets;
 import com.google.common.collect.LinkedListMultimap;
+import com.qualcomm.robotcore.util.RobotLog;
 
-import org.ftccommunity.simulator.protobuf.SimulatorData;
+import org.ftccommunity.simulator.net.HeartbeatTask;
+import org.ftccommunity.simulator.net.SimulatorData;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.LinkedList;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.UUID;
 
 /**
  *
@@ -23,18 +31,66 @@ public final class NetworkManager {
     //public static PendingWriteQueue mWriteToPcQueueNew;
 
     // private DatagramSocket mSimulatorSocket;
-    private static LinkedBlockingQueue<SimulatorData.Data> mWriteToPcQueue = new LinkedBlockingQueue<>();
-    private static LinkedBlockingQueue<SimulatorData.Data> mReadFromPcQueue = new LinkedBlockingQueue<>();
+    //private static LinkedBlockingQueue<SimulatorData.Data> mWriteToPcQueue = new LinkedBlockingQueue<>();
+    //private static LinkedBlockingQueue<SimulatorData.Data> mReadFromPcQueue = new LinkedBlockingQueue<>();
 
+    private static final LinkedList<SimulatorData.Data> receivedQueue = new LinkedList<>();
     private static boolean serverWorking;
-
     private static LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
-    private static LinkedList<SimulatorData.Data> receivedQueue = new LinkedList<>();
     private static LinkedList<SimulatorData.Data> sendingQueue = new LinkedList<>();
     private static InetAddress robotAddress;
     private static boolean isReady;
 
-    public NetworkManager(String ipAddress, int port) {
+    public NetworkManager(NetworkTypes type) {
+        if (type == NetworkTypes.BLUETOOTH) {
+            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+            adapter.startDiscovery();
+            while (BluetoothAdapter.getDefaultAdapter().isDiscovering()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+
+            LinkedList<BluetoothDevice> devices = new LinkedList<>(BluetoothAdapter.getDefaultAdapter().getBondedDevices());
+            BluetoothDevice main;
+            for (BluetoothDevice device : devices) {
+                RobotLog.i(device.toString());
+            }
+            if (devices.size() > 0) {
+                main = devices.getLast();
+            } else {
+                throw new IllegalStateException("No bonded devices found, but bluetooth mode is enabled");
+            }
+            UUID bluetoothUuid = UUID.randomUUID();
+            BluetoothServerSocket socket = null;
+            RobotLog.w("Use the following UUID to connect " + bluetoothUuid.toString());
+            try {
+                socket = adapter.listenUsingRfcommWithServiceRecord("FTC_Sim", bluetoothUuid);
+            } catch (IOException e) {
+                RobotLog.e(e.toString());
+            }
+            if (socket == null) {
+                throw new NullPointerException("Socket never got initialized");
+            }
+            BluetoothSocket mainSocket;
+            try {
+                socket.accept();
+            } catch (IOException e) {
+                RobotLog.e(e.toString());
+            }
+        }
+
+        Thread processThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+            while (!Thread.currentThread().isInterrupted()) {
+                    processQueue();
+                }
+        }});
+        processThread.start();
+
         /*// Start the Network Sender thread
         // This thread will read from the mWriteToPcQueue and send packets to the PC application
         // The mWriteToPcQueue will get packets from the FT_Device write call
@@ -54,13 +110,22 @@ public final class NetworkManager {
         }*/
     }
 
-    public static void add(@NotNull SimulatorData.Data data) {
+    public synchronized static void add(@NotNull SimulatorData.Data data) {
         receivedQueue.add(data);
     }
 
-    public synchronized static void processQueue() {
-        for (SimulatorData.Data data : receivedQueue) {
-            main.put(data.getType().getType(), data);
+    public static void processQueue() {
+        while (receivedQueue.size() < 1) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        synchronized (receivedQueue) {
+            for (SimulatorData.Data data : receivedQueue) {
+                main.put(data.getType().getType(), data);
+            }
         }
     }
 
@@ -72,16 +137,16 @@ public final class NetworkManager {
         NetworkManager.serverWorking = serverWorking;
     }
 
-    public static LinkedBlockingQueue<SimulatorData.Data> getWriteToPcQueue() {
-        return mWriteToPcQueue;
+    public static LinkedList<SimulatorData.Data> getWriteToPcQueue() {
+        return sendingQueue;
     }
 
-    public static LinkedBlockingQueue<SimulatorData.Data> getReadFromPcQueue() {
-        return mReadFromPcQueue;
+    public static LinkedList<SimulatorData.Data> getReadFromPcQueue() {
+        return receivedQueue;
     }
 
     public static SimulatorData.Data[] getWriteData() {
-        return (SimulatorData.Data[]) mWriteToPcQueue.toArray() ;
+        return sendingQueue.toArray(new SimulatorData.Data[sendingQueue.size()]);
     }
 
 
@@ -104,9 +169,11 @@ public final class NetworkManager {
                 .setModule(module)
                 .addInfo(new String(data, Charsets.US_ASCII));
         sendingQueue.add(sendDataBuilder.build());
-    }
-
-    public static SimulatorData.Data getNextSend() {
+    }    /**
+     * Gets the next data to send
+     * @return the next data to send
+     */
+    public synchronized static SimulatorData.Data getNextSend() {
         if (sendingQueue.size() > 100) {
             LinkedList<SimulatorData.Data> temp = new LinkedList<>();
             for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
@@ -114,18 +181,38 @@ public final class NetworkManager {
             }
             sendingQueue = temp;
         }
-        return sendingQueue.removeFirst();
+
+        if (sendingQueue.size() > 0) {
+            return sendingQueue.removeFirst();
+        } else {
+            return HeartbeatTask.buildMessage();
+        }
     }
 
+    /**
+     * Rertrieve the next datas to send
+     * @return an array of the entire sending queue
+     */
     public static SimulatorData.Data[] getNextSends() {
         return getNextSends(sendingQueue.size());
     }
 
+    /**
+     * Rertieve an the next datas to send based on a specificed amount
+     * @param size the maximum, inclusive size of the data array
+     * @return a data array of the next datas to send up to a limit
+     */
     public static SimulatorData.Data[] getNextSends(int size) {
         return getNextSends(size, true);
     }
 
-    public static SimulatorData.Data[] getNextSends(final int size, final boolean autoShrink) {
+    /**
+     * Retrieve an array of the next datas to send up to a specific size
+     * @param size the maximum size of the returned array
+     * @param autoShrink if true this automatically adjusts the size returned
+     * @return a data array of the next datas to send
+     */
+    public synchronized static SimulatorData.Data[] getNextSends(final int size, final boolean autoShrink) {
         int currentSize = size;
         if (currentSize <= sendingQueue.size() / 2) {
             cleanup();
@@ -136,7 +223,7 @@ public final class NetworkManager {
         }
 
         if (autoShrink) {
-            if (size > sendingQueue.size()) {
+            if (size >  sendingQueue.size()) {
                 currentSize = sendingQueue.size();
             }
         }
@@ -149,7 +236,10 @@ public final class NetworkManager {
         return datas;
     }
 
-    private static void cleanup() {
+    /**
+     * Cleanup the sending queue
+     */
+    private synchronized static void cleanup() {
         if (sendingQueue.size() > 100) {
             LinkedList<SimulatorData.Data> temp = new LinkedList<>();
             for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
@@ -267,4 +357,9 @@ public final class NetworkManager {
     }
 
 */
+    public enum NetworkTypes {
+        BLUETOOTH,
+        USB,
+        WIFI
+    }
 }

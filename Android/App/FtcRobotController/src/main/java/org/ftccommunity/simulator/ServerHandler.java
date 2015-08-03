@@ -3,7 +3,8 @@ package org.ftccommunity.simulator;
 import com.ftdi.j2xx.NetworkManager;
 import com.google.common.base.Charsets;
 
-import org.ftccommunity.simulator.protobuf.SimulatorData;
+import org.ftccommunity.simulator.net.HeartbeatTask;
+import org.ftccommunity.simulator.net.SimulatorData;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,22 +15,25 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) { // (2)
         SimulatorData.Data receiveData = (SimulatorData.Data) msg;
-        try {
+       /* try {
             Thread.sleep(2);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-        }
-
-
+        }*/
 
         // TODO: write heartbeat
         // ctx.executor().scheduleAtFixedRate()
-        NetworkManager.add(receiveData);
-
-        for (SimulatorData.Data data: NetworkManager.getWriteData()) {
-            ctx.writeAndFlush(data);
+        // We don't need to queue heartbearts (OPT_DATA2)
+        if (receiveData.getType().getType() != SimulatorData.Type.Types.OPT_DATA2) {
+            NetworkManager.add(receiveData);
+        } else { // Acknowledge an OPT_DATA2 with another Heartbeat
+            ctx.write(HeartbeatTask.buildMessage());
         }
 
+        for (SimulatorData.Data data: NetworkManager.getWriteData()) {
+            ctx.write(data);
+        }
+        ctx.flush();
     }
 
     @Override
@@ -37,11 +41,12 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         // NetworkManager.mWriteToPcQueueNew = new PendingWriteQueue(ctx);
         //this.ctx = ctx;
         SimulatorData.Data.Builder dataBuilder = SimulatorData.Data.newBuilder()
-                .setType(SimulatorData.Type.newBuilder().setType(SimulatorData.Type.Types.LEGACY_MOTOR))
+                .setType(SimulatorData.Type.newBuilder().setType(SimulatorData.Type.Types.OPT_DATA2))
                 .setModule(SimulatorData.Data.Modules.LEGACY_CONTROLLER)
                 .setDataName("info")
+                // Completely arbitrary
                 .addInfo(new String(new byte[]{
-                        34, 43, 90
+                        34, 43, 90, 127, 76, 97
                 }, Charsets.US_ASCII));
         SimulatorData.Data data = dataBuilder.build();
 

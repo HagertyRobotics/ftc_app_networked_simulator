@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.ftccommunity.simulator.Server;
-import org.ftccommunity.simulator.protobuf.SimulatorData;
+import org.ftccommunity.simulator.net.SimulatorData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -14,7 +14,6 @@ import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
@@ -26,8 +25,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-// import java.net.DatagramSocket;
-
 public class D2xxManager
 {
     public static final int PHONEPORT = 7000;
@@ -37,29 +34,29 @@ public class D2xxManager
     private static final String TAG = "D2xx::";
     private static D2xxManager mInstance = null;
     InetAddress mIPAddress;
-    DatagramSocket mModuleListerSocket;
     private ArrayList<FT_Device> mFtdiDevices;
     private Server server;
 
     private D2xxManager(Context parentContext)
             throws D2xxManager.D2xxException
     {
-        Log.v("D2xx::", "Start constructor");
+        Log.v(TAG, "Start constructor");
         server = new Server(7002);
         Thread serverThread = new Thread(server);
         serverThread.start();
 
         try {
-            //mModuleListerSocket = new DatagramSocket(PHONEPORT);
             mIPAddress = InetAddress.getByName(PC_IP_ADDRESS);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        new NetworkManager(NetworkManager.NetworkTypes.WIFI);
         if (parentContext == null) {
             throw new D2xxException("D2xx init failed: Can not find parentContext!");
         }
         //updateContext(parentContext);
+
 
         Log.v("D2xx::", "End constructor");
     }

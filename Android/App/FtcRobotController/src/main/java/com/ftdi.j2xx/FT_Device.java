@@ -1,6 +1,6 @@
 package com.ftdi.j2xx;
 
-import org.ftccommunity.simulator.protobuf.SimulatorData;
+import org.ftccommunity.simulator.net.SimulatorData;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -37,7 +37,7 @@ abstract public class FT_Device
         mDeviceInfoNode.description = description;
         mFT_DeviceDescription = description;  // for use in log
 
-        mNetworkManager = new NetworkManager(ipAddress, port);
+        //mNetworkManager = new NetworkManager();
         //mReadFromPcQueue = mNetworkManager.getReadFromPcQueue();
         // mWriteToPcQueue = mNetworkManager.getWriteToPcQueue();
     }

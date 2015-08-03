@@ -29,4 +29,5 @@ dependencies {
     compile files('libs/guava-18.0.jar')
 
     compile 'com.intellij:annotations:12.0'
+    compile 'com.android.support:support-v4:22.2.0'
 }

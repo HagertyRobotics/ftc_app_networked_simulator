@@ -5,13 +5,13 @@
     android:title="@string/pref_wifi_channel_selection_title">
 
     <PreferenceScreen
-      android:title="Change Wifi Channel"
-      android:key="pref_launch_settings">
+      android:key="pref_launch_settings"
+      android:title="Change Wifi Channel">
       <intent
         android:action="android.intent.action.VIEW"
         android:data="com.qualcomm.ftcrobotcontroller.FtcWifiChannelSelectorActivity"
-        android:targetPackage="com.qualcomm.ftcrobotcontroller"
-        android:targetClass="com.qualcomm.ftcrobotcontroller.FtcWifiChannelSelectorActivity" />
+        android:targetClass="com.qualcomm.ftcrobotcontroller.FtcWifiChannelSelectorActivity"
+        android:targetPackage="com.qualcomm.ftcrobotcontroller" />
     </PreferenceScreen>
   </PreferenceCategory>
 
@@ -22,8 +22,8 @@
       <intent
         android:action="android.intent.action.VIEW"
         android:data="com.qualcomm.ftcrobotcontroller.FtcConfigurationActivity"
-        android:targetPackage="com.qualcomm.ftcrobotcontroller"
-        android:targetClass="com.qualcomm.ftcrobotcontroller.FtcConfigurationActivity" />
+        android:targetClass="com.qualcomm.ftcrobotcontroller.FtcConfigurationActivity"
+        android:targetPackage="com.qualcomm.ftcrobotcontroller" />
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -31,8 +31,8 @@
       <intent
         android:action="android.intent.action.VIEW"
         android:data="com.qualcomm.ftcrobotcontroller.FtcLoadFileActivity"
-        android:targetPackage="com.qualcomm.ftcrobotcontroller"
-        android:targetClass="com.qualcomm.ftcrobotcontroller.FtcLoadFileActivity" />
+        android:targetClass="com.qualcomm.ftcrobotcontroller.FtcLoadFileActivity"
+        android:targetPackage="com.qualcomm.ftcrobotcontroller" />
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -40,16 +40,43 @@
       <intent
         android:action="android.intent.action.VIEW"
         android:data="com.qualcomm.ftcrobotcontroller.AutoConfigureActivity"
-        android:targetPackage="com.qualcomm.ftcrobotcontroller"
-        android:targetClass="com.qualcomm.ftcrobotcontroller.AutoConfigureActivity" />
+        android:targetClass="com.qualcomm.ftcrobotcontroller.AutoConfigureActivity"
+        android:targetPackage="com.qualcomm.ftcrobotcontroller" />
     </PreferenceScreen>
   </PreferenceCategory>
 
   <PreferenceCategory
     android:title="Simulation">
       <SwitchPreference
-          android:title="Use Simulator"
-          android:key="simulator_enabled"
-          android:defaultValue="true"/>
+          android:defaultValue="true"
+          android:key="pref_simulatorEnabled"
+          android:title="Use Simulator"  />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="sim_use_wifi"
+        android:title="Use WiFi" />
+
+      <PreferenceScreen
+          android:title="Setup Simulator Wifi">
+          <intent
+              android:action="android.intent.action.VIEW"
+              android:data="com.qualcomm.ftcrobotcontroller.ConfigureSimulatorWiFiActivity"
+              android:targetClass="com.qualcomm.ftcrobotcontroller.ConfigureSimulatorWiFiActivity"
+              android:targetPackage="com.qualcomm.ftcrobotcontroller" />
+      </PreferenceScreen>
+      <SwitchPreference
+          android:defaultValue="false"
+          android:key="pref_simUseBluetooth"
+          android:title="Use Bluetooth" />
+
+      <PreferenceScreen
+          android:title="Setup Bluetooth">
+          <intent
+              android:action="android.intent.action.VIEW"
+              android:data="com.qualcomm.ftcrobotcontroller.ConfigureSimulatorBluetooth"
+              android:targetClass="com.qualcomm.ftcrobotcontrollerConfigureSimulatorBluetoothActivity"
+              android:targetPackage="com.qualcomm.ftcrobotcontroller" />
+      </PreferenceScreen>
   </PreferenceCategory>
 </PreferenceScreen>
