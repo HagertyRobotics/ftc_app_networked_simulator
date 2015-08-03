@@ -4,17 +4,31 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.LinkedListMultimap;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import hagerty.simulator.io.ClientHandler;
+import hagerty.simulator.io.Decoder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.ftccommunity.simulator.net.SimulatorData;
 
 import java.net.InetAddress;
 import java.util.LinkedList;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public final class NetworkManager {
     private static LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
-    private static LinkedList<SimulatorData.Data> receivedQueue = new LinkedList<>();
+    private final static LinkedList<SimulatorData.Data> receivedQueue = new LinkedList<>();
     private static LinkedList<SimulatorData.Data> sendingQueue = new LinkedList<>();
     private static InetAddress robotAddress;
     private static boolean isReady;
+    private static String host = "192.168.44.1";
+    private static int port = 7002;
+    static EventLoopGroup workerGroup = new NioEventLoopGroup();
 
     /**
      * Add a recieved packet to the processing queue for deferred processing
@@ -28,8 +42,15 @@ public final class NetworkManager {
      * Force the queue to sort the processing queue into their respective types
      */
     public synchronized static void processQueue() {
-        for (SimulatorData.Data data : receivedQueue) {
-            main.put(data.getType().getType(), data);
+        try {
+            Thread.sleep(5);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        synchronized (receivedQueue) {
+            for (SimulatorData.Data data : receivedQueue) {
+                main.put(data.getType().getType(), data);
+            }
         }
     }
 
@@ -40,7 +61,16 @@ public final class NetworkManager {
      */
     @NotNull
     public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type) {
-        return ((LinkedList<SimulatorData.Data>) main.get(type)).getLast();
+        while (!(main.get(type).size() > 0)) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        synchronized (main) {
+            return main.get(type).get(main.get(type).size());
+        }
     }
 
     /**
@@ -68,7 +98,7 @@ public final class NetworkManager {
      * @param module which module correlates to the data being sent
      * @param data a byte array of data to send
      */
-    public static void requestSend(SimulatorData.Type.Types type, SimulatorData.Data.Modules module, byte[] data) {
+    public synchronized static void requestSend(SimulatorData.Type.Types type, SimulatorData.Data.Modules module, byte[] data) {
         SimulatorData.Data.Builder sendDataBuilder = SimulatorData.Data.newBuilder();
         sendDataBuilder.setType(SimulatorData.Type.newBuilder().setType(type).build())
                 .setModule(module)
@@ -80,7 +110,7 @@ public final class NetworkManager {
      * Gets the next data to send
      * @return the next data to send
      */
-    public static SimulatorData.Data getNextSend() {
+    public synchronized static SimulatorData.Data getNextSend() {
         if (sendingQueue.size() > 100) {
             LinkedList<SimulatorData.Data> temp = new LinkedList<>();
             for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
@@ -88,7 +118,12 @@ public final class NetworkManager {
             }
             sendingQueue = temp;
         }
-        return sendingQueue.removeFirst();
+
+        if (sendingQueue.size() > 0) {
+            return sendingQueue.removeFirst();
+        } else {
+            return HeartbeatTask.buildMessage();
+        }
     }
 
     /**
@@ -114,7 +149,7 @@ public final class NetworkManager {
      * @param autoShrink if true this automatically adjusts the size returned
      * @return a data array of the next datas to send
      */
-    public static SimulatorData.Data[] getNextSends(final int size, final boolean autoShrink) {
+    public synchronized static SimulatorData.Data[] getNextSends(final int size, final boolean autoShrink) {
         int currentSize = size;
         if (currentSize <= sendingQueue.size() / 2) {
             cleanup();
@@ -141,7 +176,7 @@ public final class NetworkManager {
     /**
      * Cleanup the sending queue
      */
-    private static void cleanup() {
+    private synchronized static void cleanup() {
         if (sendingQueue.size() > 100) {
             LinkedList<SimulatorData.Data> temp = new LinkedList<>();
             for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
@@ -184,4 +219,43 @@ public final class NetworkManager {
     public static void changeReadiness(boolean isReady) {
         NetworkManager.isReady = isReady;
     }
+
+    public static void start() {
+       Thread clientListener = new Thread(new Client());
+        clientListener.start();
+    }
+
+    public static class Client implements Runnable {
+        @Override
+        public void run() {
+            try {
+                Bootstrap b = new Bootstrap(); // (1)
+                b.group(workerGroup); // (2)
+                b.channel(NioSocketChannel.class); // (3)
+                b.option(io.netty.channel.ChannelOption.SO_KEEPALIVE, true); // (4)
+                b.handler(new io.netty.channel.ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new IdleStateHandler(1, 1, 2), new Decoder(), new ClientHandler());
+                    }
+                });
+
+                // Start the client.
+                ChannelFuture f = b.connect(host, port).sync(); // (5)
+                f.channel().closeFuture().sync();
+                // ScheduledFuture g = f.channel().eventLoop().scheduleAtFixedRate(new HeartbeatTask(f.channel(), port), 0, 1, TimeUnit.SECONDS);
+
+                // Wait until the connection is closed.
+                f.channel().closeFuture().sync();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } finally {
+                workerGroup.shutdownGracefully();
+            }
+            System.out.print("Server closed");
+        }
+
+    }
+
 }
+

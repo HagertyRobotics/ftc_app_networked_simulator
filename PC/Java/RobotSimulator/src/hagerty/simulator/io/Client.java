@@ -8,12 +8,13 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.InetSocketAddress;
 
 public class Client {
     public static void main(String[] args) throws Exception {
-        String host = "192.168.2.6";
+        String host = "192.168.44.1";
         int port = 7002;
         io.netty.channel.EventLoopGroup workerGroup = new io.netty.channel.nio.NioEventLoopGroup();
 
@@ -35,6 +36,7 @@ public class Client {
         } catch (Exception e) {
             e.printStackTrace();
         }
+/*
 
         while (!NetworkManager.isReady()) {
             System.out.print("Wait on robot...");
@@ -46,6 +48,8 @@ public class Client {
             }
 
         }
+*/
+
 
         try {
             MainApp mainApp = new MainApp();
@@ -59,7 +63,8 @@ public class Client {
             b.handler(new io.netty.channel.ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new Decoder(), new ClientHandler());
+                    ch.pipeline().addLast(new IdleStateHandler(1, 1, 2), new Decoder(),
+                                                 new ClientHandler());
                 }
             });
 

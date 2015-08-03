@@ -1,6 +1,7 @@
 package hagerty.simulator;
 
 import hagerty.simulator.modules.BrickSimulator;
+import sun.nio.ch.Net;
 
 import java.net.InetAddress;
 import java.util.LinkedList;
@@ -21,12 +22,19 @@ public class RobotSimulator  {
     private static boolean visualizerStarted = false;
 
     static public void startSimulator(hagerty.gui.MainApp mainApp) {
+        Thread processQueue = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                NetworkManager.processQueue();
+            }
+        });
+        processQueue.start();
     	simulatorStarted = true;
 
     	System.out.println("Starting Module Lister...");
         gBrickListGenerator = new BrickListGenerator(mainApp);  // Runnable
-        Thread moduleListerThread = new Thread(gBrickListGenerator,"");
+        Thread moduleListerThread = new Thread(gBrickListGenerator, "Brick List Generator");
         moduleListerThread.start();
+        NetworkManager.start();
 
         // Start the individual threads for each module
         // Read the current list of modules from the GUI MainApp class
