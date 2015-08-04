@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="453.0" prefWidth="439.0"
+            xmlns="http://javafx.com/javafx/8.0.40" fx:controller="org.ftccommunity.gui.view.EditMotorDialogController">
+    <GridPane layoutX="30.0" layoutY="28.0" prefHeight="144.0" prefWidth="419.0" AnchorPane.leftAnchor="10.0"
+              AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="218.0" minWidth="10.0" prefWidth="111.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="316.0" minWidth="10.0" prefWidth="261.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <Label text="Controller Name" GridPane.rowIndex="1"/>
+        <TextField fx:id="brickNameField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Label text="Controller Type"/>
+        <Label text="UDP Port" GridPane.rowIndex="2"/>
+        <TextField fx:id="brickPortField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        <Label text="Serial Number" GridPane.rowIndex="3"/>
+        <TextField fx:id="brickSerialField" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+    </GridPane>
+    <GridPane fx:id="portGrid" layoutX="10.0" layoutY="198.0" prefHeight="161.0" prefWidth="419.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="134.0" minWidth="10.0" prefWidth="81.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" prefWidth="153.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.0" minWidth="10.0" prefWidth="166.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        </rowConstraints>
+    </GridPane>
+    <ButtonBar layoutX="176.0" layoutY="233.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
+        <buttons>
+            <Button defaultButton="true" mnemonicParsing="false" onAction="#handleOk" text="OK"/>
+            <Button mnemonicParsing="false" onAction="#handleCancel" prefWidth="120.0" text="Cancel"/>
+        </buttons>
+    </ButtonBar>
+</AnchorPane>

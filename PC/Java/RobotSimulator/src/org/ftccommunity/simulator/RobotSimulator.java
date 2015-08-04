@@ -33,10 +33,10 @@ public class RobotSimulator  {
         // Start the individual threads for each module
         List<BrickSimulator> brickList = mainApp.getBrickData();
         for (BrickSimulator temp : brickList) {
-        	Thread t = new Thread(temp,temp.getAlias());  // Make a thread from the object and also set the process name
+        	Thread t = new Thread(temp,temp.getName());  // Make a thread from the object and also set the process name
         	t.start();
             threadLinkedList.add(t);
-            System.out.println("Starting: " + temp.getName() + "  \"" + temp.getAlias() + "\"");
+            System.out.println("Starting: " + temp.getName() + "  \"" + temp.getName() + "\"");
 		}
     }
 

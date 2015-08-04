@@ -5,16 +5,21 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.ftccommunity.simulator.data.LegacyMotorSimData;
+import org.ftccommunity.simulator.data.MotorSimData;
 import org.ftccommunity.simulator.data.SimData;
-import org.ftccommunity.simulator.data.SimDataFactory;
-import org.ftccommunity.simulator.data.SimDataType;
+import org.ftccommunity.simulator.modules.devices.Device;
+import org.ftccommunity.simulator.modules.devices.DeviceFactory;
+import org.ftccommunity.simulator.modules.devices.DeviceType;
+import org.ftccommunity.simulator.modules.devices.NullDevice;
 import org.ftccommunity.utils.Utils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -26,7 +31,9 @@ import java.util.logging.Logger;
 @XmlRootElement(name="Legacy")
 public class LegacyBrickSimulator extends BrickSimulator {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    protected final String mType = "Core Legacy Module";
     protected final byte[] mCurrentStateBuffer = new byte[208];
+
     /*
      ** Packet types
      */
@@ -36,20 +43,16 @@ public class LegacyBrickSimulator extends BrickSimulator {
     protected final byte[] recSyncCmd0 = {51, -52, -128, 0, 0};
     protected final byte[] recSyncCmd208 = {51, -52, -128, 0, (byte) 208};
     protected final byte[] controllerTypeLegacy = {0, 77, 73};       // Controller type USBLegacyModule
-    private final String name = "Core Legacy Module";
-    @XmlElement
-    private String[] portName = new String[6];
-    @XmlElement
-    private SimDataType[] portType = new SimDataType[6];
-    private SimData[] portSimData = new SimData[6];
+
+
     /**
      * Default constructor.
      */
     public LegacyBrickSimulator() {
+    	mFXMLFileName = "view/EditLegacyDialog.fxml";
+    	mDevices = new Device[6];
     	for (int i=0;i<6;i++) {
-    		portName[i] = "";
-    		portType[i] = SimDataType.NONE;
-    		portSimData[i] = null;
+    		mDevices[i] = new NullDevice();
     	}
     }
 
@@ -74,52 +77,24 @@ public class LegacyBrickSimulator extends BrickSimulator {
 	        // Write Command
 	    	// Process the received data packet
 	        // Loop through each of the 6 ports and see if the Action flag is set.
-	        // If set then copy the 32 bytes for the port into the CurrentStateBuffer
 
 	        for (int i=0;i<6;i++) {
-	        	switch (portType[i]) {
-	        	case LEGACY_MOTOR:
-	        		((LegacyMotorSimData) portSimData[i]).processBuffer(i, data, mCurrentStateBuffer );
-	        		break;
-	        	case LEGACY_LIGHT:
-	        		break;
-	        	case LEGACY_TOUCH:
-	        		break;
-	        	default:
-	        		break;
-	        	}
+	        	mDevices[i].processBuffer(data, mCurrentStateBuffer );
 	        }
         }
-    }
-
-
-    /**
-     * For the LegacyBrickSimulator objects, since we couldn't get the marshaler to handle the list of small
-     * SimData objects(6), we created and marshaled a list of the six port types and names.  We now need to create
-     * the objects by hand using the unmarshaled list of portTypes and portNames.
-     */
-    public void fixupUnMarshaling() {
-    	for (int i=0;i<6;i++) {
-    		// if port is not configured then don't create any SimData objects for it!
-    		portSimData[i] = SimDataFactory.buildSimData(portType[i]);
-    		if (portSimData[i] != null){
-        		portSimData[i].setSimDataName(portName[i]);  // name the newly created SimData object
-    		}
-
-    	}
     }
 
     /**
      *
      */
-    public SimData findSimDataName(String name) {
-    	for (int i=0;i<6;i++) {
-    		if (portName[i] != null) {
-    			if (portName[i].equals(name)) {
-    				return portSimData[i];
-    			}
-    		}
-    	}
+    public SimData findSimDataByName(String name) {
+//    	for (int i=0;i<6;i++) {
+//    		if (portName[i] != null) {
+//    			if (portName[i].equals(name)) {
+//    				return portSimData[i];
+//    			}
+//    		}
+//    	}
     	return null;
     }
 
@@ -148,11 +123,13 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		for (int i=0;i<6;i++) {
 			Text portText = new Text("Port " + i);
 			grid.add(portText, 0, i);
-			Text typeText = new Text(portType[i].getName());
-			grid.add(typeText, 1,  i);
-			Text nameText = new Text(portName[i]);
-			grid.add(nameText, 2,  i);
 
+			Text typeText = new Text(mDevices[i].getType().getName());
+			grid.add(typeText, 1,  i);
+
+//			SimData[] sda = mDevices[i].getSimDataArray();
+//			Text nameText = new Text(sda[0].getName());
+//			grid.add(nameText, 2,  i);
 		}
 
 		pane.getChildren().add(grid);
@@ -162,29 +139,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
     /**
      * Getters/Setters
      */
-    public String getName() {
-    	return name;
-    }
 
-    public SimData[] getPortSimData() {
-    	return portSimData;
-    }
-
-    public String[] getPortName() {
-    	return portName;
-    }
-
-    public void setPortName(String[] s) {
-    	portName = s;
-    }
-
-    public SimDataType[] getPortType() {
-        return portType;
-    }
-
-    public void setPortType(SimDataType[] type) {
-    	portType = type;
-    }
 
 
     /**
@@ -193,18 +148,14 @@ public class LegacyBrickSimulator extends BrickSimulator {
 	public void setupDebugGuiVbox(VBox vbox) {
 
 		for (int i=0;i<6;i++) {
-			if (portSimData[i] != null) {
-				portSimData[i].setupDebugGuiVbox(vbox);
-			}
+			mDevices[i].setupDebugGuiVbox(vbox);
 		}
 	}
 
 	public void updateDebugGuiVbox() {
 
 		for (int i=0;i<6;i++) {
-			if (portSimData[i] != null) {
-				portSimData[i].updateDebugGuiVbox();
-			}
+				mDevices[i].updateDebugGuiVbox();
 		}
 	}
 

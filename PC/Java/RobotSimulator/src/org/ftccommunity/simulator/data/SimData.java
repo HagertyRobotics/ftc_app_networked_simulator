@@ -6,42 +6,31 @@ import javafx.scene.layout.VBox;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.ftccommunity.simulator.modules.devices.DeviceType;
+
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+
+//@XmlRootElement(name="xSimData")
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class SimData {
 
-	public final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	protected StringProperty simDataName = null;
-    private SimDataType mType=null;
-
-	public SimData(SimDataType type) {
-		mType=type;
-	}
+	@XmlElement
+	protected StringProperty mName = null;
 
     // Do subclass level processing in this method
     protected abstract void construct();
 
-	public String getSimDataName() {
-		return simDataName.getValue();
+
+	public String getName() {
+		return mName.getValue();
 	}
 
-	public void setSimDataName(String name) {
-		this.simDataName = new SimpleStringProperty(name);
+	public void setName(String name) {
+		mName = new SimpleStringProperty(name);
 	}
-
-	public SimDataType getType() {
-		return mType;
-	}
-
-	public void setType(SimDataType type) {
-		mType = type;
-	}
-
-	abstract public void setupDebugGuiVbox(VBox vbox);
-
-	abstract public void updateDebugGuiVbox();
-	
-
 }

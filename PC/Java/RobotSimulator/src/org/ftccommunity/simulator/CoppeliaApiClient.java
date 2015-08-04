@@ -6,7 +6,7 @@ import coppelia.remoteApi;
 
 import java.util.List;
 
-import org.ftccommunity.simulator.data.LegacyMotorSimData;
+import org.ftccommunity.simulator.data.MotorSimData;
 import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.BrickSimulator;
 
@@ -89,7 +89,7 @@ public class CoppeliaApiClient implements Runnable {
 		SimData simData=null;
 		List<BrickSimulator> brickList = mMainApp.getBrickData();
 		for (BrickSimulator currentBrick : brickList) {
-			simData = currentBrick.findSimDataName("Wheels");
+			simData = currentBrick.findSimDataByName("Wheels");
 			if (simData != null) break;
 		}
 
@@ -99,13 +99,13 @@ public class CoppeliaApiClient implements Runnable {
 		}
 
         while (!done && !Thread.currentThread().isInterrupted()) {
-			simData.lock.readLock().lock();
-			try {
-				leftMotorSpeed = ((LegacyMotorSimData)simData).getMotor1Speed() * 3.14f;
-				rightMotorSpeed = ((LegacyMotorSimData)simData).getMotor2Speed() * 3.14f;
-			} finally {
-				simData.lock.readLock().unlock();
-			}
+//			simData.lock.readLock().lock();
+//			try {
+//				leftMotorSpeed = ((MotorSimData)simData).getMotor1Speed() * 3.14f;
+//				rightMotorSpeed = ((MotorSimData)simData).getMotor2Speed() * 3.14f;
+//			} finally {
+//				simData.lock.readLock().unlock();
+//			}
 
 			mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotorHandle.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
 			mVrep.simxSetJointTargetVelocity(mClientID,mRightMotorHandle.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);

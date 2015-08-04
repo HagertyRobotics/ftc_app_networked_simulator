@@ -5,7 +5,14 @@ import javafx.collections.ObservableList;
 import javax.xml.bind.*;
 
 import org.ftccommunity.gui.MainApp;
-import org.ftccommunity.simulator.modules.*;
+import org.ftccommunity.simulator.data.MotorSimData;
+import org.ftccommunity.simulator.data.SimData;
+import org.ftccommunity.simulator.modules.BrickListWrapper;
+import org.ftccommunity.simulator.modules.BrickSimulator;
+import org.ftccommunity.simulator.modules.LegacyBrickSimulator;
+import org.ftccommunity.simulator.modules.MotorBrickSimulator;
+import org.ftccommunity.simulator.modules.ServoBrickSimulator;
+import org.ftccommunity.simulator.modules.devices.Device;
 
 import java.io.File;
 import java.util.List;
@@ -34,7 +41,13 @@ public final class Utils {
      * @param brickList
      */
     public static void saveBrickDataToFile(File file, List<BrickSimulator> brickList) throws Exception {
-        JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class);
+        JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class,
+        		LegacyBrickSimulator.class,
+        		MotorBrickSimulator.class,
+        		ServoBrickSimulator.class,
+        		SimData.class,
+        		Device.class,
+        		MotorSimData.class);
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
@@ -78,7 +91,13 @@ public final class Utils {
      */
     public static void loadBrickDataFromFile(File file, ObservableList<BrickSimulator> brickList) throws Exception {
         JAXBContext context = JAXBContext
-                .newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class);
+                .newInstance(BrickListWrapper.class,
+                		LegacyBrickSimulator.class,
+                		MotorBrickSimulator.class,
+                		ServoBrickSimulator.class,
+                		Device.class,
+                		MotorSimData.class);
+
         Unmarshaller um = context.createUnmarshaller();
         try {
             // Reading XML from the file and unmarshalling to a Wrapper class that just contains a single List
@@ -89,10 +108,6 @@ public final class Utils {
             // This list will be returned from the method getBrickData()
             brickList.clear();
             brickList.addAll(wrapper.getBricks());
-
-            // For the LegacyBrickSimulator objects, since we couldn't get the marshaler to handle the list of small
-            // SimData objects(6), we need to create the objects by hand using the returned list of portTypes.
-            brickList.forEach(BrickSimulator::fixupUnMarshaling);
 
             // Save the file path to the registry.
             setBrickFilePath(file);

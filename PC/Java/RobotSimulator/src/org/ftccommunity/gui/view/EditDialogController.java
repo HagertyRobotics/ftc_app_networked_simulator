@@ -65,7 +65,7 @@ public class EditDialogController {
      * @param brick
      */
     public void fillFieldsWithCurrentValues() {
-        brickNameField.setText(brick.getAlias());
+        brickNameField.setText(brick.getName());
         brickPortField.setText(brick.getPort().toString());
         brickSerialField.setText(brick.getSerial());
     }
@@ -86,7 +86,7 @@ public class EditDialogController {
     @FXML
     private void handleOk() {
         if (isInputValid()) {
-            brick.setAlias(brickNameField.getText());
+            brick.setName(brickNameField.getText());
             brick.setPort(Integer.parseInt(brickPortField.getText()));
             brick.setSerial(brickSerialField.getText());
 

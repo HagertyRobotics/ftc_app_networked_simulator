@@ -2,6 +2,7 @@ package org.ftccommunity.gui.view;
 
 import org.ftccommunity.simulator.modules.BrickSimulator;
 import org.ftccommunity.simulator.modules.LegacyBrickSimulator;
+import org.ftccommunity.simulator.modules.MotorBrickSimulator;
 import org.ftccommunity.simulator.modules.devices.DeviceType;
 
 import javafx.collections.FXCollections;
@@ -18,7 +19,7 @@ import javafx.stage.Stage;
  *
  * @author Hagerty High
  */
-public class EditLegacyDialogController extends EditDialogController {
+public class EditMotorDialogController extends EditDialogController {
 
     @FXML
     private TextField brickNameField;
@@ -32,16 +33,14 @@ public class EditLegacyDialogController extends EditDialogController {
     @FXML
     private GridPane portGrid;
 
-    private ChoiceBox[] legacyChoiceBoxes;
-    private TextField[] legacyPortNames;
+    private TextField motorPortName;
 
     private Stage dialogStage;
     private BrickSimulator brick;
     private boolean okClicked = false;
 
-    public EditLegacyDialogController() {
-        legacyChoiceBoxes = new ChoiceBox[6];
-        legacyPortNames = new TextField[6];
+    public EditMotorDialogController() {
+        motorPortName = new TextField();
     }
 
     /**
@@ -50,24 +49,12 @@ public class EditLegacyDialogController extends EditDialogController {
      */
     @FXML
     private void initialize() {
-    	for (int i=0;i<6;i++) {
-            legacyChoiceBoxes[i] = new ChoiceBox<>(FXCollections.observableArrayList(
-                    DeviceType.NONE,
-                    DeviceType.TETRIX_MOTOR,
-                    DeviceType.TETRIX_SERVO,
-                    DeviceType.LEGO_LIGHT));
-
-    		legacyChoiceBoxes[i].getSelectionModel().selectFirst();
-    		portGrid.add(legacyChoiceBoxes[i], 1, i);
-
-    		legacyPortNames[i] = new TextField();
-    		portGrid.add(legacyPortNames[i], 2, i);
+    		motorPortName = new TextField();
+    		portGrid.add(motorPortName, 2, 0);
 
     		Label legacyLabel = new Label();
-    		legacyLabel.setText("Port " + i);
-    		portGrid.add(legacyLabel, 0, i);
-
-    	}
+    		legacyLabel.setText("Port " + 0);
+    		portGrid.add(legacyLabel, 0, 0);
     }
 
     /**
@@ -100,10 +87,9 @@ public class EditLegacyDialogController extends EditDialogController {
         brickPortField.setText(brick.getPort().toString());
         brickSerialField.setText(brick.getSerial());
 
-        for (int i=0;i<6;i++) {
-        	legacyChoiceBoxes[i].getSelectionModel().select(brick.getPortType(i));
-        	//legacyPortNames[i].setText(brick.getPortName(i));
-    	}
+        MotorBrickSimulator mb = (MotorBrickSimulator)brick;
+
+        //motorPortName.setText(mb.getPortName());
     }
 
     /**
@@ -116,12 +102,11 @@ public class EditLegacyDialogController extends EditDialogController {
             brick.setPort(Integer.parseInt(brickPortField.getText()));
             brick.setSerial(brickSerialField.getText());
 
-            for (int i=0;i<6;i++) {
-            	brick.setPortType(i, (DeviceType)legacyChoiceBoxes[i].getSelectionModel().getSelectedItem());
-//            	brick.setPortName(i, legacyPortNames[i].getText());
-        	}
+            MotorBrickSimulator mb = (MotorBrickSimulator)brick;
 
-            //lb.fixupUnMarshaling();
+            //mb.setPortName(motorPortName.getText());
+
+            mb.fixupUnMarshaling();
 
             okClicked = true;
             dialogStage.close();

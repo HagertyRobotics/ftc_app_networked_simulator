@@ -44,7 +44,7 @@ public class OverviewController {
         //controllerNameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
         //noinspection Convert2Diamond
         brickNameColumn.setCellValueFactory(new PropertyValueFactory<BrickSimulator,String>("name"));
-        brickAliasColumn.setCellValueFactory(cellData -> cellData.getValue().aliasProperty());
+        brickAliasColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
 
         // Show brick details in the Details window.
         showBrickDetails(null);
@@ -79,7 +79,7 @@ public class OverviewController {
     private void showBrickDetails(BrickSimulator brick) {
         if (brick != null) {
             // Fill the labels with info from the brick object.
-            brickNameLabel.setText(brick.getAlias());
+            brickNameLabel.setText(brick.getName());
             brickPortLabel.setText(brick.getPort().toString());
             brickSerialLabel.setText(brick.getSerial());
             detailsPane.getChildren().clear();

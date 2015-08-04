@@ -1,28 +1,28 @@
-package org.ftccommunity.simulator.data;
+package org.ftccommunity.simulator.modules.devices;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class SimDataFactory {
-	public static SimData buildSimData(SimDataType type) {
-        SimData simData;
+public class DeviceFactory {
+	public static Device buildSimData(DeviceType type) {
+        Device device;
         switch (type) {
 		case NONE:
-			simData = null;
+			device = null;
 			break;
-		case LEGACY_MOTOR:
-			simData = new LegacyMotorSimData();
+		case TETRIX_MOTOR:
+			device = new TetrixMotorControllerDevice();
 			break;
-		case LEGACY_LIGHT:
+		case TETRIX_SERVO:
             // fall through
-            case LEGACY_TOUCH:
-            // fallthrough
+            case LEGO_LIGHT:
+            // fall through
             case USB_MOTOR:
-            // fallthrough
+            // fall through
             case USB_SERVO:
             throw new NotImplementedException();
             default:
                 throw new AssertionError("You did not specify a valid type");
         }
-        return simData;
+        return device;
 	}
 }

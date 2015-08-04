@@ -17,13 +17,9 @@ import java.util.logging.Logger;
 @XmlRootElement(name="Servo")
 public class ServoBrickSimulator extends BrickSimulator {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    private final String name = "Core Servo Controller";
+    protected final String mType = "Core Servo Controller";
 
     public ServoBrickSimulator() {
-    }
-
-    public String getName() {
-    	return name;
     }
 
     public void fixupUnMarshaling() {}
@@ -34,7 +30,7 @@ public class ServoBrickSimulator extends BrickSimulator {
 
 	public void populateDetailsPane(Pane pane) {}
 
-    public SimData findSimDataName(String name) {
+    public SimData findSimDataByName(String name) {
         return null;
     }
 

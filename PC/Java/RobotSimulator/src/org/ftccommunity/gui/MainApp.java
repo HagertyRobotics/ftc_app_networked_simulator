@@ -147,10 +147,7 @@ public class MainApp extends Application {
         try {
             // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
-            if (brick instanceof LegacyBrickSimulator)
-                loader.setLocation(this.getClass().getResource("view/EditLegacyDialog.fxml"));
-            else
-                loader.setLocation(this.getClass().getResource("view/EditDialog.fxml"));
+            loader.setLocation(this.getClass().getResource(brick.getFXMLFileName()));
             AnchorPane page = loader.load();
 
             // Create the dialog Stage.

@@ -1,5 +1,11 @@
 package org.ftccommunity.simulator.modules;
 
+
+import org.ftccommunity.simulator.data.SimData;
+import org.ftccommunity.simulator.modules.devices.Device;
+import org.ftccommunity.simulator.modules.devices.DeviceFactory;
+import org.ftccommunity.simulator.modules.devices.DeviceType;
+
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -10,8 +16,6 @@ import javafx.scene.layout.VBox;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-
-import org.ftccommunity.simulator.data.SimData;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -28,12 +32,15 @@ import java.util.logging.Logger;
 public abstract class BrickSimulator implements Runnable {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    protected final StringProperty alias;
-    protected final StringProperty serial;
+    protected final StringProperty mName;
+    protected final StringProperty mSerial;
     protected IntegerProperty mPort;
     int mPhonePort;
     InetAddress mPhoneIPAddress;
     DatagramSocket mServerSocket;
+    protected String mFXMLFileName;
+
+    protected Device[] mDevices;
 
     byte[] mReceiveData = new byte[1024];
     byte[] mSendData = new byte[1024];
@@ -42,9 +49,9 @@ public abstract class BrickSimulator implements Runnable {
      *
      */
     public BrickSimulator() {
-        this.alias = new SimpleStringProperty("");
+        mName = new SimpleStringProperty("");
         mPort = new SimpleIntegerProperty(0);
-        serial = new SimpleStringProperty("");
+        mSerial = new SimpleStringProperty("");
     }
 
 
@@ -94,33 +101,29 @@ public abstract class BrickSimulator implements Runnable {
     		ex.printStackTrace();
     	}
     }
-    public abstract String getName();
 
 	public abstract void setupDebugGuiVbox(VBox vbox);
 
 	public abstract void updateDebugGuiVbox();
 
-	public abstract void fixupUnMarshaling();
-
 	public abstract void populateDetailsPane(Pane pane);
 
-	public abstract SimData findSimDataName(String name);
+	public abstract SimData findSimDataByName(String name);
 
 	public abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
 
 
-
     //---------------------------------------------------------------
     //
-    // Getters and Setters for the marshaler and demarshaler
+    // Getters and Setters
     //
-    public String getAlias() {
-        return alias.get();
+    public String getName() {
+        return mName.get();
     }
 
     @XmlElement
-    public void setAlias(String alias) {
-        this.alias.set(alias);
+    public void setName(String name) {
+        mName.set(name);
     }
 
     public Integer getPort() {
@@ -133,23 +136,47 @@ public abstract class BrickSimulator implements Runnable {
     }
 
     public String getSerial() {
-        return serial.get();
+        return mSerial.get();
     }
 
     @XmlElement
     public void setSerial(String serial) {
-        this.serial.set(serial);
+        mSerial.set(serial);
     }
 
-    public StringProperty aliasProperty() {
-        return alias;
+    public StringProperty nameProperty() {
+        return mName;
     }
 
     public StringProperty serialProperty() {
-        return serial;
+        return mSerial;
     }
 
+    public Device[] getPortSimData() {
+    	return mDevices;
+    }
 
+    // PortType
+    public DeviceType getPortType(int i) {
+    	return mDevices[i].getType();
+    }
 
+    public void setPortType(int i, DeviceType type) {
+    	mDevices[i] = DeviceFactory.buildSimData(type);
+    }
+
+    // PortName
+//    public String getPortName(int i) {
+//    	SimData[] simDataArray = mDevices[i].getSimDataArray();
+//    	return mDevices[i].getName();
+//    }
+
+//    public void setPortName(int i, String name) {
+//    		mDevices[i].setName(name);
+//    }
+
+    public String getFXMLFileName() {
+    	return mFXMLFileName;
+    }
 }
 
