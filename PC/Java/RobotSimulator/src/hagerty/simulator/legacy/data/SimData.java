@@ -3,7 +3,7 @@ package hagerty.simulator.legacy.data;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.layout.VBox;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

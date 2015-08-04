@@ -1,4 +1,4 @@
-package hagerty.simulator;
+package org.ftccommunity.simulator.net.tasks;
 
 import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
@@ -6,7 +6,7 @@ import io.netty.buffer.EmptyByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

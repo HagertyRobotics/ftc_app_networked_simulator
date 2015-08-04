@@ -1,10 +1,10 @@
 package hagerty.simulator.modules;
 
-import hagerty.simulator.NetworkManager;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
 import hagerty.simulator.legacy.data.SimData;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.logging.Logger;

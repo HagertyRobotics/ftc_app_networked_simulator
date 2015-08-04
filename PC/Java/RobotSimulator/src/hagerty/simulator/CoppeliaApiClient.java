@@ -3,6 +3,7 @@ package hagerty.simulator;
 import coppelia.IntW;
 import coppelia.IntWA;
 import coppelia.remoteApi;
+import hagerty.gui.MainApp;
 import hagerty.simulator.legacy.data.LegacyMotorSimData;
 import hagerty.simulator.legacy.data.SimData;
 import hagerty.simulator.modules.BrickSimulator;
@@ -25,7 +26,7 @@ public class CoppeliaApiClient implements Runnable {
 	hagerty.gui.MainApp mMainApp;
     private volatile boolean done;
 
-	public CoppeliaApiClient(hagerty.gui.MainApp mainApp) {
+	public CoppeliaApiClient(MainApp mainApp) {
 		mMainApp = mainApp;
         done = false;
     }

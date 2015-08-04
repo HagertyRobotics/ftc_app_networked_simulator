@@ -2,7 +2,7 @@ package hagerty.gui.view;
 
 import hagerty.simulator.modules.BrickSimulator;
 import hagerty.simulator.modules.LegacyBrickSimulator;
-import org.ftccommunity.simulator.net.SimulatorData.Type.Types;
+import org.ftccommunity.simulator.net.protocol.SimulatorData.Type.Types;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

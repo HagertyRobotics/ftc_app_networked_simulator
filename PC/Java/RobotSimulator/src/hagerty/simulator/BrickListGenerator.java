@@ -8,7 +8,8 @@ import hagerty.simulator.modules.MotorBrickSimulator;
 import hagerty.simulator.modules.ServoBrickSimulator;
 import hagerty.utils.Utils;
 import javafx.collections.ObservableList;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

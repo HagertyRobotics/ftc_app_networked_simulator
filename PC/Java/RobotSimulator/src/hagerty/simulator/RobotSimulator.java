@@ -1,7 +1,7 @@
 package hagerty.simulator;
 
 import hagerty.simulator.modules.BrickSimulator;
-import sun.nio.ch.Net;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
 
 import java.net.InetAddress;
 import java.util.LinkedList;

@@ -1,15 +1,14 @@
-package hagerty.simulator.io;
+package org.ftccommunity.simulator.io.handler;
 
 import com.google.common.base.Charsets;
-import com.google.common.net.HostAndPort;
-import hagerty.simulator.HeartbeatTask;
-import hagerty.simulator.NetworkManager;
+import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
@@ -23,7 +22,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         if (data.getType().getType() != SimulatorData.Type.Types.OPT_DATA2) {
             NetworkManager.add(data);
         } else { // Acknowledge an OPT_DATA2 with another Heartbeat
-            ctx.write(HeartbeatTask.buildMessage());
+            final SimulatorData.Data heartbeat = HeartbeatTask.buildMessage();
+            ctx.write(heartbeat.getSerializedSize());
+            ctx.write(heartbeat);
         }
 
 
@@ -33,8 +34,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             final ByteBuf writeBuffer = ctx.alloc().buffer(4 + data.getSerializedSize());
             writeBuffer.writeInt(data.getSerializedSize());
             writeBuffer.writeBytes(data.toByteArray());
-            ctx.writeAndFlush(writeBuffer);
+            ctx.write(writeBuffer);
         }
+        ctx.flush();
     }
 
     @Override

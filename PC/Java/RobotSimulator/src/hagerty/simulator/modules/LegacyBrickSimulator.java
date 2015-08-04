@@ -1,6 +1,6 @@
 package hagerty.simulator.modules;
 
-import hagerty.simulator.NetworkManager;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
 import hagerty.simulator.legacy.data.LegacyMotorSimData;
 import hagerty.simulator.legacy.data.SimData;
 import hagerty.simulator.legacy.data.SimDataFactory;
@@ -8,7 +8,7 @@ import hagerty.simulator.legacy.data.SimDataFactory;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

@@ -1,14 +1,10 @@
-package hagerty.simulator.io;
+package org.ftccommunity.simulator.io.handler;
 
-import com.google.common.base.Charsets;
 import com.google.common.net.InetAddresses;
-import com.google.protobuf.InvalidProtocolBufferException;
-import hagerty.simulator.NetworkManager;
-import io.netty.buffer.ByteBuf;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import org.ftccommunity.simulator.net.SimulatorData;
-import sun.nio.ch.Net;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import java.io.IOException;
 import java.net.InetAddress;

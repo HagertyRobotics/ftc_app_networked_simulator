@@ -1,11 +1,11 @@
-package hagerty.simulator;
+package org.ftccommunity.simulator.net.manager;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.LinkedListMultimap;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import hagerty.simulator.io.ClientHandler;
-import hagerty.simulator.io.Decoder;
+import org.ftccommunity.simulator.io.handler.ClientHandler;
+import org.ftccommunity.simulator.io.decoder.Decoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -13,15 +13,14 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
+import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 
 import java.net.InetAddress;
 import java.util.LinkedList;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 public final class NetworkManager {
-    private static LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
+    private final static LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
     private final static LinkedList<SimulatorData.Data> receivedQueue = new LinkedList<>();
     private static LinkedList<SimulatorData.Data> sendingQueue = new LinkedList<>();
     private static InetAddress robotAddress;
@@ -236,7 +235,7 @@ public final class NetworkManager {
                 b.handler(new io.netty.channel.ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new IdleStateHandler(1, 1, 2), new Decoder(), new ClientHandler());
+                        ch.pipeline().addLast(new Decoder(), new ClientHandler());
                     }
                 });
 

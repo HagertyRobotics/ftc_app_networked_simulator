@@ -1,6 +1,6 @@
 package hagerty.simulator.legacy.data;
 
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class SimDataFactory {

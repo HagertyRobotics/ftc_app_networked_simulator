@@ -1,13 +1,13 @@
 package org.ftccommunity.simulator;
 
-import hagerty.simulator.NetworkManager;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import static java.lang.Thread.currentThread;
 

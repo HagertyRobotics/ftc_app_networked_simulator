@@ -1,13 +1,14 @@
 package org.ftccommunity.simulator;
 
 import hagerty.utils.ClientLogger;
-
+import hagerty.simulator.CoppeliaApiClient;
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class RobotSimulator
+@Deprecated
+class RobotSimulatorConsole
 {	
 	public static void main(String[] args)
 	{
@@ -22,7 +23,8 @@ class RobotSimulator
 
         LinkedBlockingQueue<ControllerData> mQueue = new LinkedBlockingQueue<>(100);
 
-        CoppeliaApiClient client = new CoppeliaApiClient(mQueue);
+        // TODO: fix this
+        //CoppeliaApiClient client = new CoppeliaApiClient(mQueue);
 		
 		// Start the network reader 
         ControllerSimulator simulator;
@@ -34,14 +36,14 @@ class RobotSimulator
             return;
         }
         Thread simulatorThread = new Thread(simulator);
-		
+		/*
 		try {
             System.out.print("Starting up...");
             if (client.init()) {
                 System.out.println("Done!");
                 simulatorThread.start();
 
-                Thread clientThread = new Thread(new CoppeliaApiClient(mQueue));
+                Thread clientThread = new Thread(new org.ftccommunity.simulator.CoppeliaApiClient(mQueue));
                 clientThread.start();
 
                 long totalPackets = 0;
@@ -65,9 +67,9 @@ class RobotSimulator
                 }
             } else {
                 System.out.println("Failed!");
-            }
+            }*/
 
-        } catch (Exception ex) {
+       /* } catch (Exception ex) {
             System.out.println("\nAn error occurred during execution! Please see the log.");
             logger.log(Level.SEVERE, ex.getMessage());
             for (StackTraceElement stack : ex.getStackTrace()) {
@@ -88,7 +90,7 @@ class RobotSimulator
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
         }
-    }
+    }*/
         System.out.print("Cleaning up...");
 		simulator.requestTerminate();
         try {
