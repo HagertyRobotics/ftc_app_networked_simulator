@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.ftccommunity.simulator.Server;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -93,7 +93,7 @@ public class D2xxManager
                         SimulatorData.Data.Modules.LEGACY_CONTROLLER,
                         sendData);
                 Log.d("D2xx::", "Send Packet to PC");
-                receiveData = NetworkManager.getLatestData(SimulatorData.Type.Types.BRICK_INFO);
+                receiveData = NetworkManager.getLatestData(SimulatorData.Type.Types.BRICK_INFO, true);
 
                 // If we got a reply from the PC then parse the xml and return a list of FT_Device objects
                 this.mFtdiDevices = buildFT_DeviceList(receiveData);

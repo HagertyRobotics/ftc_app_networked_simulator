@@ -1,6 +1,6 @@
 package com.ftdi.j2xx;
 
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -46,7 +46,7 @@ abstract public class FT_Device
         int rc;
         byte[] packet;
 
-        packet = NetworkManager.getLatestData(SimulatorData.Type.Types.DEVICE_LIST);
+        packet = NetworkManager.getLatestData(SimulatorData.Type.Types.BRICK_INFO, true);
 
         // If timed out waiting for packet then return the last packet that was read
         if (packet == null) {

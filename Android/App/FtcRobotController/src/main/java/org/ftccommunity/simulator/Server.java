@@ -2,6 +2,9 @@ package org.ftccommunity.simulator;
 
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.ftccommunity.simulator.net.decoders.Decoder;
+import org.ftccommunity.simulator.net.handler.ServerHandler;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -45,7 +48,6 @@ public class Server implements Runnable {
 
 
             // Log all IP addresses
-
             try {
                 Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()){
@@ -63,26 +65,18 @@ public class Server implements Runnable {
                 RobotLog.e(e.toString());
             }
 
-            // Bind and start to accept incoming connections.
             ChannelFuture f = null;
             try {
                 RobotLog.w("Starting Server on " + port + "@" + InetAddress.getLocalHost().getHostAddress());
+                // Bind and start to accept incoming connections.
                 f = b.bind(port).sync();
+                f.channel().closeFuture().sync();
 
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             } catch (UnknownHostException e) {
                 RobotLog.e("Something Bad happened " + e.toString());
-            } finally {
-                if (f != null) {
-                    try {
-                        f.channel().closeFuture().sync();
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
             }
-
             // Wait until the server socket is closed.
             // In this example, this does not happen, but you can do that to gracefully
             // shut down your server.

@@ -9,8 +9,8 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.LinkedListMultimap;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.ftccommunity.simulator.net.HeartbeatTask;
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -149,13 +149,29 @@ public final class NetworkManager {
         return sendingQueue.toArray(new SimulatorData.Data[sendingQueue.size()]);
     }
 
-
-    public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type) {
-        return ((LinkedList<SimulatorData.Data>) main.get(type)).getLast();
+    public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type, boolean block) {
+        if (block) {
+            while (!Thread.currentThread().isInterrupted()) {
+                if (main.get(type).size() > 0) {
+                    synchronized (main) {
+                        return ((LinkedList<SimulatorData.Data>) main.get(type)).getLast();
+                    }
+                } else {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }
+        synchronized (main) {
+            return ((LinkedList<SimulatorData.Data>) main.get(type)).getLast();
+        }
     }
 
-    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type) {
-        SimulatorData.Data data = getLatestMessage(type);
+    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type, boolean block) {
+        SimulatorData.Data data = getLatestMessage(type, block);
         return data.getInfo(0).getBytes(Charsets.US_ASCII);
     }
 
@@ -169,7 +185,9 @@ public final class NetworkManager {
                 .setModule(module)
                 .addInfo(new String(data, Charsets.US_ASCII));
         sendingQueue.add(sendDataBuilder.build());
-    }    /**
+    }
+
+    /**
      * Gets the next data to send
      * @return the next data to send
      */
