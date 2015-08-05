@@ -1,9 +1,9 @@
-package org.ftccommunity.simulator;
+package org.ftccommunity.simulator.net.handler;
 
 import com.ftdi.j2xx.NetworkManager;
 import com.google.common.net.InetAddresses;
 
-import org.ftccommunity.simulator.net.SimulatorData;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import java.io.IOException;
 import java.net.InetAddress;

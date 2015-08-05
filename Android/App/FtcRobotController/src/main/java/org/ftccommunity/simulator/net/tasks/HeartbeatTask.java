@@ -1,6 +1,8 @@
-package org.ftccommunity.simulator.net;
+package org.ftccommunity.simulator.net.tasks;
 
 import com.google.common.base.Charsets;
+
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
