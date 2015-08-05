@@ -10,6 +10,9 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
+import java.io.IOException;
+import java.net.SocketException;
+
 public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -61,7 +64,12 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(io.netty.channel.ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
+        if (cause instanceof SocketException) {
+            cause.printStackTrace();
+        } else if (cause instanceof IOException) {
+            cause.printStackTrace();
+        } else {
+            ctx.close();
+        }
     }
 }

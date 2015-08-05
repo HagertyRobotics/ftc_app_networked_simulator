@@ -41,29 +41,32 @@ public class RobotSimulator  {
         moduleListerThread.start();
         NetworkManager.start();
 
-        System.out.println("Seeing if we can get a multicast...");
-        Thread multicastListener = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                DatagramSocket socket = null;
-                try {
-                    socket = new DatagramSocket(7003);
-                } catch (SocketException e) {
-                    logger.log(Level.SEVERE, e.toString());
-                }
-
-                while (!Thread.currentThread().isInterrupted() && socket != null) {
-                    DatagramPacket packet = new DatagramPacket(new byte[0], 1);
+        final boolean useMulticast = false;
+        if (useMulticast) {
+            System.out.println("Seeing if we can get a multicast...");
+            Thread multicastListener = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    DatagramSocket socket = null;
                     try {
-                        socket.receive(packet);
-                    } catch (IOException e) {
+                        socket = new DatagramSocket(7003);
+                    } catch (SocketException e) {
                         logger.log(Level.SEVERE, e.toString());
                     }
-                    System.out.println(packet.getAddress().getHostAddress());
+
+                    while (!Thread.currentThread().isInterrupted() && socket != null) {
+                        DatagramPacket packet = new DatagramPacket(new byte[1], 1);
+                        try {
+                            socket.receive(packet);
+                        } catch (IOException e) {
+                            logger.log(Level.SEVERE, e.toString());
+                        }
+                        System.out.println(packet.getAddress().getHostAddress());
+                    }
                 }
-            }
-        });
-        multicastListener.start();
+            });
+            multicastListener.start();
+        }
 
         // Start the individual threads for each module
         // Read the current list of modules from the GUI MainApp class

@@ -10,11 +10,13 @@ import hagerty.utils.Utils;
 import javafx.collections.ObservableList;
 import org.ftccommunity.simulator.net.manager.NetworkManager;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
+import sun.nio.ch.Net;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
+import java.net.NetworkInterface;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,6 +40,7 @@ public class BrickListGenerator implements Runnable {
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 packet = receivePacketFromPhone();
+                NetworkManager.clear(SimulatorData.Type.Types.DEVICE_LIST);
                 handleIncomingPacket(packet, false);
             }
             // Catch unhandled exceptions and cleanup

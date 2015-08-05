@@ -22,7 +22,7 @@ import java.util.LinkedList;
 public final class NetworkManager {
     private final static LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
     private final static LinkedList<SimulatorData.Data> receivedQueue = new LinkedList<>();
-    private static LinkedList<SimulatorData.Data> sendingQueue = new LinkedList<>();
+    private final static LinkedList<SimulatorData.Data> sendingQueue = new LinkedList<>();
     private static InetAddress robotAddress;
     private static boolean isReady;
     private static String host = "192.168.44.1";
@@ -43,15 +43,27 @@ public final class NetworkManager {
      * Force the queue to sort the processing queue into their respective types
      */
     public synchronized static void processQueue() {
-        try {
-            Thread.sleep(5);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        int size;
+        synchronized (receivedQueue) {
+            size = receivedQueue.size();
         }
+        while (size < 1) {
+            try {
+                Thread.sleep(5);
+                Thread.yield();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            synchronized (receivedQueue) {
+                size = receivedQueue.size();
+            }
+        }
+
         synchronized (receivedQueue) {
             for (SimulatorData.Data data : receivedQueue) {
                 main.put(data.getType().getType(), data);
             }
+            receivedQueue.pop();
         }
     }
 
@@ -62,16 +74,24 @@ public final class NetworkManager {
      */
     @NotNull
     public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type) {
-        while (!(main.get(type).size() > 0)) {
+        int size;
+        synchronized (main) {
+            size = main.get(type).size();
+        }
+        while (!(size > 0) && !(Thread.currentThread().isInterrupted())) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+            // Fetch the size again
+            synchronized (main) {
+                size = main.get(type).size();
+            }
         }
         synchronized (main) {
             System.out.println("Retrieving latest packet of " + type.getValueDescriptor().getName());
-            return main.get(type).get(main.get(type).size() - 1);
+            return main.get(type).remove(main.get(type).size() - 1);
         }
     }
 
@@ -104,28 +124,37 @@ public final class NetworkManager {
      * @param module which module correlates to the data being sent
      * @param data a byte array of data to send
      */
-    public synchronized static void requestSend(SimulatorData.Type.Types type, SimulatorData.Data.Modules module, byte[] data) {
+    public static void requestSend(SimulatorData.Type.Types type, SimulatorData.Data.Modules module, byte[] data) {
         SimulatorData.Data.Builder sendDataBuilder = SimulatorData.Data.newBuilder();
         sendDataBuilder.setType(SimulatorData.Type.newBuilder().setType(type).build())
                 .setModule(module)
                 .addInfo(new String(data, Charsets.US_ASCII));
-        sendingQueue.add(sendDataBuilder.build());
+        synchronized (sendingQueue) {
+            sendingQueue.add(sendDataBuilder.build());
+        }
     }
 
     /**
      * Gets the next data to send
      * @return the next data to send
      */
-    public synchronized static SimulatorData.Data getNextSend() {
-        if (sendingQueue.size() > 100) {
+    public static SimulatorData.Data getNextSend() {
+        int size;
+        synchronized (sendingQueue) {
+            size = sendingQueue.size();
+        }
+        if (size > 100) {
             LinkedList<SimulatorData.Data> temp = new LinkedList<>();
-            for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
-                temp.add(sendingQueue.get(i));
+            synchronized (sendingQueue) {
+                for (int i = size - 1; i > size / 2; i--) {
+                    temp.add(sendingQueue.pollLast());
+                }
+                sendingQueue.clear();
+                sendingQueue.addAll(temp);
             }
-            sendingQueue = temp;
         }
 
-        if (sendingQueue.size() > 0) {
+        if (size > 0) {
             System.out.println("Getting next send.");
             return sendingQueue.removeFirst();
         } else {
@@ -184,12 +213,15 @@ public final class NetworkManager {
      * Cleanup the sending queue
      */
     private synchronized static void cleanup() {
-        if (sendingQueue.size() > 100) {
-            LinkedList<SimulatorData.Data> temp = new LinkedList<>();
-            for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
-                temp.add(sendingQueue.get(i));
+        synchronized (sendingQueue) {
+            if (sendingQueue.size() > 100) {
+                LinkedList<SimulatorData.Data> temp = new LinkedList<>();
+                for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
+                    temp.add(sendingQueue.get(i));
+                }
+                sendingQueue.clear();
+                sendingQueue.addAll(temp);
             }
-            sendingQueue = temp;
         }
     }
 
