@@ -13,8 +13,8 @@ public class FT_Device_Motor extends FT_Device {
     protected final byte[] RECEIVE_SYNC_COMMAND_0 = { 51, -52, -128, 0, 0};
     protected final byte[] RECEIVE_SYNC_COMMAND_94 = { 51, -52, -128, 0, (byte)94};
     protected final byte[] CONTROLLER_TYPE_LEGACY = { 0, 77, 77};       // Controller type USB Motor Module
-    public FT_Device_Motor(String serialNumber, String description, String ipAddress, int port) {
-        super(serialNumber, description, ipAddress, port);
+    public FT_Device_Motor(String serialNumber, String description) {
+        super(serialNumber, description);
     }
 
     public int write(byte[] data, int length, boolean wait)

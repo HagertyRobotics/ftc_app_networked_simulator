@@ -2,9 +2,13 @@ package org.ftccommunity.simulator.net.handler;
 
 import com.ftdi.j2xx.NetworkManager;
 import com.google.common.base.Charsets;
+import com.qualcomm.robotcore.util.RobotLog;
 
-import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
+import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
+
+import java.io.IOException;
+import java.net.SocketException;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -65,8 +69,12 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        // Close the connection when an exception is raised.
-        cause.printStackTrace();
-        ctx.close();
+        if (cause instanceof SocketException) {
+            RobotLog.e(cause.toString());
+        } else if (cause instanceof IOException) {
+            RobotLog.e(cause.toString());
+        } else {
+            ctx.close();
+        }
     }
 }

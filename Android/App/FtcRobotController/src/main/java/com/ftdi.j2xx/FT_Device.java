@@ -8,6 +8,7 @@ abstract public class FT_Device
 {
     private static final String TAG = "FTDI_Device::";
     protected final byte[] mCurrentStateBuffer = new byte[208];
+
     // Queue used to pass packets between writes and reads in the onboard simulator.
     // Read and Writes come from the ftc_app when it thinks it is talking to the
     // FTDI driver.
@@ -25,21 +26,14 @@ abstract public class FT_Device
     // LinkedBlockingQueue<SimulatorData.Data> mReadFromPcQueue;
     long mOldTimeInMilliseconds=0;
     long mDeltaWriteTime=0;
-    NetworkManager mNetworkManager;
     int mPacketCount=0;
 
-    public FT_Device(String serialNumber, String description, String ipAddress, int port)
-    {
-        int i;
+    public FT_Device(String serialNumber, String description) {
         mDeviceInfoNode = new D2xxManager.FtDeviceInfoListNode();
 
         mDeviceInfoNode.serialNumber = serialNumber;
         mDeviceInfoNode.description = description;
         mFT_DeviceDescription = description;  // for use in log
-
-        //mNetworkManager = new NetworkManager();
-        //mReadFromPcQueue = mNetworkManager.getReadFromPcQueue();
-        // mWriteToPcQueue = mNetworkManager.getWriteToPcQueue();
     }
 
     private int getPacketFromPC(byte[] data, int length, long wait_ms) {

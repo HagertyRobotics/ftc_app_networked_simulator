@@ -9,12 +9,13 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.LinkedListMultimap;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
+import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -35,8 +36,8 @@ public final class NetworkManager {
     //private static LinkedBlockingQueue<SimulatorData.Data> mReadFromPcQueue = new LinkedBlockingQueue<>();
 
     private static final LinkedList<SimulatorData.Data> receivedQueue = new LinkedList<>();
+    private static final LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
     private static boolean serverWorking;
-    private static LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
     private static LinkedList<SimulatorData.Data> sendingQueue = new LinkedList<>();
     private static InetAddress robotAddress;
     private static boolean isReady;
@@ -88,7 +89,7 @@ public final class NetworkManager {
             while (!Thread.currentThread().isInterrupted()) {
                     processQueue();
                 }
-        }});
+        }}, "Process Queue");
         processThread.start();
 
         /*// Start the Network Sender thread
@@ -111,20 +112,35 @@ public final class NetworkManager {
     }
 
     public synchronized static void add(@NotNull SimulatorData.Data data) {
-        receivedQueue.add(data);
+        synchronized (receivedQueue) {
+            receivedQueue.add(data);
+        }
     }
 
-    public static void processQueue() {
-        while (receivedQueue.size() < 1) {
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+    public synchronized static void processQueue() {
+        int size;
         synchronized (receivedQueue) {
-            for (SimulatorData.Data data : receivedQueue) {
-                main.put(data.getType().getType(), data);
+            size = receivedQueue.size();
+        }
+            while (size < 1) {
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                synchronized (receivedQueue) {
+                    size = receivedQueue.size();
+                }
+            }
+
+        synchronized (receivedQueue) {
+            try {
+                for (SimulatorData.Data data : receivedQueue) {
+                    main.put(data.getType().getType(), data);
+                    receivedQueue.pop();
+                }
+            } catch (ConcurrentModificationException ex) {
+                RobotLog.e("Not quite thread safe for some reason (receivedQueue" + ex.toString());
             }
         }
     }
@@ -137,13 +153,13 @@ public final class NetworkManager {
         NetworkManager.serverWorking = serverWorking;
     }
 
-    public static LinkedList<SimulatorData.Data> getWriteToPcQueue() {
+   /* public static LinkedList<SimulatorData.Data> getWriteToPcQueue() {
         return sendingQueue;
     }
-
-    public static LinkedList<SimulatorData.Data> getReadFromPcQueue() {
+*/
+    /*public static LinkedList<SimulatorData.Data> getReadFromPcQueue() {
         return receivedQueue;
-    }
+    }*/
 
     public static SimulatorData.Data[] getWriteData() {
         return sendingQueue.toArray(new SimulatorData.Data[sendingQueue.size()]);
@@ -154,7 +170,7 @@ public final class NetworkManager {
             while (!Thread.currentThread().isInterrupted()) {
                 if (main.get(type).size() > 0) {
                     synchronized (main) {
-                        return ((LinkedList<SimulatorData.Data>) main.get(type)).getLast();
+                        return main.get(type).remove(main.get(type).size() - 1);
                     }
                 } else {
                     try {
@@ -246,9 +262,10 @@ public final class NetworkManager {
             }
         }
 
+
         SimulatorData.Data[] datas = new SimulatorData.Data[currentSize];
         for (int i = 0; i < datas.length; i++) {
-            datas[i] = receivedQueue.removeLast();
+            datas[i] = sendingQueue.removeLast();
         }
 
         return datas;

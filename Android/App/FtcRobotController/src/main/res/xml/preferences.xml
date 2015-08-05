@@ -56,27 +56,9 @@
         android:defaultValue="true"
         android:key="sim_use_wifi"
         android:title="Use WiFi" />
-
-      <PreferenceScreen
-          android:title="Setup Simulator Wifi">
-          <intent
-              android:action="android.intent.action.VIEW"
-              android:data="com.qualcomm.ftcrobotcontroller.ConfigureSimulatorWiFiActivity"
-              android:targetClass="com.qualcomm.ftcrobotcontroller.ConfigureSimulatorWiFiActivity"
-              android:targetPackage="com.qualcomm.ftcrobotcontroller" />
-      </PreferenceScreen>
       <SwitchPreference
-          android:defaultValue="false"
-          android:key="pref_simUseBluetooth"
-          android:title="Use Bluetooth" />
-
-      <PreferenceScreen
-          android:title="Setup Bluetooth">
-          <intent
-              android:action="android.intent.action.VIEW"
-              android:data="com.qualcomm.ftcrobotcontroller.ConfigureSimulatorBluetooth"
-              android:targetClass="com.qualcomm.ftcrobotcontrollerConfigureSimulatorBluetoothActivity"
-              android:targetPackage="com.qualcomm.ftcrobotcontroller" />
-      </PreferenceScreen>
+          android:defaultValue="true"
+          android:key="sim_net_multicast"
+          android:title="Multicast" />
   </PreferenceCategory>
 </PreferenceScreen>

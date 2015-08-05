@@ -1,38 +1,44 @@
 package com.ftdi.j2xx;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.google.common.net.InetAddresses;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.ftccommunity.simulator.Server;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 public class D2xxManager
 {
-    public static final int PHONEPORT = 7000;
-    public static final int MODULE_LISTER_PORT = 7000;
-    public static final String PC_IP_ADDRESS = "192.168.1.119"; // "10.0.1.193";
     protected static final String ACTION_USB_PERMISSION = "com.ftdi.j2xx";
     private static final String TAG = "D2xx::";
     private static D2xxManager mInstance = null;
+    public boolean useWifi;
+    public boolean multicast;
+    public boolean simulate;
     InetAddress mIPAddress;
     private ArrayList<FT_Device> mFtdiDevices;
     private Server server;
@@ -41,22 +47,53 @@ public class D2xxManager
             throws D2xxManager.D2xxException
     {
         Log.v(TAG, "Start constructor");
+        Log.v(TAG, "Init Server");
         server = new Server(7002);
         Thread serverThread = new Thread(server);
         serverThread.start();
 
-        try {
-            mIPAddress = InetAddress.getByName(PC_IP_ADDRESS);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         new NetworkManager(NetworkManager.NetworkTypes.WIFI);
+
         if (parentContext == null) {
             throw new D2xxException("D2xx init failed: Can not find parentContext!");
         }
-        //updateContext(parentContext);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(parentContext);
+        useWifi = preferences.getBoolean("sim_use_wifi", true);
+        simulate = preferences.getBoolean("pref_simulatorEnabled", true);
+        multicast= preferences.getBoolean("sim_net_multicast", true);
+
+        // Multicast
+        if (multicast) {
+            Thread multicastServer = new Thread(new Runnable() {
+                DatagramSocket socket;
+                @Override
+                public void run() {
+                    try {
+                        socket = new DatagramSocket(7003);
+                    } catch (SocketException e) {
+                        RobotLog.e(e.toString());
+                    }
+                    // Always multicast every 100 milliseconds
+                    while (!Thread.currentThread().isInterrupted()) {
+                        try {
+                            socket.send(new DatagramPacket(new byte[1], 1,
+                                    InetAddresses.forString("255.255.255.255"), 7003));
+                        } catch (IOException e) {
+                            RobotLog.e(e.toString());
+                            RobotLog.e("Stopping Multicast System!");
+                            break;
+                        }
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                }
+            }, "Multicast Server");
+            multicastServer.start();
+        }
 
         Log.v("D2xx::", "End constructor");
     }
@@ -80,31 +117,35 @@ public class D2xxManager
 
         // Check if this is the first time, don't change anything after the 1st call, we already made a list
         // Real code would look again for new usb devices
-        if (this.mFtdiDevices == null) {
+        if (simulate) {
+            if (useWifi) {
+                if (this.mFtdiDevices == null) {
+                    final byte[] sendData = new byte[1];
+                    sendData[0] = '?';      // Simple packet, ask for a list of connected modules
+                    NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST,
+                            SimulatorData.Data.Modules.LEGACY_CONTROLLER, sendData);
+                    while (!done) {
 
-            final byte[] sendData = new byte[1];
-            sendData[0] = '?';      // Simple packet, ask for a list of connected modules
-            NetworkManager.requestSend(SimulatorData.Type.Types.BRICK_INFO, SimulatorData.Data.Modules.LEGACY_CONTROLLER, sendData);
-            // DatagramPacket send_packet = new DatagramPacket(sendData, sendData.length, mIPAddress, MODULE_LISTER_PORT);
-            while (!done) {
+                        // Send a query for a list of connected modules
+                        NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST,
+                                SimulatorData.Data.Modules.LEGACY_CONTROLLER,
+                                sendData);
+                        Log.d("D2xx::", "Send Packet to PC");
+                        receiveData = NetworkManager.getLatestData(
+                                SimulatorData.Type.Types.DEVICE_LIST, true);
 
-                // Send a query for a list of connected modules
-                NetworkManager.requestSend(SimulatorData.Type.Types.BRICK_INFO,
-                        SimulatorData.Data.Modules.LEGACY_CONTROLLER,
-                        sendData);
-                Log.d("D2xx::", "Send Packet to PC");
-                receiveData = NetworkManager.getLatestData(SimulatorData.Type.Types.BRICK_INFO, true);
-
-                // If we got a reply from the PC then parse the xml and return a list of FT_Device objects
-                this.mFtdiDevices = buildFT_DeviceList(receiveData);
-
+                        Log.d(TAG, "Got a reply!");
+                        // If we got a reply from the PC then parse the xml and return a list of FT_Device objects
+                        this.mFtdiDevices = buildFT_DeviceList(receiveData);
+                        done = true;
+                    }
+                    //ftDev = new FT_Device("A501E27V", "Hagerty USB1");
+                    //devices.add(ftDev);
+                }
             }
-            //ftDev = new FT_Device("A501E27V", "Hagerty USB1");
-            //devices.add(ftDev);
         }
 
         rc = this.mFtdiDevices.size();
-
         return rc;
     }
 
@@ -113,7 +154,7 @@ public class D2xxManager
         FtDeviceInfoListNode devInfo = null;
         FT_Device ftDev = null;
 
-        if (parentContext == null) return ftDev;
+        if (parentContext == null) return null;
 
         //updateContext(parentContext);
 
@@ -142,8 +183,9 @@ public class D2xxManager
         return ((FT_Device)this.mFtdiDevices.get(index)).mDeviceInfoNode;
     }
 
-    private ArrayList buildFT_DeviceList(byte[] inputText) {
-        ArrayList devices = new ArrayList();
+    @NotNull
+    private ArrayList<FT_Device> buildFT_DeviceList(byte[] inputText) {
+        ArrayList<FT_Device> devices = new ArrayList<>();
         FT_Device ftDev = null;
 
         try {
@@ -159,7 +201,8 @@ public class D2xxManager
             XPath xPath = XPathFactory.newInstance().newXPath();
 
             String expression = "/bricks/*";
-            NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(doc, XPathConstants.NODESET);
+            NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(doc,
+                    XPathConstants.NODESET);
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node nNode = nodeList.item(i);
                 Log.d("D2xx::", "Current Element :" + nNode.getNodeName());
@@ -170,7 +213,7 @@ public class D2xxManager
                         String alias = eElement.getElementsByTagName("alias").item(0).getTextContent();
                         String portString = eElement.getElementsByTagName("port").item(0).getTextContent();
 
-                        ftDev = new FT_Device_Legacy(serial, alias, PC_IP_ADDRESS, Integer.parseInt(portString));
+                        ftDev = new FT_Device_Legacy(serial, alias);
                         devices.add(ftDev);
                     }
                 } else if (nNode.getNodeName().equals("motor")) {
@@ -180,20 +223,20 @@ public class D2xxManager
                         String alias = eElement.getElementsByTagName("alias").item(0).getTextContent();
                         String portString = eElement.getElementsByTagName("port").item(0).getTextContent();
 
-                        ftDev = new FT_Device_Motor(serial, alias, PC_IP_ADDRESS, Integer.parseInt(portString));
+                        ftDev = new FT_Device_Motor(serial, alias);
                         devices.add(ftDev);
                     }
                 }
             }
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
+        } catch (Exception e) {
+            RobotLog.e(e.toString());
+        } /*catch (SAXException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (XPathExpressionException e) {
             e.printStackTrace();
-        }
+        }*/
 
         return devices;
     }
