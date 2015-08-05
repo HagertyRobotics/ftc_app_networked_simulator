@@ -15,20 +15,26 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         SimulatorData.Data data = (SimulatorData.Data) msg;
 
-        for (byte test : data.getInfo(0).getBytes(Charsets.US_ASCII)) {
+        // Uncomment to display all data
+        /*for (byte test : data.getInfo(0).getBytes(Charsets.US_ASCII)) {
             System.out.print(String.format("0x%02X ", test));
-        }
+        }*/
+
+
         // We don't need to queue heartbearts (OPT_DATA2)
         if (data.getType().getType() != SimulatorData.Type.Types.OPT_DATA2) {
+            // Print out size and data
+            // System.out.println("Received Data of significance with size=" + data.getSerializedSize());
             NetworkManager.add(data);
         } else { // Acknowledge an OPT_DATA2 with another Heartbeat
+            // System.out.print(" Received heartbeat ");
             final SimulatorData.Data heartbeat = HeartbeatTask.buildMessage();
-            ctx.write(heartbeat.getSerializedSize());
-            ctx.write(heartbeat);
+            final ByteBuf heartbeatBuffer = ctx.alloc().buffer(4 + heartbeat.getSerializedSize());
+           heartbeatBuffer.writeInt(heartbeat.getSerializedSize());
+            heartbeatBuffer.writeBytes(heartbeat.toByteArray());
+            ctx.write(heartbeatBuffer);
         }
 
-
-        System.out.println();
         SimulatorData.Data next  = NetworkManager.getNextSend();
         if (next != null) {
             final ByteBuf writeBuffer = ctx.alloc().buffer(4 + data.getSerializedSize());
@@ -36,6 +42,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             writeBuffer.writeBytes(data.toByteArray());
             ctx.write(writeBuffer);
         }
+
         ctx.flush();
     }
 

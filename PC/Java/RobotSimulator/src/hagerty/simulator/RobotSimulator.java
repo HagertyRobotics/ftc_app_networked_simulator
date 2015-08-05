@@ -1,9 +1,14 @@
 package hagerty.simulator;
 
 import hagerty.simulator.modules.BrickSimulator;
+import io.netty.channel.socket.DatagramChannel;
 import org.ftccommunity.simulator.net.manager.NetworkManager;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,6 +40,30 @@ public class RobotSimulator  {
         Thread moduleListerThread = new Thread(gBrickListGenerator, "Brick List Generator");
         moduleListerThread.start();
         NetworkManager.start();
+
+        System.out.println("Seeing if we can get a multicast...");
+        Thread multicastListener = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DatagramSocket socket = null;
+                try {
+                    socket = new DatagramSocket(7003);
+                } catch (SocketException e) {
+                    logger.log(Level.SEVERE, e.toString());
+                }
+
+                while (!Thread.currentThread().isInterrupted() && socket != null) {
+                    DatagramPacket packet = new DatagramPacket(new byte[0], 1);
+                    try {
+                        socket.receive(packet);
+                    } catch (IOException e) {
+                        logger.log(Level.SEVERE, e.toString());
+                    }
+                    System.out.println(packet.getAddress().getHostAddress());
+                }
+            }
+        });
+        multicastListener.start();
 
         // Start the individual threads for each module
         // Read the current list of modules from the GUI MainApp class

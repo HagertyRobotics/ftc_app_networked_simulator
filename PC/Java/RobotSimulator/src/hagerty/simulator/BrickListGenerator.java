@@ -39,7 +39,6 @@ public class BrickListGenerator implements Runnable {
             while (!Thread.currentThread().isInterrupted()) {
                 packet = receivePacketFromPhone();
                 handleIncomingPacket(packet, false);
-                // System.out.println("ModuleLister");
             }
             // Catch unhandled exceptions and cleanup
         } catch (Exception e) {
@@ -48,7 +47,7 @@ public class BrickListGenerator implements Runnable {
     }
 
     private byte[] receivePacketFromPhone() {
-        return NetworkManager.getLatestData(SimulatorData.Type.Types.BRICK_INFO);
+        return NetworkManager.getLatestData(SimulatorData.Type.Types.DEVICE_LIST);
     }
 
     private void sendPacketToPhone(byte[] sendData) {
@@ -62,7 +61,7 @@ public class BrickListGenerator implements Runnable {
     }
 
     public void handleIncomingPacket(byte[] data, boolean wait) {
-        System.out.println("Receive Buffer: (" + Utils.bufferToHexString(data, 0, 25) + ") len=" + data.length);
+        // System.out.println("Receive Buffer: (" + Utils.bufferToHexString(data, 0, 25) + ") len=" + data.length);
 
         if (data[0] == '?') { // infoCmd
             sendPacketToPhone(getXmlModuleList(mMainApp.getBrickData()));

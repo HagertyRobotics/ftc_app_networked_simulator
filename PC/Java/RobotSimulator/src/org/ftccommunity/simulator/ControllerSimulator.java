@@ -63,6 +63,13 @@ public class ControllerSimulator implements Runnable {
     }
 
     private byte[] receivePacketFromPhone() {
+        while (!NetworkManager.isReadyToFetch(SimulatorData.Type.Types.SIM_DATA)) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
         packetsReceived++;
     	return NetworkManager.getLatestData(SimulatorData.Type.Types.SIM_DATA);
     }

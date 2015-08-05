@@ -34,7 +34,9 @@ public final class NetworkManager {
      * @param data The data to add to processing queue
      */
     public static void add(@NotNull SimulatorData.Data data) {
-        receivedQueue.add(data);
+        synchronized (receivedQueue) {
+            receivedQueue.add(data);
+        }
     }
 
     /**
@@ -68,8 +70,13 @@ public final class NetworkManager {
             }
         }
         synchronized (main) {
-            return main.get(type).get(main.get(type).size());
+            System.out.println("Retrieving latest packet of " + type.getValueDescriptor().getName());
+            return main.get(type).get(main.get(type).size() - 1);
         }
+    }
+
+    public static boolean isReadyToFetch(SimulatorData.Type.Types type) {
+        return main.get(type).size() > 0;
     }
 
     /**
@@ -119,6 +126,7 @@ public final class NetworkManager {
         }
 
         if (sendingQueue.size() > 0) {
+            System.out.println("Getting next send.");
             return sendingQueue.removeFirst();
         } else {
             return HeartbeatTask.buildMessage();

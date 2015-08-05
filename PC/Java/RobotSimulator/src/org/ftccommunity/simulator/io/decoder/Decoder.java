@@ -14,7 +14,7 @@ public class Decoder extends ByteToMessageDecoder { // (1)
         long size = 0;
         if (in.readableBytes() >= 4) {
             size = in.readUnsignedInt();
-            System.out.print(" Size of data: " + size + " Received: " + in.readableBytes());
+            // System.out.print(" Size of data: " + size + " Received: " + in.readableBytes());
             if (in.readableBytes() < size) {
                 return;
             }
