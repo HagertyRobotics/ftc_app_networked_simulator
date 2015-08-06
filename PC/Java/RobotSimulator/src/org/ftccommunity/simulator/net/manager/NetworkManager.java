@@ -63,7 +63,6 @@ public final class NetworkManager {
             for (SimulatorData.Data data : receivedQueue) {
                 main.put(data.getType().getType(), data);
             }
-            receivedQueue.pop();
         }
     }
 

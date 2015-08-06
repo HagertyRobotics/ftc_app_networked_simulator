@@ -1,6 +1,5 @@
 package org.ftccommunity.simulator.io.handler;
 
-import com.google.common.base.Charsets;
 import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 import org.ftccommunity.simulator.net.manager.NetworkManager;
 import io.netty.buffer.ByteBuf;
@@ -28,6 +27,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         if (data.getType().getType() != SimulatorData.Type.Types.OPT_DATA2) {
             // Print out size and data
             // System.out.println("Received Data of significance with size=" + data.getSerializedSize());
+
             NetworkManager.add(data);
         } else { // Acknowledge an OPT_DATA2 with another Heartbeat
             // System.out.print(" Received heartbeat ");
