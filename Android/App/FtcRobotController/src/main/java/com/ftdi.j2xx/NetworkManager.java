@@ -18,6 +18,7 @@ import java.net.InetAddress;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  *
@@ -35,10 +36,10 @@ public final class NetworkManager {
     //private static LinkedBlockingQueue<SimulatorData.Data> mWriteToPcQueue = new LinkedBlockingQueue<>();
     //private static LinkedBlockingQueue<SimulatorData.Data> mReadFromPcQueue = new LinkedBlockingQueue<>();
 
-    private static final LinkedList<SimulatorData.Data> receivedQueue = new LinkedList<>();
+    private static final ConcurrentLinkedQueue<SimulatorData.Data> receivedQueue = new ConcurrentLinkedQueue<>();
     private static final LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
     private static boolean serverWorking;
-    private static LinkedList<SimulatorData.Data> sendingQueue = new LinkedList<>();
+    private static final ConcurrentLinkedQueue<SimulatorData.Data> sendingQueue = new ConcurrentLinkedQueue<>();
     private static InetAddress robotAddress;
     private static boolean isReady;
 
@@ -111,25 +112,20 @@ public final class NetworkManager {
         }*/
     }
 
-    public synchronized static void add(@NotNull SimulatorData.Data data) {
+    public static void add(@NotNull SimulatorData.Data data) {
         synchronized (receivedQueue) {
             receivedQueue.add(data);
         }
     }
 
     public synchronized static void processQueue() {
-        int size;
-        synchronized (receivedQueue) {
-            size = receivedQueue.size();
-        }
-            while (size < 1) {
+
+            while (receivedQueue.size() < 1) {
                 try {
-                    Thread.sleep(5);
+                    Thread.sleep(10);
+                    Thread.yield();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                }
-                synchronized (receivedQueue) {
-                    size = receivedQueue.size();
                 }
             }
 
@@ -137,7 +133,6 @@ public final class NetworkManager {
             try {
                 for (SimulatorData.Data data : receivedQueue) {
                     main.put(data.getType().getType(), data);
-                    receivedQueue.pop();
                 }
             } catch (ConcurrentModificationException ex) {
                 RobotLog.e("Not quite thread safe for some reason (receivedQueue" + ex.toString());
@@ -162,7 +157,9 @@ public final class NetworkManager {
     }*/
 
     public static SimulatorData.Data[] getWriteData() {
-        return sendingQueue.toArray(new SimulatorData.Data[sendingQueue.size()]);
+        synchronized (sendingQueue) {
+            return sendingQueue.toArray(new SimulatorData.Data[sendingQueue.size()]);
+        }
     }
 
     public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type, boolean block) {
@@ -170,7 +167,8 @@ public final class NetworkManager {
             while (!Thread.currentThread().isInterrupted()) {
                 if (main.get(type).size() > 0) {
                     synchronized (main) {
-                        return main.get(type).remove(main.get(type).size() - 1);
+                        // return main.get(type).remove(main.get(type).size() - 1);
+                        return  main.get(type).get(main.get(type).size() - 1); // Don't delete for debugging
                     }
                 } else {
                     try {
@@ -209,15 +207,16 @@ public final class NetworkManager {
      */
     public synchronized static SimulatorData.Data getNextSend() {
         if (sendingQueue.size() > 100) {
-            LinkedList<SimulatorData.Data> temp = new LinkedList<>();
+            ConcurrentLinkedQueue<SimulatorData.Data> temp = new ConcurrentLinkedQueue<>();
             for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
-                temp.add(sendingQueue.get(i));
+                temp.add(sendingQueue.poll());
             }
-            sendingQueue = temp;
+            sendingQueue.clear();
+            sendingQueue.addAll(temp);
         }
 
         if (sendingQueue.size() > 0) {
-            return sendingQueue.removeFirst();
+            return sendingQueue.poll();
         } else {
             return HeartbeatTask.buildMessage();
         }
@@ -264,8 +263,10 @@ public final class NetworkManager {
 
 
         SimulatorData.Data[] datas = new SimulatorData.Data[currentSize];
-        for (int i = 0; i < datas.length; i++) {
-            datas[i] = sendingQueue.removeLast();
+        synchronized (sendingQueue) {
+            for (int i = 0; i < datas.length; i++) {
+                datas[i] = sendingQueue.poll();
+            }
         }
 
         return datas;
@@ -276,11 +277,14 @@ public final class NetworkManager {
      */
     private synchronized static void cleanup() {
         if (sendingQueue.size() > 100) {
-            LinkedList<SimulatorData.Data> temp = new LinkedList<>();
-            for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
-                temp.add(sendingQueue.get(i));
+            ConcurrentLinkedQueue<SimulatorData.Data> temp = new ConcurrentLinkedQueue<>();
+            synchronized (sendingQueue) {
+                for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
+                    temp.add(sendingQueue.poll());
+                }
+                sendingQueue.clear();
+                sendingQueue.addAll(temp);
             }
-            sendingQueue = temp;
         }
     }
 
@@ -300,98 +304,6 @@ public final class NetworkManager {
         NetworkManager.isReady = isReady;
     }
 
-
-    /**
-     * NetworkRecevier
-     * Receive packets from the PC simulator and feed them into a queue that the FT_Device class will read
-     * The FT_Device class will pretend to be a FTDI USB device and feed the
-     * received packets to the FTC_APP
-     *
-     *//*
-    public class NetworkReceiver implements Runnable {
-        private LinkedBlockingQueue<SimulatorData.Data> queue;
-        DatagramSocket mSocket;
-        byte[] mReceiveData = new byte[1024];
-
-        public NetworkReceiver(LinkedBlockingQueue<SimulatorData.Data> queue, DatagramSocket my_socket) {
-            this.queue = queue;
-            this.mSocket = my_socket;
-        }
-
-
-        @Override
-        public void run() {
-            while (!Thread.currentThread().isInterrupted()) {
-                DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
-                try {
-                    mSocket.receive(receivePacket);
-
-                    byte[] readBuffer = new byte[receivePacket.getLength()];
-                    System.arraycopy(receivePacket.getData(), 0, readBuffer, 0, receivePacket.getLength());
-                    Log.v("D2xx::", "Receive: " + readBuffer[0] + "Len: " + receivePacket.getLength());
-                    queue.put(readBuffer);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-
-
-    *//**
-     * NetworkSender
-     * Send packets to the PC simulator.
-     * Pull the packets from the passed queue.  Packets were queued in the FT_Device class after being
-     * received from the USB transmit functions of this app.  The FT_Device class is simulating the
-     * USB stack using a UDP network connection to the PC simulator.
-     *
-     *//*
-    public class NetworkSender implements Runnable {
-        private LinkedBlockingQueue queue;
-
-        DatagramSocket mSocket;
-        int mDestPort;
-        private InetAddress IPAddress;
-
-        public NetworkSender(LinkedBlockingQueue queue, String ipAddress, DatagramSocket mySocket, int destPort) {
-            this.queue = queue;
-            this.mSocket = mySocket;
-            this.mDestPort = destPort;
-
-            try {
-                this.IPAddress = InetAddress.getByName(ipAddress);
-            } catch (IOException e) {
-                Log.e("FTC Controller", "The following ip address is not invalid: " +
-                        ipAddress + "Details: " + e.getMessage(), e);
-                throw new AssertionError("IP Address is invalid!");
-            }
-
-        }
-
-        @Override
-        public void run() {
-            byte[] writeBuf;
-
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    writeBuf = (byte[])queue.take();
-                    DatagramPacket send_packet = new DatagramPacket(writeBuf,writeBuf.length, IPAddress, SENDING_PORT);
-                    mSocket.send(send_packet);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void buildConnection() {
-
-        }
-    }
-
-*/
     public enum NetworkTypes {
         BLUETOOTH,
         USB,
