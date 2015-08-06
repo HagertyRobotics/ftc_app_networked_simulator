@@ -1,20 +1,15 @@
 package org.ftccommunity.simulator.modules;
 
+
+import org.ftccommunity.simulator.modules.devices.Device;
+import org.ftccommunity.simulator.modules.devices.DeviceType;
+import org.ftccommunity.simulator.modules.devices.NullDevice;
+
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.ftccommunity.simulator.data.MotorSimData;
-import org.ftccommunity.simulator.data.SimData;
-import org.ftccommunity.simulator.modules.devices.Device;
-import org.ftccommunity.simulator.modules.devices.DeviceFactory;
-import org.ftccommunity.simulator.modules.devices.DeviceType;
-import org.ftccommunity.simulator.modules.devices.NullDevice;
-import org.ftccommunity.utils.Utils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -31,7 +26,7 @@ import java.util.logging.Logger;
 @XmlRootElement(name="Legacy")
 public class LegacyBrickSimulator extends BrickSimulator {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected final String mType = "Core Legacy Module";
+
     protected final byte[] mCurrentStateBuffer = new byte[208];
 
     /*
@@ -49,9 +44,11 @@ public class LegacyBrickSimulator extends BrickSimulator {
      * Default constructor.
      */
     public LegacyBrickSimulator() {
-    	mFXMLFileName = "view/EditLegacyDialog.fxml";
-    	mDevices = new Device[6];
-    	for (int i=0;i<6;i++) {
+    	mType = "Core Legacy Module";
+    	mFXMLFileName = "view/EditDialog.fxml";
+    	mNumberOfPorts = 6;
+    	mDevices = new Device[mNumberOfPorts];
+    	for (int i=0;i<mNumberOfPorts;i++) {
     		mDevices[i] = new NullDevice();
     	}
     }
@@ -73,30 +70,17 @@ public class LegacyBrickSimulator extends BrickSimulator {
     		// Set the Port S0 ready bit in the global part of the Current State Buffer
     		mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
         } else {
-
-	        // Write Command
+	        // Write Command...
 	    	// Process the received data packet
-	        // Loop through each of the 6 ports and see if the Action flag is set.
+	        // Loop through each of the ports in this object
 
-	        for (int i=0;i<6;i++) {
-	        	mDevices[i].processBuffer(data, mCurrentStateBuffer );
+	        for (int i=0;i<mNumberOfPorts;i++) {
+	        	mDevices[i].processBuffer(data, mCurrentStateBuffer, i);
 	        }
         }
     }
 
-    /**
-     *
-     */
-    public SimData findSimDataByName(String name) {
-//    	for (int i=0;i<6;i++) {
-//    		if (portName[i] != null) {
-//    			if (portName[i].equals(name)) {
-//    				return portSimData[i];
-//    			}
-//    		}
-//    	}
-    	return null;
-    }
+
 
     /**
      * Populate the details pane in the Overview window.  This method adds details that are not common
@@ -112,24 +96,30 @@ public class LegacyBrickSimulator extends BrickSimulator {
         grid.setPadding(new Insets(10, 10, 10, 10));
         grid.prefWidthProperty().bind(pane.widthProperty());
         grid.prefHeightProperty().bind(pane.heightProperty());
-		ColumnConstraints col1 = new ColumnConstraints();
-		col1.setPercentWidth(25);
-		ColumnConstraints col2 = new ColumnConstraints();
-		col2.setPercentWidth(50);
-		ColumnConstraints col3 = new ColumnConstraints();
-		col3.setPercentWidth(25);
-		grid.getColumnConstraints().addAll(col1,col2,col3);
+//		ColumnConstraints col1 = new ColumnConstraints();
+//		col1.setPercentWidth(20);
+//		ColumnConstraints col2 = new ColumnConstraints();
+//		col2.setPercentWidth(20);
+//		ColumnConstraints col3 = new ColumnConstraints();
+//		col3.setPercentWidth(20);
+//		ColumnConstraints col4 = new ColumnConstraints();
+//		col4.setPercentWidth(20);
+//		ColumnConstraints col5 = new ColumnConstraints();
+//		col5.setPercentWidth(20);
+//		grid.getColumnConstraints().addAll(col1,col2,col3,col4,col5);
 
-		for (int i=0;i<6;i++) {
+		for (int i=0;i<mNumberOfPorts;i++) {
 			Text portText = new Text("Port " + i);
 			grid.add(portText, 0, i);
 
 			Text typeText = new Text(mDevices[i].getType().getName());
 			grid.add(typeText, 1,  i);
 
-//			SimData[] sda = mDevices[i].getSimDataArray();
-//			Text nameText = new Text(sda[0].getName());
-//			grid.add(nameText, 2,  i);
+        	List<String> nameList = getPortDevice(i).getPortNames();
+        	for (int j=0;j<nameList.size();j++) {
+        		Text nameText = new Text(nameList.get(j));
+        		grid.add(nameText,j+2,i);
+        	}
 		}
 
 		pane.getChildren().add(grid);
@@ -147,16 +137,26 @@ public class LegacyBrickSimulator extends BrickSimulator {
      */
 	public void setupDebugGuiVbox(VBox vbox) {
 
-		for (int i=0;i<6;i++) {
+		for (int i=0;i<mNumberOfPorts;i++) {
 			mDevices[i].setupDebugGuiVbox(vbox);
 		}
 	}
 
 	public void updateDebugGuiVbox() {
 
-		for (int i=0;i<6;i++) {
+		for (int i=0;i<mNumberOfPorts;i++) {
 				mDevices[i].updateDebugGuiVbox();
 		}
 	}
+
+	public List<DeviceType> getDeviceTypeList() {
+		List<DeviceType> dtl = new ArrayList<>();
+		dtl.add(DeviceType.NONE);
+		dtl.add(DeviceType.TETRIX_MOTOR);
+		dtl.add(DeviceType.TETRIX_SERVO);
+		dtl.add(DeviceType.LEGO_LIGHT);
+		return dtl;
+	}
+
 
 }

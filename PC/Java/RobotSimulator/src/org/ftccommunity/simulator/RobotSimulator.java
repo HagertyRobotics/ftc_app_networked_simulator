@@ -1,11 +1,11 @@
 package org.ftccommunity.simulator;
 
+import org.ftccommunity.simulator.modules.BrickSimulator;
+
 import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
-
-import org.ftccommunity.simulator.modules.BrickSimulator;
 
 public class RobotSimulator  {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -28,7 +28,7 @@ public class RobotSimulator  {
         Thread moduleListerThread = new Thread(gBrickListGenerator,"");
         moduleListerThread.start();
 
-        
+
         // Read the current list of modules from the GUI MainApp class
         // Start the individual threads for each module
         List<BrickSimulator> brickList = mainApp.getBrickData();

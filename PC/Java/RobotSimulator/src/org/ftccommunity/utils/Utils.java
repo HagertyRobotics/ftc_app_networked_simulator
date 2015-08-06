@@ -6,6 +6,7 @@ import javax.xml.bind.*;
 
 import org.ftccommunity.gui.MainApp;
 import org.ftccommunity.simulator.data.MotorSimData;
+import org.ftccommunity.simulator.data.NullSimData;
 import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.BrickListWrapper;
 import org.ftccommunity.simulator.modules.BrickSimulator;
@@ -13,6 +14,11 @@ import org.ftccommunity.simulator.modules.LegacyBrickSimulator;
 import org.ftccommunity.simulator.modules.MotorBrickSimulator;
 import org.ftccommunity.simulator.modules.ServoBrickSimulator;
 import org.ftccommunity.simulator.modules.devices.Device;
+import org.ftccommunity.simulator.modules.devices.LegoLightSensorDevice;
+import org.ftccommunity.simulator.modules.devices.NullDevice;
+import org.ftccommunity.simulator.modules.devices.TetrixMotorControllerDevice;
+import org.ftccommunity.simulator.modules.devices.TetrixServoControllerDevice;
+import org.ftccommunity.simulator.modules.devices.USBMotorControllerDevice;
 
 import java.io.File;
 import java.util.List;
@@ -41,13 +47,21 @@ public final class Utils {
      * @param brickList
      */
     public static void saveBrickDataToFile(File file, List<BrickSimulator> brickList) throws Exception {
-        JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class,
+        JAXBContext context = JAXBContext.newInstance(
+        		BrickListWrapper.class,
+        		BrickSimulator.class,
         		LegacyBrickSimulator.class,
         		MotorBrickSimulator.class,
         		ServoBrickSimulator.class,
-        		SimData.class,
         		Device.class,
-        		MotorSimData.class);
+        		NullDevice.class,
+        		LegoLightSensorDevice.class,
+        		TetrixMotorControllerDevice.class,
+        		TetrixServoControllerDevice.class,
+        		USBMotorControllerDevice.class,
+        		MotorSimData.class,
+        		NullSimData.class,
+        		SimData.class);
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
@@ -91,11 +105,17 @@ public final class Utils {
      */
     public static void loadBrickDataFromFile(File file, ObservableList<BrickSimulator> brickList) throws Exception {
         JAXBContext context = JAXBContext
-                .newInstance(BrickListWrapper.class,
+                .newInstance(
+                		BrickListWrapper.class,
                 		LegacyBrickSimulator.class,
                 		MotorBrickSimulator.class,
                 		ServoBrickSimulator.class,
                 		Device.class,
+                		NullDevice.class,
+                		LegoLightSensorDevice.class,
+                		TetrixMotorControllerDevice.class,
+                		TetrixServoControllerDevice.class,
+                		USBMotorControllerDevice.class,
                 		MotorSimData.class);
 
         Unmarshaller um = context.createUnmarshaller();

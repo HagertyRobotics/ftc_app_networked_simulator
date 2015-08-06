@@ -1,14 +1,21 @@
 package org.ftccommunity.simulator;
 
+
+import org.ftccommunity.gui.MainApp;
+import org.ftccommunity.simulator.data.MotorSimData;
+import org.ftccommunity.simulator.modules.*;
+import org.ftccommunity.simulator.modules.devices.Device;
+import org.ftccommunity.simulator.modules.devices.LegoLightSensorDevice;
+import org.ftccommunity.simulator.modules.devices.NullDevice;
+import org.ftccommunity.simulator.modules.devices.TetrixMotorControllerDevice;
+import org.ftccommunity.simulator.modules.devices.TetrixServoControllerDevice;
+import org.ftccommunity.simulator.modules.devices.USBMotorControllerDevice;
+
 import javafx.collections.ObservableList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-
-import org.ftccommunity.gui.MainApp;
-import org.ftccommunity.simulator.modules.*;
-import org.ftccommunity.utils.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -99,7 +106,19 @@ public class BrickListGenerator implements Runnable {
 
     private byte[] getXmlModuleList(ObservableList<BrickSimulator> mBrickList) {
     	try {
-	    	JAXBContext context = JAXBContext.newInstance(BrickListWrapper.class, LegacyBrickSimulator.class, MotorBrickSimulator.class, ServoBrickSimulator.class );
+	    	JAXBContext context = JAXBContext.newInstance(
+	    			BrickListWrapper.class,
+            		LegacyBrickSimulator.class,
+            		MotorBrickSimulator.class,
+            		ServoBrickSimulator.class,
+            		Device.class,
+            		NullDevice.class,
+            		LegoLightSensorDevice.class,
+            		TetrixMotorControllerDevice.class,
+            		TetrixServoControllerDevice.class,
+            		USBMotorControllerDevice.class,
+            		MotorSimData.class
+	    	);
 	        Marshaller m = context.createMarshaller();
 	        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 

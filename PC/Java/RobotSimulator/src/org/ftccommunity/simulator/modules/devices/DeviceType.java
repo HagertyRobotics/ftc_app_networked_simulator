@@ -1,10 +1,11 @@
 package org.ftccommunity.simulator.modules.devices;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAccessType;
 
-@XmlType(name = "SimulationDataType")
-@XmlEnum
+//@XmlType(name = "DeviceType")
+//@XmlEnum
+@XmlAccessorType(XmlAccessType.NONE)
 public enum DeviceType {
 	NONE("None"),
 	TETRIX_MOTOR("Tetrix Motor Controller"),

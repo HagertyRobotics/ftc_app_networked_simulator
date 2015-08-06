@@ -1,23 +1,19 @@
 package org.ftccommunity.simulator.modules;
 
+import org.ftccommunity.simulator.modules.devices.Device;
+import org.ftccommunity.simulator.modules.devices.DeviceType;
+import org.ftccommunity.simulator.modules.devices.USBMotorControllerDevice;
+
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.ftccommunity.simulator.data.MotorSimData;
-import org.ftccommunity.simulator.data.MotorSimData;
-import org.ftccommunity.simulator.data.SimData;
-import org.ftccommunity.simulator.modules.devices.Device;
-import org.ftccommunity.simulator.modules.devices.DeviceFactory;
-import org.ftccommunity.simulator.modules.devices.DeviceType;
-import org.ftccommunity.simulator.modules.devices.NullDevice;
-import org.ftccommunity.utils.Utils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -30,8 +26,8 @@ import java.util.logging.Logger;
 @XmlRootElement(name="Motor")
 public class MotorBrickSimulator extends BrickSimulator {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected final String mType = "Core Motor Controller";
     protected final byte[] mCurrentStateBuffer = new byte[94];
+
     /*
      ** Packet types
      */
@@ -47,9 +43,13 @@ public class MotorBrickSimulator extends BrickSimulator {
      * Default constructor.
      */
     public MotorBrickSimulator() {
-    	mFXMLFileName = "view/EditMotorDialog.fxml";
-    	mDevices = new Device[1];
-    	mDevices[0] = new NullDevice();
+    	mType = "Core Motor Controller";
+    	mFXMLFileName = "view/EditDialog.fxml";
+    	mNumberOfPorts = 1;
+    	mDevices = new Device[mNumberOfPorts];
+    	for (int i=0;i<mNumberOfPorts;i++) {
+    		mDevices[i] = new USBMotorControllerDevice();
+    	}
     }
 
     private void sendPacketToPhone(byte[] sendData) {
@@ -67,31 +67,14 @@ public class MotorBrickSimulator extends BrickSimulator {
     	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)94) { // readCmd
     		sendPacketToPhone(mCurrentStateBuffer);
         } else {
+	        // Write Command...
 	    	// Process the received data packet
-        	mDevices[0].processBuffer(data, mCurrentStateBuffer );
+	        // Loop through each of the ports in this object
+
+	        for (int i=0;i<mNumberOfPorts;i++) {
+	        	mDevices[i].processBuffer(data, mCurrentStateBuffer, i);
+	        }
         }
-    }
-
-
-    /**
-     * For the LegacyBrickSimulator objects, since we couldn't get the marshaler to handle the list of small
-     * SimData objects(6), we created and marshaled a list of the six port types and names.  We now need to create
-     * the objects by hand using the unmarshaled list of portTypes and portNames.
-     */
-    public void fixupUnMarshaling() {
-
-    }
-
-    /**
-     *
-     */
-    public SimData findSimDataByName(String name) {
-//		if (motor1Name.equals(name)) {
-//			return portSimData;
-//		} else 	if (motor2Name.equals(name)) {
-//			return portSimData;
-//		}
-    	return null;
     }
 
     /**
@@ -108,24 +91,22 @@ public class MotorBrickSimulator extends BrickSimulator {
         grid.setPadding(new Insets(10, 10, 10, 10));
         grid.prefWidthProperty().bind(pane.widthProperty());
         grid.prefHeightProperty().bind(pane.heightProperty());
-		ColumnConstraints col1 = new ColumnConstraints();
-		col1.setPercentWidth(25);
-		ColumnConstraints col2 = new ColumnConstraints();
-		col2.setPercentWidth(50);
-		ColumnConstraints col3 = new ColumnConstraints();
-		col3.setPercentWidth(25);
-		grid.getColumnConstraints().addAll(col1,col2,col3);
+        grid.setStyle("-fx-border: 2px solid; -fx-border-color: blue;");
+        //grid.setGridLinesVisible(true);
 
-/*		Text motor1Text = new Text("Motor 1");
-		grid.add(motor1Text, 0, 0);
-		Text motor1NameText = new Text(motor1Name);
-		grid.add(motor1NameText, 1,  0);
+		for (int i=0;i<mNumberOfPorts;i++) {
+			Text portText = new Text("Port " + i);
+			grid.add(portText, 0, i);
 
-		Text motor2Text = new Text("Motor 2");
-		grid.add(motor1Text, 0, 0);
-		Text motor2NameText = new Text(motor2Name);
-		grid.add(motor2NameText, 1,  0);
-*/
+			Text typeText = new Text(mDevices[i].getType().getName());
+			grid.add(typeText, 1,  i);
+
+        	List<String> nameList = getPortDevice(i).getPortNames();
+        	for (int j=0;j<nameList.size();j++) {
+        		Text nameText = new Text(nameList.get(j));
+        		grid.add(nameText,j+2,i);
+        	}
+		}
 		pane.getChildren().add(grid);
 	}
 
@@ -145,6 +126,12 @@ public class MotorBrickSimulator extends BrickSimulator {
 
 	public void updateDebugGuiVbox() {
 		mDevices[0].updateDebugGuiVbox();
+	}
+
+	public List<DeviceType> getDeviceTypeList() {
+		List<DeviceType> dtl = new ArrayList<>();
+		dtl.add(DeviceType.USB_MOTOR);
+		return dtl;
 	}
 
 }

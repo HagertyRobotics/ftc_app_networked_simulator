@@ -1,11 +1,11 @@
 package org.ftccommunity.simulator.modules.devices;
 
+import org.ftccommunity.simulator.data.MotorSimData;
+import org.ftccommunity.simulator.data.SimData;
+
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.ftccommunity.simulator.data.MotorSimData;
-import org.ftccommunity.simulator.data.SimData;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -15,9 +15,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-@XmlRootElement(name="TetrixMotorControllerDevice")
+@XmlRootElement(name="USBMotorControllerDevice")
 @XmlAccessorType(XmlAccessType.NONE)
-public class TetrixMotorControllerDevice extends Device {
+public class USBMotorControllerDevice extends Device {
 
 	// GUI stuff for the Debug windows
 	public Label mMotor1SpeedDebugLabel;
@@ -26,36 +26,18 @@ public class TetrixMotorControllerDevice extends Device {
     /**
      * Default constructor.
      */
-	public TetrixMotorControllerDevice() {
-		super(DeviceType.TETRIX_MOTOR);
+	public USBMotorControllerDevice() {
+		super(DeviceType.USB_MOTOR);
 		mSimData = new SimData[2];
 		mSimData[0] = new MotorSimData();	// Add 1st motor
 		mSimData[1] = new MotorSimData();	// Add 2nd motor
 	}
 
-	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum ) {
-		int p;
-
-        p=16+portNum*32;
-
-        // This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
-        // If I2C_ACTION is set, take some action
-//	        if (packet[p+32] == (byte)0xff) { // Action flag
-        if ((packet[p] & (byte)0x01) == (byte)0x01) { // I2C Mode
-        	if ((packet[p] & (byte)0x80) == (byte)0x80) { // Read mode
-            	// Copy this port's 32 bytes into buffer
-        		System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
-
-            } else { // Write mode
-            	// Copy this port's 32 bytes into buffer
-            	System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
-
-            	((MotorSimData)mSimData[0]).setMotorSpeed(mCurrentStateBuffer[p+4+5]);
-            	((MotorSimData)mSimData[1]).setMotorSpeed(mCurrentStateBuffer[p+4+6]);
-            }
-        }
+	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum) {
+		System.arraycopy(packet, 0, mCurrentStateBuffer, 0, packet.length);
+    	((MotorSimData)mSimData[0]).setMotorSpeed(packet[0x45]);
+    	((MotorSimData)mSimData[1]).setMotorSpeed(packet[0x46]);
     }
-
 
 	//
 	// GUI Routines

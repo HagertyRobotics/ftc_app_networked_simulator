@@ -1,14 +1,15 @@
 package org.ftccommunity.simulator;
 
+
+import org.ftccommunity.simulator.data.MotorSimData;
+import org.ftccommunity.simulator.data.SimData;
+import org.ftccommunity.simulator.modules.BrickSimulator;
+
 import coppelia.IntW;
 import coppelia.IntWA;
 import coppelia.remoteApi;
 
 import java.util.List;
-
-import org.ftccommunity.simulator.data.MotorSimData;
-import org.ftccommunity.simulator.data.SimData;
-import org.ftccommunity.simulator.modules.BrickSimulator;
 
 public class CoppeliaApiClient implements Runnable {
     public static final String LOCAL_HOST = "127.0.0.1";
@@ -35,7 +36,6 @@ public class CoppeliaApiClient implements Runnable {
 
 		mVrep = new remoteApi();
 		mVrep.simxFinish(-1); // just in case, close all opened connections
-
 
         mClientID = mVrep.simxStart(LOCAL_HOST,
                 CONNECT_PORT, WAIT_UNTIL_CONNECTED,
@@ -86,26 +86,31 @@ public class CoppeliaApiClient implements Runnable {
 		/*
 		 * Read the current list of modules from the GUI MainApp class
 		 */
-		SimData simData=null;
+		SimData simDataMotor1=null;
 		List<BrickSimulator> brickList = mMainApp.getBrickData();
 		for (BrickSimulator currentBrick : brickList) {
-			simData = currentBrick.findSimDataByName("Wheels");
-			if (simData != null) break;
+			simDataMotor1 = currentBrick.findSimDataByName("motor_1");
+			if (simDataMotor1 != null) break;
+		}
+		if (simDataMotor1 == null) {
+			System.out.println("Failed to find a port named 'motor_1'");
+			done = true;
 		}
 
-		if (simData == null) {
-			System.out.println("Failed to find a module name 'Wheels'");
+		SimData simDataMotor2=null;
+		for (BrickSimulator currentBrick : brickList) {
+			simDataMotor2 = currentBrick.findSimDataByName("motor_2");
+			if (simDataMotor2 != null) break;
+		}
+
+		if (simDataMotor2 == null) {
+			System.out.println("Failed to find a port named 'motor_2'");
 			done = true;
 		}
 
         while (!done && !Thread.currentThread().isInterrupted()) {
-//			simData.lock.readLock().lock();
-//			try {
-//				leftMotorSpeed = ((MotorSimData)simData).getMotor1Speed() * 3.14f;
-//				rightMotorSpeed = ((MotorSimData)simData).getMotor2Speed() * 3.14f;
-//			} finally {
-//				simData.lock.readLock().unlock();
-//			}
+			leftMotorSpeed = ((MotorSimData)simDataMotor1).getMotorSpeed() * 3.14f;
+			rightMotorSpeed = ((MotorSimData)simDataMotor2).getMotorSpeed() * 3.14f;
 
 			mVrep.simxSetJointTargetVelocity(mClientID,mLeftMotorHandle.getValue(),-leftMotorSpeed,remoteApi.simx_opmode_oneshot);
 			mVrep.simxSetJointTargetVelocity(mClientID,mRightMotorHandle.getValue(),rightMotorSpeed,remoteApi.simx_opmode_oneshot);

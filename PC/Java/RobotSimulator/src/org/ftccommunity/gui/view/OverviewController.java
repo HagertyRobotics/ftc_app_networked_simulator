@@ -43,7 +43,8 @@ public class OverviewController {
         // Initialize the brick table with the two columns.
         //controllerNameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
         //noinspection Convert2Diamond
-        brickNameColumn.setCellValueFactory(new PropertyValueFactory<BrickSimulator,String>("name"));
+    	// the "type" is tied to getType() in BrickSimulator
+        brickNameColumn.setCellValueFactory(new PropertyValueFactory<BrickSimulator,String>("type"));
         brickAliasColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
 
         // Show brick details in the Details window.
@@ -90,8 +91,6 @@ public class OverviewController {
             brickPortLabel.setText("");
             brickSerialLabel.setText("");
         }
-
-
     }
 
     /**
@@ -139,11 +138,10 @@ public class OverviewController {
             if (okClicked) {
                 showBrickDetails(selectedBrick);
             }
-
         } else {
             // Nothing selected.
             Alert alert = new Alert(AlertType.WARNING);
-            alert.initOwner(mainApp.getPrimaryStage());
+            alert.initOwner(MainApp.getPrimaryStage());
             alert.setTitle("No Selection");
             alert.setHeaderText("No Controller Selected");
             alert.setContentText("Please select a controller in the table.");

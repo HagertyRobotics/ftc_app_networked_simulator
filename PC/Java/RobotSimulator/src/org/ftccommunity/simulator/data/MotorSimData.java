@@ -4,25 +4,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.ftccommunity.simulator.modules.devices.DeviceType;
-
-import javafx.beans.property.StringProperty;
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-
-//@XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name="LegacySimData")
+@XmlRootElement(name="MotorSimData")
+@XmlAccessorType(XmlAccessType.NONE)
 public class MotorSimData extends SimData {
 
-	float mMotorSpeed;
-	boolean mMotorFloatMode;
+	float mMotorSpeed=0;
+	boolean mMotorFloatMode=false;
 
 	public MotorSimData() {
 		super();
@@ -31,14 +18,33 @@ public class MotorSimData extends SimData {
 
     @Override
     protected void construct() {
-        System.out.println("Building Legacy Motor SimData");
+        //System.out.println("Building Legacy Motor SimData");
     }
 
 	public float getMotorSpeed() {
-		return mMotorSpeed;
+		lock.readLock().lock();
+		try {
+			return mMotorSpeed;
+		} finally {
+			lock.readLock().unlock();
+		}
 	}
 
 	public boolean getMotorFloatMode() {
 		return mMotorFloatMode;
+	}
+
+	public void setMotorSpeed(byte speedByte) {
+		lock.writeLock().lock();
+		try {
+			if (speedByte == (byte)0x80) {
+				mMotorFloatMode = true;
+				mMotorSpeed=0.0f;
+			} else {
+				mMotorSpeed = (float)speedByte/100.0f;
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 }

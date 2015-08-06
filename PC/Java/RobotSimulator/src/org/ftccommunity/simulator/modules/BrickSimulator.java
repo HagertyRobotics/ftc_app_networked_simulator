@@ -16,11 +16,13 @@ import javafx.scene.layout.VBox;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -31,15 +33,18 @@ import java.util.logging.Logger;
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class BrickSimulator implements Runnable {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    protected String mType;
+    protected int mNumberOfPorts;
 
     protected final StringProperty mName;
     protected final StringProperty mSerial;
     protected IntegerProperty mPort;
-    int mPhonePort;
-    InetAddress mPhoneIPAddress;
-    DatagramSocket mServerSocket;
+    protected int mPhonePort;
+    protected InetAddress mPhoneIPAddress;
+    protected DatagramSocket mServerSocket;
     protected String mFXMLFileName;
 
+    @XmlElementRef(name="Devices")
     protected Device[] mDevices;
 
     byte[] mReceiveData = new byte[1024];
@@ -108,15 +113,24 @@ public abstract class BrickSimulator implements Runnable {
 
 	public abstract void populateDetailsPane(Pane pane);
 
-	public abstract SimData findSimDataByName(String name);
-
 	public abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
+
+	public abstract List<DeviceType> getDeviceTypeList();
 
 
     //---------------------------------------------------------------
     //
     // Getters and Setters
     //
+
+	public int getNumberOfPorts() {
+		return mNumberOfPorts;
+	}
+
+    public String getType() {
+        return mType;
+    }
+
     public String getName() {
         return mName.get();
     }
@@ -152,31 +166,49 @@ public abstract class BrickSimulator implements Runnable {
         return mSerial;
     }
 
-    public Device[] getPortSimData() {
-    	return mDevices;
+    public Device getPortDevice(int i) {
+    	// TODO add try catch for device length
+    	return mDevices[i];
     }
 
-    // PortType
-    public DeviceType getPortType(int i) {
+    public DeviceType getPortDeviceType(int i) {
     	return mDevices[i].getType();
     }
 
-    public void setPortType(int i, DeviceType type) {
-    	mDevices[i] = DeviceFactory.buildSimData(type);
+    public void setPortDeviceType(int i, DeviceType type) {
+    	mDevices[i] = DeviceFactory.buildDevice(type);
     }
-
-    // PortName
-//    public String getPortName(int i) {
-//    	SimData[] simDataArray = mDevices[i].getSimDataArray();
-//    	return mDevices[i].getName();
-//    }
-
-//    public void setPortName(int i, String name) {
-//    		mDevices[i].setName(name);
-//    }
 
     public String getFXMLFileName() {
     	return mFXMLFileName;
+    }
+
+    public Device[] getDevices() {
+    	return mDevices;
+    }
+
+    public void setDevices(Device[] dev) {
+    	mDevices = dev;
+    }
+
+    /**
+    *
+    */
+    public SimData findSimDataByName(String name) {
+	   for (Device d: mDevices) {
+		   SimData s = d.findSimDataByName(name);
+		   if (s != null) {
+			   return s;
+		   }
+	   }
+//   	for (int i=0;i<mNumberOfPorts;i++) {
+//   		if (portName[i] != null) {
+//   			if (portName[i].equals(name)) {
+//   				return portSimData[i];
+//   			}
+//   		}
+//   	}
+	   return null;
     }
 }
 

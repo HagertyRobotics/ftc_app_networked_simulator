@@ -5,8 +5,12 @@ import javafx.scene.layout.VBox;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.ftccommunity.simulator.data.SimData;
+import org.ftccommunity.simulator.modules.devices.Device;
+import org.ftccommunity.simulator.modules.devices.DeviceType;
+import org.ftccommunity.simulator.modules.devices.NullDevice;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -17,9 +21,15 @@ import java.util.logging.Logger;
 @XmlRootElement(name="Servo")
 public class ServoBrickSimulator extends BrickSimulator {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected final String mType = "Core Servo Controller";
 
     public ServoBrickSimulator() {
+    	mType = "Core Servo Controller";
+    	mFXMLFileName = "view/EditDialog.fxml";
+    	mNumberOfPorts = 6;
+    	mDevices = new Device[mNumberOfPorts];
+    	for (int i=0;i<mNumberOfPorts;i++) {
+    		mDevices[i] = new NullDevice();
+    	}
     }
 
     public void fixupUnMarshaling() {}
@@ -30,11 +40,12 @@ public class ServoBrickSimulator extends BrickSimulator {
 
 	public void populateDetailsPane(Pane pane) {}
 
-    public SimData findSimDataByName(String name) {
-        return null;
-    }
-
     public void handleIncomingPacket(byte[] data, int length, boolean wait) {
     }
 
+	public List<DeviceType> getDeviceTypeList() {
+		List<DeviceType> dtl = new ArrayList<>();
+		dtl.add(DeviceType.USB_SERVO);
+		return dtl;
+	}
 }

@@ -36,8 +36,8 @@ public class D2xxManager
 
     public static final int PHONEPORT  = 7000;
     public static final int MODULE_LISTER_PORT = 7000;
-    //public static final String PC_IP_ADDRESS  = "10.0.1.193";
-    public static final String PC_IP_ADDRESS  = "192.168.1.119";
+    public static final String PC_IP_ADDRESS  = "10.0.1.193";
+    //public static final String PC_IP_ADDRESS  = "192.168.1.119";
 
     InetAddress mIPAddress;
 
@@ -234,11 +234,11 @@ public class D2xxManager
                         ftDev = new FT_Device_Legacy(serial, alias, PC_IP_ADDRESS, Integer.parseInt(portString));
                         devices.add(ftDev);
                     }
-                } else if (nNode.getNodeName().equals("motor")) {
+                } else if (nNode.getNodeName().equals("Motor")) {
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element eElement = (Element) nNode;
                         String serial = eElement.getElementsByTagName("serial").item(0).getTextContent();
-                        String alias = eElement.getElementsByTagName("alias").item(0).getTextContent();
+                        String alias = eElement.getElementsByTagName("name").item(0).getTextContent();
                         String portString = eElement.getElementsByTagName("port").item(0).getTextContent();
 
                         ftDev = new FT_Device_Motor(serial, alias, PC_IP_ADDRESS, Integer.parseInt(portString));
