@@ -95,7 +95,6 @@ abstract public class FT_Device
             return -2;
         }
 
-
         // Check onboard read queue and see if we have a override
         // Use this packet instead of reading one from the network
         if (!this.readQueue.isEmpty()) {
@@ -109,7 +108,7 @@ abstract public class FT_Device
             rc = getPacketFromPC(data, length, wait_ms);
         }
 
-        Log.v(mFT_DeviceDescription, "READ(): Buffer len=" + length + " (" + bufferToHexString(data,0,length) + ")");
+        //Log.v(mFT_DeviceDescription, "READ(): Buffer len=" + length + " (" + bufferToHexString(data,0,length) + ")");
 
         return rc;
     }

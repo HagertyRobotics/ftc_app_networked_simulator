@@ -171,10 +171,10 @@ public class CoppeliaApiClient implements Runnable {
 					);
 			if (ret == remoteApi.simx_return_ok) {
 				float light = mLightSensorAuxValues.getArray()[0].getArray()[11];
-				System.out.println("got image " + light);
+				//System.out.println("got image " + light);
 				((AnalogSimData)simDataLight1).setAnalogValue(light);
 			} else if (ret == remoteApi.simx_return_novalue_flag) {
-				System.out.println("no image");
+				//System.out.println("no image");
 			} else {
 				System.out.println("Error: Geting Light Sensor Image. " + ret);
 			}

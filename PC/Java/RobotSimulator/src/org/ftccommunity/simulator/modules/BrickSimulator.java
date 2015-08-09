@@ -201,13 +201,6 @@ public abstract class BrickSimulator implements Runnable {
 			   return s;
 		   }
 	   }
-//   	for (int i=0;i<mNumberOfPorts;i++) {
-//   		if (portName[i] != null) {
-//   			if (portName[i].equals(name)) {
-//   				return portSimData[i];
-//   			}
-//   		}
-//   	}
 	   return null;
     }
 }

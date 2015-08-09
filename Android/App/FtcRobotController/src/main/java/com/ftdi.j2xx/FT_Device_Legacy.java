@@ -1,5 +1,7 @@
 package com.ftdi.j2xx;
 
+import android.util.Log;
+
 public class FT_Device_Legacy extends FT_Device {
 
     public FT_Device_Legacy(String serialNumber, String description, String ipAddress, int port) {
@@ -54,7 +56,7 @@ public class FT_Device_Legacy extends FT_Device {
 //                Log.v("Legacy", "WRITE: Delta Time = " + mDeltaWriteTime);
 
                 // Set the Port S0 ready bit in the global part of the Current State Buffer
-                mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
+                //mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
 
             }
             // Read Command

@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.ftccommunity.simulator.data.AnalogSimData;
 import org.ftccommunity.simulator.data.MotorSimData;
 import org.ftccommunity.simulator.data.SimData;
+import org.ftccommunity.utils.Utils;
 
 import javax.xml.bind.annotation.XmlAccessType;
 
@@ -37,20 +38,14 @@ public class LegoLightSensorDevice extends Device {
         p=16+portNum*32;
         q=4+portNum*2;
 
-        // If I2C_ACTION is set, take some action
-        // if (packet[p+32] == (byte)0xff) { // Action flag
-        if ((packet[p] & (byte)0x01) == (byte)0x01) { // I2C Mode
-        	if ((packet[p] & (byte)0x80) == (byte)0x80) { // Read mode
-            	// Copy this port's 32 bytes into buffer
-        		System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
-        		int a = (int) ((AnalogSimData)mSimData[0]).getAnalogValue() * 1024;
-        		mCurrentStateBuffer[q] = (byte)(a&0xff);
-        		mCurrentStateBuffer[q+1] = (byte)((a>>8)&0xff);
+        if ((packet[p] & (byte)0x01) == (byte)0x00) { // Analog Mode
+        	// Copy this port's 32 bytes into buffer
+    		int a = (int) (((AnalogSimData)mSimData[0]).getAnalogValue()*256.0);
+    		mCurrentStateBuffer[q] = (byte)a;
 
-            } else { // Write mode
-            	// Copy this port's 32 bytes into buffer
-            	//System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
-            }
+    		// Set the Port ready bit in the global part of the Current State Buffer
+    		int bufferStatus = ~(1 << portNum);
+    		mCurrentStateBuffer[3] &= (byte)bufferStatus;
         }
     }
 

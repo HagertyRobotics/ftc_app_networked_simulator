@@ -67,8 +67,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
     {
     	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
     		sendPacketToPhone(mCurrentStateBuffer);
-    		// Set the Port S0 ready bit in the global part of the Current State Buffer
-    		mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
+    		
         } else {
 	        // Write Command...
 	    	// Process the received data packet
