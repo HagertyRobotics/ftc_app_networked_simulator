@@ -2,7 +2,9 @@ package org.ftccommunity.simulator;
 
 
 import org.ftccommunity.gui.MainApp;
+import org.ftccommunity.simulator.data.AnalogSimData;
 import org.ftccommunity.simulator.data.MotorSimData;
+import org.ftccommunity.simulator.data.NullSimData;
 import org.ftccommunity.simulator.modules.*;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.LegoLightSensorDevice;
@@ -117,7 +119,9 @@ public class BrickListGenerator implements Runnable {
             		TetrixMotorControllerDevice.class,
             		TetrixServoControllerDevice.class,
             		USBMotorControllerDevice.class,
-            		MotorSimData.class
+            		MotorSimData.class,
+            		AnalogSimData.class,
+            		NullSimData.class
 	    	);
 	        Marshaller m = context.createMarshaller();
 	        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);

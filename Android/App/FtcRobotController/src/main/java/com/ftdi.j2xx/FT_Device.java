@@ -109,7 +109,7 @@ abstract public class FT_Device
             rc = getPacketFromPC(data, length, wait_ms);
         }
 
-        //Log.v(mFT_DeviceDescription, "READ(): Buffer len=" + length + " (" + bufferToHexString(data,0,length) + ")");
+        Log.v(mFT_DeviceDescription, "READ(): Buffer len=" + length + " (" + bufferToHexString(data,0,length) + ")");
 
         return rc;
     }

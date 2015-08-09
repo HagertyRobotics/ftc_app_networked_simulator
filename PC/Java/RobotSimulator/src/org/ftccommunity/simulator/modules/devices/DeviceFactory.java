@@ -15,8 +15,10 @@ public class DeviceFactory {
 		case USB_MOTOR:
 			device = new USBMotorControllerDevice();
 			break;
+        case LEGO_LIGHT:
+        	device = new LegoLightSensorDevice();
+        	break;
 
-            case LEGO_LIGHT:
             // fall through
             case TETRIX_SERVO:
             // fall through

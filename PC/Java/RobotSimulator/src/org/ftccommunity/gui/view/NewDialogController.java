@@ -51,7 +51,11 @@ public class NewDialogController {
 
     @FXML
     public void initChoiceBox() {
-    	brickChoiceBox.setItems(FXCollections.observableArrayList("Core Legacy Module","Core Motor Controller","Core Servo Controller"));
+    	brickChoiceBox.setItems(FXCollections.observableArrayList(
+    			"Core Legacy Module",
+    			"Core Motor Controller",
+    			"Core Servo Controller"
+    	));
     	brickChoiceBox.getSelectionModel().selectFirst();
     }
 
