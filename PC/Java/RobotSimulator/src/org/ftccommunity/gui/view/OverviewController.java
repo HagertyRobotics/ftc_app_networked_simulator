@@ -1,6 +1,7 @@
 package org.ftccommunity.gui.view;
 
 import org.ftccommunity.gui.MainApp;
+// import org.ftccommunity.simulator.RobotSimulator;
 import org.ftccommunity.simulator.RobotSimulator;
 import org.ftccommunity.simulator.modules.BrickSimulator;
 
@@ -157,6 +158,9 @@ public class OverviewController {
     private void handleStartSimulatorButton() {
     	if (!RobotSimulator.simulatorStarted())
     		RobotSimulator.startSimulator(mainApp);
+        else {
+            RobotSimulator.requestTermination();
+        }
     }
 
     /**

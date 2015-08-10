@@ -1,19 +1,20 @@
 package org.ftccommunity.simulator;
 
 
+import org.ftccommunity.gui.MainApp;
 import org.ftccommunity.simulator.data.AnalogSimData;
 import org.ftccommunity.simulator.data.MotorSimData;
 import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.BrickSimulator;
 
 import coppelia.BoolW;
-import coppelia.CharWA;
 import coppelia.FloatWAA;
 import coppelia.IntW;
 import coppelia.IntWA;
 import coppelia.remoteApi;
 
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class CoppeliaApiClient implements Runnable {
     public static final String LOCAL_HOST = "127.0.0.1";
@@ -39,7 +40,7 @@ public class CoppeliaApiClient implements Runnable {
     private volatile boolean done;
     int ret;
 
-	public CoppeliaApiClient(org.ftccommunity.gui.MainApp mainApp) {
+	public CoppeliaApiClient(MainApp mainApp) {
 		mMainApp = mainApp;
         done = false;
     }

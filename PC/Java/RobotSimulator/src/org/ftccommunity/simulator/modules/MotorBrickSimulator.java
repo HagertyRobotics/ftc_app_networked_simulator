@@ -1,5 +1,6 @@
 package org.ftccommunity.simulator.modules;
 
+import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.DeviceType;
 import org.ftccommunity.simulator.modules.devices.USBMotorControllerDevice;
@@ -7,6 +8,8 @@ import org.ftccommunity.simulator.modules.devices.USBMotorControllerDevice;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -52,13 +55,20 @@ public class MotorBrickSimulator extends BrickSimulator {
     	}
     }
 
+    @Override
+    protected byte[] receivePacketFromPhone() {
+        return new byte[0];
+    }
+
     private void sendPacketToPhone(byte[] sendData) {
-    	try {
+    	/*try {
     		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
         	mServerSocket.send(sendPacket);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+        NetworkManager.requestSend(SimulatorData.Type.Types.LEGACY_MOTOR,
+                                          SimulatorData.Data.Modules.LEGACY_MOTOR, sendData);
     }
 
 
@@ -110,6 +120,10 @@ public class MotorBrickSimulator extends BrickSimulator {
 		pane.getChildren().add(grid);
 	}
 
+    @Override
+    public SimData findSimDataName(String name) {
+        return null;
+    }
 
     /**
      * Getters/Setters
@@ -128,9 +142,9 @@ public class MotorBrickSimulator extends BrickSimulator {
 		mDevices[0].updateDebugGuiVbox();
 	}
 
-	public List<DeviceType> getDeviceTypeList() {
-		List<DeviceType> dtl = new ArrayList<>();
-		dtl.add(DeviceType.USB_MOTOR);
+	public List<SimulatorData.Type.Types> getDeviceTypeList() {
+		List<SimulatorData.Type.Types> dtl = new ArrayList<>();
+		dtl.add(SimulatorData.Type.Types.USB_MOTOR);
 		return dtl;
 	}
 

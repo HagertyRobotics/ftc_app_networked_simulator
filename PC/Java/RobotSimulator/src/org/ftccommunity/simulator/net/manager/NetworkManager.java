@@ -18,6 +18,7 @@ import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 
 import java.net.InetAddress;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class NetworkManager {
     private final static LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
@@ -47,23 +48,38 @@ public final class NetworkManager {
         synchronized (receivedQueue) {
             size = receivedQueue.size();
         }
-        while (size < 1) {
+        while (size < 1 && !Thread.currentThread().isInterrupted()) {
             try {
-                Thread.sleep(5);
-                Thread.yield();
+                Thread.sleep(25);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return;
             }
             synchronized (receivedQueue) {
                 size = receivedQueue.size();
             }
         }
 
+        ConcurrentLinkedQueue<SimulatorData.Data> temp = new ConcurrentLinkedQueue<>();
+        // Move the contents over to an new queue
         synchronized (receivedQueue) {
-            for (SimulatorData.Data data : receivedQueue) {
-                main.put(data.getType().getType(), data);
-            }
+            temp.addAll(receivedQueue);
+            receivedQueue.clear();
         }
+
+        // Flip the old moved data into a new container
+        LinkedList<SimulatorData.Data> tempB = new LinkedList<>();
+        while (!temp.isEmpty()) {
+            tempB.add(temp.poll());
+        }
+        temp.clear();
+
+        // Then, add the flipped data so the oldest gets processed first
+        while (!tempB.isEmpty()) {
+            SimulatorData.Data data = tempB.poll();
+            main.put(data.getType().getType(), data);
+        }
+        tempB.clear();
     }
 
     /**
@@ -82,6 +98,7 @@ public final class NetworkManager {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                break;
             }
             // Fetch the size again
             synchronized (main) {
@@ -124,14 +141,34 @@ public final class NetworkManager {
      * @param data a byte array of data to send
      */
     public static void requestSend(SimulatorData.Type.Types type, SimulatorData.Data.Modules module, byte[] data) {
+        String dataString = new String(data, Charsets.US_ASCII);
+        System.out.println(dataString);
+        requestSend(type, module, dataString);
+    /*SimulatorData.Data.Builder sendDataBuilder = SimulatorData.Data.newBuilder();
+    sendDataBuilder.setType(SimulatorData.Type.newBuilder().setType(type).build())
+            .setModule(module)
+            .addInfo(new String(data, Charsets.US_ASCII));
+    synchronized (sendingQueue) {
+        sendingQueue.add(sendDataBuilder.build());
+    }*/
+    }
+
+    /**
+     * Request the packets to be sent, the sending does not have a guarantee to be sent
+     * @param type the type of data to send
+     * @param module which module correlates to the data being sent
+     * @param data a string of data to send
+     */
+    public static void requestSend(SimulatorData.Type.Types type, SimulatorData.Data.Modules module, String data) {
         SimulatorData.Data.Builder sendDataBuilder = SimulatorData.Data.newBuilder();
         sendDataBuilder.setType(SimulatorData.Type.newBuilder().setType(type).build())
                 .setModule(module)
-                .addInfo(new String(data, Charsets.US_ASCII));
+                .addInfo(data);
         synchronized (sendingQueue) {
             sendingQueue.add(sendDataBuilder.build());
         }
     }
+
 
     /**
      * Gets the next data to send

@@ -1,15 +1,11 @@
 package org.ftccommunity.simulator;
 
-import hagerty.utils.ClientLogger;
-import hagerty.simulator.CoppeliaApiClient;
+import org.ftccommunity.gui.MainApp;
+import org.ftccommunity.utils.ClientLogger;
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
-import org.ftccommunity.simulator.modules.BrickSimulator;
 
-import java.net.InetAddress;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Logger;
 
 @Deprecated
@@ -26,14 +22,13 @@ class RobotSimulatorConsole
         final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 		System.out.println("Program started");
 
-        LinkedBlockingQueue<ControllerData> mQueue = new LinkedBlockingQueue<>(100);
-
-        CoppeliaApiClient client = new CoppeliaApiClient(mQueue);
+        //LinkedBlockingQueue<ControllerData> mQueue = new LinkedBlockingQueue<>(100);
+        CoppeliaApiClient client = new CoppeliaApiClient(new MainApp());
 		
-		// Start the network reader 
-        ControllerSimulator simulator;
+		/*// Start the network reader
+        org.ftccommunity.simulator.ControllerSimulator simulator;
 		try {
-            simulator = new ControllerSimulator(mQueue);  // Runnable
+            simulator = new org.ftccommunity.simulator.ControllerSimulator(new MainApp());  // Runnable
         } catch (Exception ex) {
             System.out.println("Sorry, this application cannot continue.\nAborting! Details:");
             logger.log(Level.SEVERE, ex.getMessage());
@@ -71,12 +66,9 @@ class RobotSimulatorConsole
                 }
             } else {
                 System.out.println("Failed!");
-                simulator.close();
             }
 
         } catch (Exception ex) {
-
-            simulator.close();
             System.out.println("\nAn error occurred during execution! Please see the log.");
             logger.log(Level.SEVERE, ex.getMessage());
             for (StackTraceElement stack : ex.getStackTrace()) {
@@ -91,7 +83,6 @@ class RobotSimulatorConsole
             }
         } catch (UnsatisfiedLinkError libraryNotFound){
             System.out.println("I could not find the 'remoteApiJava.dll' in the system PATH or the current directory.");
-            simulator.close();
             try {
                 Thread.sleep(25); // Wait a brief period for termination
                 simulatorThread.join(); // Get the thread to join
@@ -101,12 +92,11 @@ class RobotSimulatorConsole
     }
         System.out.print("Cleaning up...");
 		simulator.requestTerminate();
-        simulator.close();
         try {
             simulatorThread.join(300);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
+        }*/
         System.out.println("Done!");
         System.out.println("Program ended");
 	}

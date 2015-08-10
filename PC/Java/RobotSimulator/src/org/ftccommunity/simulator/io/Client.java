@@ -1,13 +1,13 @@
 package org.ftccommunity.simulator.io;
 
-import hagerty.gui.MainApp;
-import hagerty.simulator.BrickListGenerator;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.ftccommunity.gui.MainApp;
+import org.ftccommunity.simulator.BrickListGenerator;
 import org.ftccommunity.simulator.io.decoder.Decoder;
 import org.ftccommunity.simulator.io.decoder.HeartbeatDecoder;
 import org.ftccommunity.simulator.io.handler.ClientHandler;

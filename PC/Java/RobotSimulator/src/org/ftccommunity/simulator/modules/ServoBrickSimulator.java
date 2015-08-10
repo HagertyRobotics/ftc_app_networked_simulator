@@ -5,9 +5,12 @@ import javafx.scene.layout.VBox;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.DeviceType;
 import org.ftccommunity.simulator.modules.devices.NullDevice;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +35,12 @@ public class ServoBrickSimulator extends BrickSimulator {
     	}
     }
 
-    public void fixupUnMarshaling() {}
+	@Override
+	protected byte[] receivePacketFromPhone() {
+		return NetworkManager.getLatestData(SimulatorData.Type.Types.USB_SERVO);
+	}
+
+	public void fixupUnMarshaling() {}
 
 	public void setupDebugGuiVbox(VBox vbox) {}
 
@@ -40,12 +48,17 @@ public class ServoBrickSimulator extends BrickSimulator {
 
 	public void populateDetailsPane(Pane pane) {}
 
-    public void handleIncomingPacket(byte[] data, int length, boolean wait) {
+	@Override
+	public SimData findSimDataName(String name) {
+		return null;
+	}
+
+	public void handleIncomingPacket(byte[] data, int length, boolean wait) {
     }
 
-	public List<DeviceType> getDeviceTypeList() {
-		List<DeviceType> dtl = new ArrayList<>();
-		dtl.add(DeviceType.USB_SERVO);
+	public List<SimulatorData.Type.Types> getDeviceTypeList() {
+		List<SimulatorData.Type.Types> dtl = new ArrayList<>();
+		dtl.add(SimulatorData.Type.Types.USB_SERVO);
 		return dtl;
 	}
 }

@@ -20,15 +20,16 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import org.ftccommunity.gui.view.*;
+//import org.ftccommunity.simulator.RobotSimulator;
 import org.ftccommunity.simulator.RobotSimulator;
 import org.ftccommunity.simulator.modules.BrickSimulator;
-import org.ftccommunity.simulator.modules.LegacyBrickSimulator;
+//import org.ftccommunity.simulator.modules.LegacyBrickSimulator;
 import org.ftccommunity.utils.ClientLogger;
 import org.ftccommunity.utils.Utils;
 
 public class MainApp extends Application {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    private Stage primaryStage;
+    private static Stage primaryStage;
     private BorderPane rootLayout;
 
     /**

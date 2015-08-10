@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -73,7 +74,7 @@ public abstract class BrickSimulator implements Runnable {
 
 	public abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
 
-    public abstract String getName();
+    //public abstract String getName();
 
 	public abstract void setupDebugGuiVbox(VBox vbox);
 
@@ -82,9 +83,9 @@ public abstract class BrickSimulator implements Runnable {
 	public abstract void populateDetailsPane(Pane pane);
 
 	public abstract SimData findSimDataName(String name);
-	public abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
+	//public abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
 
-	public abstract List<DeviceType> getDeviceTypeList();
+	public abstract List<SimulatorData.Type.Types> getDeviceTypeList();
 
 
     //---------------------------------------------------------------

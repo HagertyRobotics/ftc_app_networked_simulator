@@ -1,6 +1,7 @@
 package org.ftccommunity.simulator.modules;
 
 
+import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.DeviceType;
 import org.ftccommunity.simulator.modules.devices.NullDevice;
@@ -8,6 +9,8 @@ import org.ftccommunity.simulator.modules.devices.NullDevice;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -53,13 +56,20 @@ public class LegacyBrickSimulator extends BrickSimulator {
     	}
     }
 
-    private void sendPacketToPhone(byte[] sendData) {
-    	try {
-    		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
-        	mServerSocket.send(sendPacket);
+	@Override
+	protected byte[] receivePacketFromPhone() {
+		return new byte[0];
+	}
+
+	private void sendPacketToPhone(byte[] sendData) {
+    	/*try {
+    		//DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
+        	//mServerSocket.send(sendPacket);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+		NetworkManager.requestSend(SimulatorData.Type.Types.SIM_DATA,
+										  SimulatorData.Data.Modules.LEGACY_CONTROLLER, sendData);
     }
 
 
@@ -124,12 +134,14 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		pane.getChildren().add(grid);
 	}
 
+	@Override
+	public SimData findSimDataName(String name) {
+		return null;
+	}
 
-    /**
+	/**
      * Getters/Setters
      */
-
-
 
     /**
      * GUI Stuff
@@ -148,12 +160,13 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		}
 	}
 
-	public List<DeviceType> getDeviceTypeList() {
-		List<DeviceType> dtl = new ArrayList<>();
-		dtl.add(DeviceType.NONE);
-		dtl.add(DeviceType.TETRIX_MOTOR);
-		dtl.add(DeviceType.TETRIX_SERVO);
-		dtl.add(DeviceType.LEGO_LIGHT);
+	public List<SimulatorData.Type.Types> getDeviceTypeList() {
+		List<SimulatorData.Type.Types> dtl = new ArrayList<>();
+		dtl.add(SimulatorData.Type.Types.LEGACY_LIGHT);
+		dtl.add(SimulatorData.Type.Types.LEGACY_MOTOR);
+		dtl.add(SimulatorData.Type.Types.LEGACY_TOUCH);
+		dtl.add(SimulatorData.Type.Types.USB_MOTOR);
+		dtl.add(SimulatorData.Type.Types.USB_SERVO);
 		return dtl;
 	}
 

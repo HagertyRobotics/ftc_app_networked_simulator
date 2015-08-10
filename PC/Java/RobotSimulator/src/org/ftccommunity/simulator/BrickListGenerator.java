@@ -1,13 +1,7 @@
 package org.ftccommunity.simulator;
 
-import hagerty.gui.MainApp;
-import hagerty.simulator.modules.BrickListWrapper;
-import hagerty.simulator.modules.BrickSimulator;
-import hagerty.simulator.modules.LegacyBrickSimulator;
-import hagerty.simulator.modules.MotorBrickSimulator;
-import hagerty.simulator.modules.ServoBrickSimulator;
-import hagerty.utils.Utils;
-
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.ftccommunity.utils.Utils;
 import org.ftccommunity.gui.MainApp;
 import org.ftccommunity.simulator.data.AnalogSimData;
 import org.ftccommunity.simulator.data.MotorSimData;
@@ -36,7 +30,7 @@ import java.util.logging.Logger;
 
 public class BrickListGenerator implements Runnable {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    DatagramSocket mServerSocket;
+    //DatagramSocket mServerSocket;
 
     byte[] mReceiveData = new byte[1024];
     byte[] mSendData = new byte[1024];
@@ -80,12 +74,27 @@ public class BrickListGenerator implements Runnable {
     public void handleIncomingPacket(byte[] data, boolean wait) {
         // System.out.println("Receive Buffer: (" + Utils.bufferToHexString(data, 0, 25) + ") len=" + data.length);
 
+        // Wrap the device list in a data in order to be sent correctly
         if (data[0] == '?') { // infoCmd
-            sendPacketToPhone(getXmlModuleList(mMainApp.getBrickData()));
+/*            SimulatorData.DeviceListOld.Builder builder = SimulatorData.DeviceListOld.newBuilder()
+                                                       .setType(SimulatorData.Type.newBuilder().setType(SimulatorData.Type.Types.DEVICE_LIST))
+                                                                  .setSerialized(getXmlModuleList(mMainApp.getBrickData()));
+            SimulatorData.DeviceListOld deviceListOld = builder.build();
+            System.out.println(deviceListOld.toByteArray()[0] + " " + deviceListOld.getSerializedSize());
+            try {
+                SimulatorData.DeviceListOld.parseFrom(deviceListOld.toByteArray());
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+                throw new AssertionError("Invalid Configuration of protocol!");
+            }*/
+            NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST,
+                                              SimulatorData.Data.Modules.LEGACY_CONTROLLER,
+                                              getXmlModuleList(mMainApp.getBrickData()));
         }
+
     }
 
-    private byte[] getXmlModuleList(ObservableList<BrickSimulator> mBrickList) {
+    private String getXmlModuleList(ObservableList<BrickSimulator> mBrickList) {
     	try {
 	    	JAXBContext context = JAXBContext.newInstance(
 	    			BrickListWrapper.class,
@@ -113,13 +122,15 @@ public class BrickListGenerator implements Runnable {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 			m.marshal(wrapper, outputStream);
-			return outputStream.toByteArray();
+            return outputStream.toString();
 		} catch (JAXBException e) {
 			e.printStackTrace();
             throw new AssertionError("JAXB should not be throwing", e.getCause());
         }
 
     }
+
+    // TODO: be able to pass the DeviceList not wrapped.
 
 }
 
