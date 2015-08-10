@@ -20,28 +20,13 @@ import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/**
- *
- */
-public final class NetworkManager {
-    // the Server's Port
-    /*
-    public static final int PHONE_PORT  = 6000;
-    public static final String PC_IP_ADDRESS  = "192.168.2.189";
-    public static final int SENDING_PORT = 6500;
-    */
-    //public static PendingWriteQueue mWriteToPcQueueNew;
-
-    // private DatagramSocket mSimulatorSocket;
-    //private static LinkedBlockingQueue<SimulatorData.Data> mWriteToPcQueue = new LinkedBlockingQueue<>();
-    //private static LinkedBlockingQueue<SimulatorData.Data> mReadFromPcQueue = new LinkedBlockingQueue<>();
-
+public class NetworkManager {
     private static final ConcurrentLinkedQueue<SimulatorData.Data> receivedQueue = new ConcurrentLinkedQueue<>();
     private static final LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
-    private static boolean serverWorking;
     private static final ConcurrentLinkedQueue<SimulatorData.Data> sendingQueue = new ConcurrentLinkedQueue<>();
+    private static boolean serverWorking;
     private static InetAddress robotAddress;
-    private static boolean isReady;
+    private static volatile boolean isReady;
 
     public NetworkManager(NetworkTypes type) {
         if (type == NetworkTypes.BLUETOOTH) {
@@ -87,29 +72,12 @@ public final class NetworkManager {
         Thread processThread = new Thread(new Runnable() {
             @Override
             public void run() {
-            while (!Thread.currentThread().isInterrupted()) {
+                while (!Thread.currentThread().isInterrupted()) {
                     processQueue();
                 }
-        }}, "Process Queue");
+            }
+        }, "Process Queue");
         processThread.start();
-
-        /*// Start the Network Sender thread
-        // This thread will read from the mWriteToPcQueue and send packets to the PC application
-        // The mWriteToPcQueue will get packets from the FT_Device write call
-        try {
-            mSimulatorSocket = new DatagramSocket(PHONE_PORT);
-            Log.v("D2xx::", "Local Port " + mSimulatorSocket.getLocalPort());
-            NetworkSender myNetworkSender = new NetworkSender(mWriteToPcQueue,
-                    PC_IP_ADDRESS, mSimulatorSocket, SENDING_PORT);  // Runnable
-            Thread networkSenderThread = new Thread(myNetworkSender);
-            networkSenderThread.start();
-
-            NetworkReceiver myNetworkReceiver = new NetworkReceiver(mReadFromPcQueue, mSimulatorSocket);
-            Thread networkReceiverThread = new Thread(myNetworkReceiver);
-            networkReceiverThread.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public static void add(@NotNull SimulatorData.Data data) {
@@ -119,15 +87,14 @@ public final class NetworkManager {
     }
 
     public synchronized static void processQueue() {
-
-            while (receivedQueue.size() < 1) {
-                try {
-                    Thread.sleep(10);
-                    Thread.yield();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+        while (receivedQueue.size() < 1) {
+            try {
+                Thread.sleep(10);
+                Thread.yield();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
+        }
 
         synchronized (receivedQueue) {
             try {
@@ -148,19 +115,33 @@ public final class NetworkManager {
         NetworkManager.serverWorking = serverWorking;
     }
 
-   /* public static LinkedList<SimulatorData.Data> getWriteToPcQueue() {
-        return sendingQueue;
-    }
-*/
-    /*public static LinkedList<SimulatorData.Data> getReadFromPcQueue() {
-        return receivedQueue;
-    }*/
-
     public static SimulatorData.Data[] getWriteData() {
         synchronized (sendingQueue) {
             return sendingQueue.toArray(new SimulatorData.Data[sendingQueue.size()]);
         }
     }
+/*
+ /*   *//*
+*
+     * NetworkRecevier
+     * Receive packets from the PC simulator and feed them into a queue that the FT_Device class will read
+     * The FT_Device class will pretend to be a FTDI USB device and feed the
+     * received packets to the FTC_APP
+     *
+     *//*
+/*
+    public class NetworkReceiver implements Runnable {
+        private LinkedBlockingQueue queue;
+        DatagramSocket mSocket;
+        byte[] mReceiveData = new byte[1024];
+
+        public NetworkReceiver(LinkedBlockingQueue queue, DatagramSocket my_socket) {
+            this.queue = queue;
+            this.mSocket = my_socket;
+>>>>>>> develop
+        }
+    }
+*/
 
     public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type, boolean block) {
         if (block) {
@@ -168,7 +149,7 @@ public final class NetworkManager {
                 if (main.get(type).size() > 0) {
                     synchronized (main) {
                         // return main.get(type).remove(main.get(type).size() - 1);
-                        return  main.get(type).get(main.get(type).size() - 1); // Don't delete for debugging
+                        return main.get(type).get(main.get(type).size() - 1); // Don't delete for debugging
                     }
                 } else {
                     try {
@@ -178,6 +159,29 @@ public final class NetworkManager {
                     }
                 }
             }
+
+/*
+        @Override
+        public void run() {
+
+            while (true) {
+                DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
+                try {
+                    mSocket.receive(receivePacket);
+
+                    byte[] readBuffer = new byte[receivePacket.getLength()];
+                    System.arraycopy(receivePacket.getData(), 0, readBuffer, 0, receivePacket.getLength());
+                    Log.v("D2xx::", "Receive: " + readBuffer[0] + " Len: " + receivePacket.getLength());
+                    queue.put(readBuffer);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+>>>>>>> develop
+                }
+            }
+        }*/
+
         }
         synchronized (main) {
             return ((LinkedList<SimulatorData.Data>) main.get(type)).getLast();
@@ -203,6 +207,7 @@ public final class NetworkManager {
 
     /**
      * Gets the next data to send
+     *
      * @return the next data to send
      */
     public synchronized static SimulatorData.Data getNextSend() {
@@ -224,6 +229,7 @@ public final class NetworkManager {
 
     /**
      * Rertrieve the next datas to send
+     *
      * @return an array of the entire sending queue
      */
     public static SimulatorData.Data[] getNextSends() {
@@ -232,6 +238,7 @@ public final class NetworkManager {
 
     /**
      * Rertieve an the next datas to send based on a specificed amount
+     *
      * @param size the maximum, inclusive size of the data array
      * @return a data array of the next datas to send up to a limit
      */
@@ -241,7 +248,8 @@ public final class NetworkManager {
 
     /**
      * Retrieve an array of the next datas to send up to a specific size
-     * @param size the maximum size of the returned array
+     *
+     * @param size       the maximum size of the returned array
      * @param autoShrink if true this automatically adjusts the size returned
      * @return a data array of the next datas to send
      */
@@ -256,7 +264,7 @@ public final class NetworkManager {
         }
 
         if (autoShrink) {
-            if (size >  sendingQueue.size()) {
+            if (size > sendingQueue.size()) {
                 currentSize = sendingQueue.size();
             }
         }
@@ -281,12 +289,13 @@ public final class NetworkManager {
             synchronized (sendingQueue) {
                 for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
                     temp.add(sendingQueue.poll());
+                    sendingQueue.clear();
                 }
-                sendingQueue.clear();
                 sendingQueue.addAll(temp);
             }
         }
     }
+
 
     public static InetAddress getRobotAddress() {
         return robotAddress;

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/8.0.40" fx:controller="org.ftccommunity.gui.view.RootLayoutController">
+   <top>
+       <MenuBar BorderPane.alignment="CENTER">
+           <Menu mnemonicParsing="false" text="File">
+               <MenuItem mnemonicParsing="false" onAction="#handleNew" text="New">
+                   <accelerator>
+                       <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                   </accelerator>
+               </MenuItem>
+               <MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open...">
+                   <accelerator>
+                       <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                   </accelerator>
+               </MenuItem>
+               <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Save">
+                   <accelerator>
+                       <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                   </accelerator>
+               </MenuItem>
+               <MenuItem mnemonicParsing="false" onAction="#handleSaveAs" text="Save As..."/>
+               <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit"/>
+           </Menu>
+           <Menu mnemonicParsing="false" text="Help">
+               <MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About"/>
+           </Menu>
+       </MenuBar>
+   </top>
+</BorderPane>

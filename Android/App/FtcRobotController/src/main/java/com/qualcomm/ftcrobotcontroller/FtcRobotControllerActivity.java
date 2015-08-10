@@ -179,11 +179,11 @@ public class FtcRobotControllerActivity extends Activity {
     callback.wifiDirectUpdate(WifiDirectAssistant.Event.DISCONNECTED);
 
     entireScreenLayout.setOnTouchListener(new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            dimmer.handleDimTimer();
-            return false;
-        }
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        dimmer.handleDimTimer();
+        return false;
+      }
     });
   }
 
@@ -414,5 +414,4 @@ public class FtcRobotControllerActivity extends Activity {
     }
 
   }
-
 }

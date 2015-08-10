@@ -39,7 +39,8 @@ public class D2xxManager
     public boolean useWifi;
     public boolean multicast;
     public boolean simulate;
-    InetAddress mIPAddress;
+
+    // InetAddress mIPAddress;
     private ArrayList<FT_Device> mFtdiDevices;
     private Server server;
 
@@ -110,8 +111,8 @@ public class D2xxManager
     {
         FT_Device ftDev = null;
         int rc = 0;
-        byte[] receiveData = new byte[1024];
-        boolean done = false;
+        byte[] receiveData = new byte[5000];
+        boolean done=false;
 
         if (parentContext == null) return rc;
 
@@ -205,39 +206,33 @@ public class D2xxManager
                     XPathConstants.NODESET);
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node nNode = nodeList.item(i);
-                Log.d("D2xx::", "Current Element :" + nNode.getNodeName());
+                Log.d("D2xx::", "Current Element: " + nNode.getNodeName());
                 if (nNode.getNodeName().equals("Legacy")) {
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Log.d("D2xx::", "Processing Legacy ");
                         Element eElement = (Element) nNode;
                         String serial = eElement.getElementsByTagName("serial").item(0).getTextContent();
-                        String alias = eElement.getElementsByTagName("alias").item(0).getTextContent();
+                        String name = eElement.getElementsByTagName("name").item(0).getTextContent();
                         String portString = eElement.getElementsByTagName("port").item(0).getTextContent();
 
-                        ftDev = new FT_Device_Legacy(serial, alias);
+                        ftDev = new FT_Device_Legacy(serial, name);
                         devices.add(ftDev);
                     }
-                } else if (nNode.getNodeName().equals("motor")) {
+                } else if (nNode.getNodeName().equals("Motor")) {
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Log.d("D2xx::", "Processing Motor ");
                         Element eElement = (Element) nNode;
                         String serial = eElement.getElementsByTagName("serial").item(0).getTextContent();
-                        String alias = eElement.getElementsByTagName("alias").item(0).getTextContent();
+                        String name = eElement.getElementsByTagName("name").item(0).getTextContent();
                         String portString = eElement.getElementsByTagName("port").item(0).getTextContent();
-
-                        ftDev = new FT_Device_Motor(serial, alias);
+                        ftDev = new FT_Device_Motor(serial, name);
                         devices.add(ftDev);
                     }
                 }
             }
         } catch (Exception e) {
             RobotLog.e(e.toString());
-        } /*catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XPathExpressionException e) {
-            e.printStackTrace();
-        }*/
-
+        }
         return devices;
     }
 

@@ -5,6 +5,11 @@ import hagerty.simulator.CoppeliaApiClient;
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
+import org.ftccommunity.simulator.modules.BrickSimulator;
+
+import java.net.InetAddress;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 @Deprecated
@@ -23,8 +28,7 @@ class RobotSimulatorConsole
 
         LinkedBlockingQueue<ControllerData> mQueue = new LinkedBlockingQueue<>(100);
 
-        // TODO: fix this
-        //CoppeliaApiClient client = new CoppeliaApiClient(mQueue);
+        CoppeliaApiClient client = new CoppeliaApiClient(mQueue);
 		
 		// Start the network reader 
         ControllerSimulator simulator;
@@ -36,14 +40,14 @@ class RobotSimulatorConsole
             return;
         }
         Thread simulatorThread = new Thread(simulator);
-		/*
+		
 		try {
             System.out.print("Starting up...");
             if (client.init()) {
                 System.out.println("Done!");
                 simulatorThread.start();
 
-                Thread clientThread = new Thread(new org.ftccommunity.simulator.CoppeliaApiClient(mQueue));
+                Thread clientThread = new Thread(new CoppeliaApiClient(mQueue));
                 clientThread.start();
 
                 long totalPackets = 0;
@@ -67,9 +71,12 @@ class RobotSimulatorConsole
                 }
             } else {
                 System.out.println("Failed!");
-            }*/
+                simulator.close();
+            }
 
-       /* } catch (Exception ex) {
+        } catch (Exception ex) {
+
+            simulator.close();
             System.out.println("\nAn error occurred during execution! Please see the log.");
             logger.log(Level.SEVERE, ex.getMessage());
             for (StackTraceElement stack : ex.getStackTrace()) {
@@ -84,15 +91,17 @@ class RobotSimulatorConsole
             }
         } catch (UnsatisfiedLinkError libraryNotFound){
             System.out.println("I could not find the 'remoteApiJava.dll' in the system PATH or the current directory.");
+            simulator.close();
             try {
                 Thread.sleep(25); // Wait a brief period for termination
                 simulatorThread.join(); // Get the thread to join
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
         }
-    }*/
+    }
         System.out.print("Cleaning up...");
 		simulator.requestTerminate();
+        simulator.close();
         try {
             simulatorThread.join(300);
         } catch (InterruptedException e) {

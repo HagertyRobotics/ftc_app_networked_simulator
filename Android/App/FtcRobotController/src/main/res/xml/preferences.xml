@@ -61,4 +61,5 @@
           android:key="sim_net_multicast"
           android:title="Multicast" />
   </PreferenceCategory>
+
 </PreferenceScreen>

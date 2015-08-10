@@ -71,7 +71,6 @@ abstract public class FT_Device
             return -2;
         }
 
-
         // Check onboard read queue and see if we have a override
         // Use this packet instead of reading one from the network
         if (!this.readQueue.isEmpty()) {
