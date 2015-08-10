@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -96,15 +95,26 @@ public class NetworkManager {
             }
         }
 
+        ConcurrentLinkedQueue<SimulatorData.Data> temp = new ConcurrentLinkedQueue<>();
+        // Move the contents over to an new queue
         synchronized (receivedQueue) {
-            try {
-                for (SimulatorData.Data data : receivedQueue) {
-                    main.put(data.getType().getType(), data);
-                }
-            } catch (ConcurrentModificationException ex) {
-                RobotLog.e("Not quite thread safe for some reason (receivedQueue" + ex.toString());
-            }
+            temp.addAll(receivedQueue);
+            receivedQueue.clear();
         }
+
+        // Flip the old moved data into a new container
+        LinkedList<SimulatorData.Data> tempB = new LinkedList<>();
+        while (!temp.isEmpty()) {
+            tempB.add(temp.poll());
+        }
+        temp.clear();
+
+        // Then, add the flipped data so the oldest gets processed first
+        while (!tempB.isEmpty()) {
+            SimulatorData.Data data = tempB.poll();
+            main.put(data.getType().getType(), data);
+        }
+        tempB.clear();
     }
 
     public static boolean isServerWorking() {
@@ -149,7 +159,7 @@ public class NetworkManager {
                 if (main.get(type).size() > 0) {
                     synchronized (main) {
                         // return main.get(type).remove(main.get(type).size() - 1);
-                        return main.get(type).get(main.get(type).size() - 1); // Don't delete for debugging
+                        return main.get(type).remove(main.get(type).size() - 1);
                     }
                 } else {
                     try {
@@ -184,7 +194,7 @@ public class NetworkManager {
 
         }
         synchronized (main) {
-            return ((LinkedList<SimulatorData.Data>) main.get(type)).getLast();
+            return main.get(type).remove(main.get(type).size() - 1);
         }
     }
 

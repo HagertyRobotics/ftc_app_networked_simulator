@@ -19,6 +19,7 @@ import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -110,7 +111,7 @@ public class D2xxManager
     {
         FT_Device ftDev = null;
         int rc = 0;
-        byte[] receiveData = new byte[5000];
+        byte[] receiveData;
         boolean done=false;
 
         if (parentContext == null) return rc;
@@ -136,14 +137,25 @@ public class D2xxManager
 
                         Log.d(TAG, "Got a reply!");
                         // If we got a reply from the PC then parse the xml and return a list of FT_Device objects
-                        this.mFtdiDevices = buildFT_DeviceList(receiveData);
-                        done = true;
+
+                        // De-convert the data
+                        /*SimulatorData.DeviceListOld deviceListOld = null;
+                        try {
+                            deviceListOld = SimulatorData.DeviceListOld.parseFrom(receiveData);
+                        } catch (InvalidProtocolBufferException e) {
+                            Log.e(TAG, "Data is not valid: " + e.toString(), e);
+                            Log.i(TAG, "Got: " + receiveData[0] + " " + receiveData.length);
+                        }
+                        if (deviceListOld != null) {*/
+                            this.mFtdiDevices = buildFT_DeviceList(receiveData);
+                            done = true;
+                        }
                     }
                     //ftDev = new FT_Device("A501E27V", "Hagerty USB1");
                     //devices.add(ftDev);
                 }
             }
-        }
+
 
         rc = this.mFtdiDevices.size();
         return rc;
@@ -195,7 +207,7 @@ public class D2xxManager
 
             dBuilder = dbFactory.newDocumentBuilder();
 
-            Document doc = dBuilder.parse(new InputSource(new ByteArrayInputStream(inputText)));
+            Document doc = dBuilder.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(inputText))));
             doc.getDocumentElement().normalize();
 
             XPath xPath = XPathFactory.newInstance().newXPath();
@@ -230,7 +242,7 @@ public class D2xxManager
                 }
             }
         } catch (Exception e) {
-            RobotLog.e(e.toString());
+            Log.e(TAG, e.toString() + " Tried with: " + inputText, e);
         }
         return devices;
     }

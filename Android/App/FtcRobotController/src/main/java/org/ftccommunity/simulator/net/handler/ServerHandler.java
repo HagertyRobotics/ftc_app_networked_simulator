@@ -37,6 +37,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         for (SimulatorData.Data data : writeData) {
             size += data.getSerializedSize() + 4;
         }
+
         final ByteBuf buf = ctx.alloc().buffer(size);
         for (SimulatorData.Data data: writeData) {
             buf.writeInt(data.getSerializedSize());

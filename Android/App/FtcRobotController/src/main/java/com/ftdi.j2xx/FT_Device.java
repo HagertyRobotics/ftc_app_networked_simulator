@@ -157,6 +157,10 @@ abstract public class FT_Device
         return true;
     }
 
+    public void close() {
+        // TODO: required stub!
+    }
+
     protected static class CacheWriteRecord {
         public byte[] data;
 
