@@ -2,6 +2,7 @@
 
 package coppelia;
 
+@SuppressWarnings("unused")
 public class BoolW
 {
     boolean w;
@@ -11,13 +12,13 @@ public class BoolW
         w = b;
     }
 
-    public void setValue(boolean b)
-    {
-        w = b;
-    }
-
     public boolean getValue()
     {
         return w;
+    }
+
+    public void setValue(boolean b)
+    {
+        w = b;
     }
 }

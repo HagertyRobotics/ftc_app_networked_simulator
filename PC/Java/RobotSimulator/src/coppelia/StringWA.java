@@ -2,6 +2,7 @@
 
 package coppelia;
 
+@SuppressWarnings("ALL")
 public class StringWA
 {
     String[] w;

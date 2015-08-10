@@ -2,6 +2,7 @@
 
 package coppelia;
 
+@SuppressWarnings("ALL")
 public class IntW
 {
     int w;
@@ -11,13 +12,13 @@ public class IntW
         w = i;
     }
 
-    public void setValue(int i)
-    {
-        w = i;
-    }
-
     public int getValue()
     {
         return w;
+    }
+
+    public void setValue(int i)
+    {
+        w = i;
     }
 }

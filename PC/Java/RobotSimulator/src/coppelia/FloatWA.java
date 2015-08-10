@@ -2,6 +2,7 @@
 
 package coppelia;
 
+@SuppressWarnings("ALL")
 public class FloatWA
 {
     float[] w;

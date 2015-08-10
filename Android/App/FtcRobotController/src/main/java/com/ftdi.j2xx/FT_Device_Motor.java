@@ -27,7 +27,7 @@ public class FT_Device_Motor extends FT_Device {
             return rc;
         }
 
-        Log.v(mFT_DeviceDescription, "WRITE(): Buffer len=" + length + " (" + bufferToHexString(data, 0, length) + ")");
+        //Log.v(mFT_DeviceDescription, "WRITE(): Buffer len=" + length + " (" + bufferToHexString(data, 0, length) + ")");
 
         // Write Command
         if (data[0] == WRITE_COMMAND[0] && data[2] == WRITE_COMMAND[2]) {  // WRITE_COMMAND
