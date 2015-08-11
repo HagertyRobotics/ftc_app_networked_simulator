@@ -13,7 +13,7 @@ public class HeartbeatHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         SimulatorData.Data data = (SimulatorData.Data) msg;
-        if (data.getType().getType() == SimulatorData.Type.Types.OPT_DATA2) {
+        if (data.getType().getType() == SimulatorData.Type.Types.HEARTBEAT) {
             InetAddress address = InetAddresses.forString(data.getInfo(0));
             try {
                 if (address.isReachable(100)) {

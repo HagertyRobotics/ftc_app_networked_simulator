@@ -24,14 +24,14 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 
         // We don't need to queue heartbearts (OPT_DATA2)
-        if (data.getType().getType() != SimulatorData.Type.Types.OPT_DATA2) {
+        if (data.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
             // Print out size and data
             // System.out.println("Received Data of significance with size=" + data.getSerializedSize());
             NetworkManager.add(data);
 
         }
          // The following shouldn't be necessary, do to new behavior below
-         /*else { // Acknowledge an OPT_DATA2 with another Heartbeat
+         /*else { // Acknowledge an HEARTBEAT with another Heartbeat
             // System.out.print(" Received heartbeat ");
             final SimulatorData.Data heartbeat = HeartbeatTask.buildMessage();
             final ByteBuf heartbeatBuffer = ctx.alloc().buffer(4 + heartbeat.getSerializedSize());

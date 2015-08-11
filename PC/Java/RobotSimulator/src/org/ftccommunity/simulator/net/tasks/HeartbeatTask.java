@@ -45,7 +45,7 @@ public class HeartbeatTask implements Runnable {
         info.writeBytes(dataEncoded);
         SimulatorData.Data.Builder dataBuilder = SimulatorData.Data.newBuilder()
                                                          .setType(SimulatorData.Type.newBuilder()
-                                                                          .setType(SimulatorData.Type.Types.OPT_DATA2))
+                                                                          .setType(SimulatorData.Type.Types.HEARTBEAT))
                                                          .setModule(SimulatorData.Data.Modules.LEGACY_CONTROLLER)
                                                          .addInfo((new PingWebSocketFrame(info)).toString());
         chl.writeAndFlush(dataBuilder.build());
@@ -68,7 +68,7 @@ public class HeartbeatTask implements Runnable {
         // info.writeBytes(dataEncoded);
         SimulatorData.Data.Builder dataBuilded = SimulatorData.Data.newBuilder()
                                                          .setType(SimulatorData.Type.newBuilder()
-                                                                          .setType(SimulatorData.Type.Types.OPT_DATA2))
+                                                                          .setType(SimulatorData.Type.Types.HEARTBEAT))
                                                          .setModule(SimulatorData.Data.Modules.LEGACY_CONTROLLER)
                                                          .addInfo((new PingWebSocketFrame()).toString());
         return dataBuilded.build();

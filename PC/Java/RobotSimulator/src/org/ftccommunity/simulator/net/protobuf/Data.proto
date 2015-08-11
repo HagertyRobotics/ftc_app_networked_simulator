@@ -1,6 +1,6 @@
-package org.ftccommunity.simulator.net;
+package org.ftccommunity.simulator.net.protocol;
 
-option java_package = "org.ftccommunity.simulator.net";
+option java_package = "org.ftccommunity.simulator.net.protocol";
 option java_outer_classname = "SimulatorData";
 
 
@@ -38,21 +38,40 @@ message Type {
     required Types type = 1;
 
     enum Types {
+        // Pritory values take the range 1-16
         NONE = 1;
 
         LEGACY_MOTOR = 2;
-        LEGACY_LIGHT = 3;
-        LEGACY_TOUCH = 4;
+        LEGACY_SERVO = 3;
 
-        USB_MOTOR= 5;
-        USB_SERVO = 6;
+        LEGACY_LIGHT = 4;
+        LEGACY_TOUCH = 5;
+        LEGACY_IR = 6;
 
-        DEVICE_LIST = 7;
-        BRICK_INFO = 8;
+        USB_MOTOR= 7;
+        USB_SERVO = 8;
 
-        SIM_DATA = 9;
-        OPT_DATA1 = 10;
-        OPT_DATA2 = 11;
+        SENSOR_IR = 9;
+        SENSOR_OPT_DIST = 10;
+        SENSOR_TOUCH = 11;
+
+        DEVICE_LIST = 12;
+        BRICK_INFO = 13;
+
+        HEARTBEAT = 14;
+
+        LEGACY_TILT_ACCL = 15;
+        LEGACY_COLOR = 16;
+        LEGACY_EOPD = 17;
+        LEGACY_FORCE = 18;
+        LEGACY_GYRO = 19;
+
+        SIM_DATA = 20;
+
+        OPT_DATA1 = 21;
+        OPT_DATA2 = 22;
+        OPT_DATA3 = 23;
+        OPT_DATA4 = 24;
     }
 }
 
