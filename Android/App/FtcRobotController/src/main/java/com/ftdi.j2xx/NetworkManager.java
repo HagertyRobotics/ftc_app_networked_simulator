@@ -126,9 +126,18 @@ public class NetworkManager {
     }
 
     public static SimulatorData.Data[] getWriteData() {
+        SimulatorData.Data[] datas;
         synchronized (sendingQueue) {
-            return sendingQueue.toArray(new SimulatorData.Data[sendingQueue.size()]);
+            if (sendingQueue.size() > 0) {
+                datas = sendingQueue.toArray(new SimulatorData.Data[sendingQueue.size()]);
+                sendingQueue.clear();
+            } else {
+                datas = new SimulatorData.Data[1];
+                datas[0] = HeartbeatTask.buildMessage();
+            }
         }
+
+            return datas;
     }
 /*
  /*   *//*
