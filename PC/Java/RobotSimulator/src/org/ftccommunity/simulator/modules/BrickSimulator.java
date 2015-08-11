@@ -4,7 +4,7 @@ package org.ftccommunity.simulator.modules;
 import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.DeviceFactory;
-import org.ftccommunity.simulator.modules.devices.DeviceType;
+import org.ftccommunity.simulator.modules.devices.DeviceTypes;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -20,10 +20,6 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.logging.Level;
 import javax.xml.bind.annotation.XmlElementRef;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -141,11 +137,11 @@ public abstract class BrickSimulator implements Runnable {
     	return mDevices[i];
     }
 
-    public DeviceType getPortDeviceType(int i) {
+    public SimulatorData.Type.Types getPortDeviceType(int i) {
     	return mDevices[i].getType();
     }
 
-    public void setPortDeviceType(int i, DeviceType type) {
+    public void setPortDeviceType(int i, SimulatorData.Type.Types type) {
     	mDevices[i] = DeviceFactory.buildDevice(type);
     }
 

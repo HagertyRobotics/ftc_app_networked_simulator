@@ -4,9 +4,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.ftccommunity.simulator.data.AnalogSimData;
-import org.ftccommunity.simulator.data.MotorSimData;
 import org.ftccommunity.simulator.data.SimData;
-import org.ftccommunity.utils.Utils;
 
 import javax.xml.bind.annotation.XmlAccessType;
 
@@ -17,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 @XmlRootElement(name="LegoLightSensorDevice")
 @XmlAccessorType(XmlAccessType.NONE)
@@ -26,7 +25,7 @@ public class LegoLightSensorDevice extends Device {
 	public Label mLightSensorDebugLabel;
 
 	public LegoLightSensorDevice() {
-		super(DeviceType.LEGO_LIGHT);
+		super(SimulatorData.Type.Types.LEGACY_LIGHT);
 		mSimData = new SimData[1];
 		mSimData[0] = new AnalogSimData();
 	}
@@ -57,7 +56,7 @@ public class LegoLightSensorDevice extends Device {
 		vbox.setPadding(new Insets(10));
 		vbox.setSpacing(8);
 
-		Text title = new Text(mType.getName());
+		Text title = new Text(DeviceType.getName(mType));
 	    title.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 	    vbox.getChildren().add(title);
 

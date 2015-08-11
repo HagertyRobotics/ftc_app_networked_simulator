@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
-import org.ftccommunity.simulator.modules.devices.DeviceType;
 import org.ftccommunity.simulator.modules.devices.NullDevice;
 import org.ftccommunity.simulator.net.manager.NetworkManager;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;

@@ -3,6 +3,7 @@ package org.ftccommunity.gui.view;
 
 import org.ftccommunity.simulator.modules.BrickSimulator;
 import org.ftccommunity.simulator.modules.devices.DeviceType;
+import org.ftccommunity.simulator.modules.devices.DeviceTypes;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 /**
  * Dialog to edit details of a Motor Controller.
@@ -141,8 +143,8 @@ public class EditDialogController {
             brick.setPort(Integer.parseInt(brickPortField.getText()));
             brick.setSerial(brickSerialField.getText());
 
-            for (int i=0;i<brick.getNumberOfPorts();i++) {
-            	DeviceType d = (DeviceType)choiceBoxes[i].getSelectionModel().getSelectedItem();
+            for (int i = 0; i < brick.getNumberOfPorts(); i++) {
+            	SimulatorData.Type.Types d = (SimulatorData.Type.Types) choiceBoxes[i].getSelectionModel().getSelectedItem();
             	brick.setPortDeviceType(i, d);
 
             	// Save name fields in SimData objects

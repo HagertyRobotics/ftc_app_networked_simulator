@@ -174,6 +174,7 @@ public final class NetworkManager {
      * Gets the next data to send
      * @return the next data to send
      */
+    @NotNull
     public static SimulatorData.Data getNextSend() {
         int size;
         synchronized (sendingQueue) {

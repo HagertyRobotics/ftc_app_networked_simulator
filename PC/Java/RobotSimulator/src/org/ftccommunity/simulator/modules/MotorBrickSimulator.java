@@ -13,8 +13,6 @@ import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -108,7 +106,7 @@ public class MotorBrickSimulator extends BrickSimulator {
 			Text portText = new Text("Port " + i);
 			grid.add(portText, 0, i);
 
-			Text typeText = new Text(mDevices[i].getType().getName());
+			Text typeText = new Text(DeviceType.getName(mDevices[i].getType()));
 			grid.add(typeText, 1,  i);
 
         	List<String> nameList = getPortDevice(i).getPortNames();

@@ -29,22 +29,23 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             // System.out.println("Received Data of significance with size=" + data.getSerializedSize());
             NetworkManager.add(data);
 
-        } else { // Acknowledge an OPT_DATA2 with another Heartbeat
+        }
+         // The following shouldn't be necessary, do to new behavior below
+         /*else { // Acknowledge an OPT_DATA2 with another Heartbeat
             // System.out.print(" Received heartbeat ");
             final SimulatorData.Data heartbeat = HeartbeatTask.buildMessage();
             final ByteBuf heartbeatBuffer = ctx.alloc().buffer(4 + heartbeat.getSerializedSize());
            heartbeatBuffer.writeInt(heartbeat.getSerializedSize());
             heartbeatBuffer.writeBytes(heartbeat.toByteArray());
             ctx.write(heartbeatBuffer);
-        }
+        }*/
 
         SimulatorData.Data next  = NetworkManager.getNextSend();
-        if (next != null) {
-            final ByteBuf writeBuffer = ctx.alloc().buffer(4 + next.getSerializedSize());
-            writeBuffer.writeInt(next.getSerializedSize());
-            writeBuffer.writeBytes(next.toByteArray());
-            ctx.write(writeBuffer);
-        }
+        final ByteBuf writeBuffer = ctx.alloc().buffer(4 + next.getSerializedSize());
+        writeBuffer.writeInt(next.getSerializedSize());
+        writeBuffer.writeBytes(next.toByteArray());
+        ctx.write(writeBuffer);
+
 
         ctx.flush();
     }

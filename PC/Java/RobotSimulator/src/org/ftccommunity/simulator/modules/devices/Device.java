@@ -10,11 +10,12 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlAccessType;
 
 import javafx.scene.layout.VBox;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class Device {
 
-    protected DeviceType mType=null;
+    protected SimulatorData.Type.Types mType = null;
 
     @XmlElementRef(name="SimData")
 	protected SimData[] mSimData;
@@ -22,15 +23,15 @@ public abstract class Device {
 	public Device() {
 	}
 
-	public Device(DeviceType type) {
-		mType=type;
+	public Device(SimulatorData.Type.Types type) {
+		mType = type;
 	}
 
 	abstract public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum);
 	abstract public void updateDebugGuiVbox();
 	abstract public void setupDebugGuiVbox(VBox vbox);
 
-	public DeviceType getType() {
+	public SimulatorData.Type.Types getType() {
 		return mType;
 	}
 
@@ -52,9 +53,8 @@ public abstract class Device {
 
 	public List<String> getPortNames() {
 		List<String> names = new ArrayList<>();
-		int len = mSimData.length;
-		for (int i=0;i<len;i++) {
-			names.add(mSimData[i].getName());
+		for (SimData aMSimData : mSimData) {
+			names.add(aMSimData.getName());
 		}
 		return names;
 	}
@@ -66,10 +66,9 @@ public abstract class Device {
 	}
 
 	public SimData findSimDataByName(String name) {
-		int len = mSimData.length;
-		for (int i=0;i<len;i++) {
-			if (mSimData[i].getName().equals(name)) {
-				return mSimData[i];
+		for (SimData aMSimData : mSimData) {
+			if (aMSimData.getName().equals(name)) {
+				return aMSimData;
 			}
 		}
 		return null;

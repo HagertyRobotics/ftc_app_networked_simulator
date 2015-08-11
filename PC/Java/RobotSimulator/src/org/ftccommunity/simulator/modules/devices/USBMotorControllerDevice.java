@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 @XmlRootElement(name="USBMotorControllerDevice")
 @XmlAccessorType(XmlAccessType.NONE)
@@ -27,7 +28,7 @@ public class USBMotorControllerDevice extends Device {
      * Default constructor.
      */
 	public USBMotorControllerDevice() {
-		super(DeviceType.USB_MOTOR);
+		super(SimulatorData.Type.Types.USB_MOTOR);
 		mSimData = new SimData[2];
 		mSimData[0] = new MotorSimData();	// Add 1st motor
 		mSimData[1] = new MotorSimData();	// Add 2nd motor
@@ -52,7 +53,7 @@ public class USBMotorControllerDevice extends Device {
 		vbox.setPadding(new Insets(10));
 		vbox.setSpacing(8);
 
-		Text title = new Text(mType.getName());
+		Text title = new Text(DeviceType.getName(mType));
 	    title.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 	    vbox.getChildren().add(title);
 

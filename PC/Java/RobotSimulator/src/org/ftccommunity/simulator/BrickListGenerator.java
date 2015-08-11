@@ -129,9 +129,6 @@ public class BrickListGenerator implements Runnable {
         }
 
     }
-
-    // TODO: be able to pass the DeviceList not wrapped.
-
 }
 
 
