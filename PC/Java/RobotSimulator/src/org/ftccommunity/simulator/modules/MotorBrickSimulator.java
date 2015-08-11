@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 @XmlRootElement(name="Motor")
 public class MotorBrickSimulator extends BrickSimulator {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected final byte[] mCurrentStateBuffer = new byte[94];
+    protected final byte[] mCurrentStateBuffer = new byte[30];
 
     /*
      ** Packet types
@@ -35,7 +35,7 @@ public class MotorBrickSimulator extends BrickSimulator {
     protected final byte[] readCmd = {85, -86, -128, 0, 0};
     protected final byte[] recSyncCmd3 = {51, -52, 0, 0, 3};
     protected final byte[] recSyncCmd0 = {51, -52, -128, 0, 0};
-    protected final byte[] recSyncCmd94 = {51, -52, -128, 0, (byte) 94};
+    protected final byte[] recSyncCmd30 = {51, -52, -128, 0, (byte) 30};
     protected final byte[] controllerTypeLegacy = {0, 77, 77};       // Controller type USBLegacyModule
 
 
@@ -64,15 +64,17 @@ public class MotorBrickSimulator extends BrickSimulator {
 
     public void handleIncomingPacket(byte[] data, int length, boolean wait)
     {
-    	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)94) { // readCmd
+    	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)30) { // Read Command
+    		mCurrentStateBuffer[20] = (byte)150; // upper 8 bits. battery voltage  80mv per
+    		mCurrentStateBuffer[21] = 00;  // lower two bits
     		sendPacketToPhone(mCurrentStateBuffer);
-        } else {
-	        // Write Command...
-	    	// Process the received data packet
+        } else { // Write Command
+        	int offset = Byte.toUnsignedInt(data[3]);
+        	int len = Byte.toUnsignedInt(data[4]);
+        	System.arraycopy(data, 5, mCurrentStateBuffer, offset, len);
 	        // Loop through each of the ports in this object
-
 	        for (int i=0;i<mNumberOfPorts;i++) {
-	        	mDevices[i].processBuffer(data, mCurrentStateBuffer, i);
+	        	mDevices[i].processBuffer(mCurrentStateBuffer, i);
 	        }
         }
     }

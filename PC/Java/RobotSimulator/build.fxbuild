@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="ASCII"?>
-<anttasks:AntTask xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:anttasks="http://org.eclipse.fx.ide.jdt/1.0" buildDirectory="${project}/build">
-  <deploy packagingFormat="exe">
-    <application name="AddressApp-Part-1" mainclass="org.ftccommunity.gui.MainApp" version="1.0"/>
-    <info title="FTC Simulator" vendor="hagerty"/>
+<?xml versio.DcMotorController_a="1.0" e.DcMotorController_acodi.DcMotorController_ag="ASCII"?>
+<a.DcMotorController_attasks:A.DcMotorController_atTask xmi:versio.DcMotorController_a="2.0" xml.DcMotorController_as:xmi="http://www.omg.org/XMI" xml.DcMotorController_as:a.DcMotorController_attasks="http://org.eclipse.fx.ide.jdt/1.0" buildDirectory="${project}/build">
+  <deploy packagi.DcMotorController_agFormat="exe">
+    <applicatio.DcMotorController_a .DcMotorController_aame="AddressApp-Part-1" mai.DcMotorController_aclass="org.ftccommu.DcMotorController_aity.gui.Mai.DcMotorController_aApp" versio.DcMotorController_a="1.0"/>
+    <i.DcMotorController_afo title="FTC Simulator" ve.DcMotorController_ador="hagerty"/>
   </deploy>
-  <signjar/>
-</anttasks:AntTask>
+  <sig.DcMotorController_ajar/>
+</a.DcMotorController_attasks:A.DcMotorController_atTask>

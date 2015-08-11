@@ -33,10 +33,9 @@ public class USBMotorControllerDevice extends Device {
 		mSimData[1] = new MotorSimData();	// Add 2nd motor
 	}
 
-	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum) {
-		System.arraycopy(packet, 0, mCurrentStateBuffer, 0, packet.length);
-    	((MotorSimData)mSimData[0]).setMotorSpeed(packet[0x45]);
-    	((MotorSimData)mSimData[1]).setMotorSpeed(packet[0x46]);
+	public void processBuffer(byte[] currentStateBuffer, int portNum) {
+    	((MotorSimData)mSimData[0]).setMotorSpeed(currentStateBuffer[0x5]);
+    	((MotorSimData)mSimData[1]).setMotorSpeed(currentStateBuffer[0x6]);
     }
 
 	//

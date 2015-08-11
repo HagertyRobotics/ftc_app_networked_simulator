@@ -15,7 +15,7 @@ public class TetrixServoControllerDevice extends Device
 		super(DeviceType.TETRIX_SERVO);
 	}
 
-	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum ) {
+	public void processBuffer(byte[] currentStateBuffer, int portNum ) {
 	}
 
 	public void updateDebugGuiVbox() {
