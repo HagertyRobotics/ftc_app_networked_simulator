@@ -13,6 +13,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.ftccommunity.simulator.net.encoder.MessageEncoder;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
 import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 
@@ -26,8 +27,8 @@ public final class NetworkManager {
     private final static LinkedList<SimulatorData.Data> sendingQueue = new LinkedList<>();
     private static InetAddress robotAddress;
     private static boolean isReady;
-    private static String host = "192.168.44.1";
-    private static int port = 7002;
+    private static final String host = "192.168.42.129";
+    private static final int port = 7002;
     static EventLoopGroup workerGroup = new NioEventLoopGroup();
 
     /**
@@ -315,7 +316,8 @@ public final class NetworkManager {
                 b.handler(new io.netty.channel.ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new IdleStateHandler(1, 1, 2), new Decoder(), new ClientHandler());
+                        ch.pipeline().addLast(new IdleStateHandler(1, 1, 2), new MessageEncoder(),
+                                new Decoder(), new ClientHandler());
                     }
                 });
 

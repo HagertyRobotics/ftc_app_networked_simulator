@@ -12,9 +12,11 @@ import org.ftccommunity.simulator.io.decoder.Decoder;
 import org.ftccommunity.simulator.io.decoder.HeartbeatDecoder;
 import org.ftccommunity.simulator.io.handler.ClientHandler;
 import org.ftccommunity.simulator.io.handler.HeartbeatHandler;
+import org.ftccommunity.simulator.net.encoder.MessageEncoder;
 
 import java.net.InetSocketAddress;
 
+@Deprecated
 public class Client {
     public static void main(String[] args) throws Exception {
         String host = "192.168.44.1";
@@ -31,7 +33,7 @@ public class Client {
                     .handler(new io.netty.channel.ChannelInitializer<NioDatagramChannel>() {
                         @Override
                         protected void initChannel(NioDatagramChannel channel) throws Exception {
-                            channel.pipeline().addLast(new HeartbeatDecoder(), new HeartbeatHandler());
+                            channel.pipeline().addLast(new MessageEncoder(), new Decoder(), new HeartbeatHandler());
                         }
                     });
             b.bind(new InetSocketAddress(7003)).sync().channel();
