@@ -222,7 +222,7 @@ public final class NetworkManager {
      * @param autoShrink if true this automatically adjusts the size returned
      * @return a data array of the next datas to send
      */
-    public synchronized static SimulatorData.Data[] getNextSends(final int size, final boolean autoShrink) {
+    public static SimulatorData.Data[] getNextSends(final int size, final boolean autoShrink) {
         int currentSize = size;
         if (currentSize <= sendingQueue.size() / 2) {
             cleanup();
@@ -239,8 +239,10 @@ public final class NetworkManager {
         }
 
         SimulatorData.Data[] datas = new SimulatorData.Data[currentSize];
-        for (int i = 0; i < datas.length; i++) {
-            datas[i] = receivedQueue.removeLast();
+        synchronized (sendingQueue) {
+            for (int i = 0; i < datas.length; i++) {
+                datas[i] = sendingQueue.removeLast();
+            }
         }
 
         return datas;
@@ -249,7 +251,7 @@ public final class NetworkManager {
     /**
      * Cleanup the sending queue
      */
-    private synchronized static void cleanup() {
+    private static void cleanup() {
         synchronized (sendingQueue) {
             if (sendingQueue.size() > 100) {
                 LinkedList<SimulatorData.Data> temp = new LinkedList<>();
@@ -296,9 +298,10 @@ public final class NetworkManager {
         NetworkManager.isReady = isReady;
     }
 
-    public static void start() {
-       Thread clientListener = new Thread(new Client());
+    public static Thread start() {
+       Thread clientListener = new Thread(new Client(), "Client");
         clientListener.start();
+        return clientListener;
     }
 
     public static class Client implements Runnable {
@@ -312,7 +315,7 @@ public final class NetworkManager {
                 b.handler(new io.netty.channel.ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new Decoder(), new ClientHandler());
+                        ch.pipeline().addLast(new IdleStateHandler(1, 1, 2), new Decoder(), new ClientHandler());
                     }
                 });
 

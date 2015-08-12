@@ -157,7 +157,8 @@ public class OverviewController {
     @FXML
     private void handleStartSimulatorButton() {
     	if (!RobotSimulator.simulatorStarted())
-    		RobotSimulator.startSimulator(mainApp);
+            // TODO: read from interface (multicast)
+    		RobotSimulator.startSimulator(mainApp, false);
         else {
             RobotSimulator.requestTermination();
         }

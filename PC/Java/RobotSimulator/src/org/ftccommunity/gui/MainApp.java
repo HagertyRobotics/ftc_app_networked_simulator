@@ -3,6 +3,7 @@ package org.ftccommunity.gui;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import javafx.stage.WindowEvent;
 import org.ftccommunity.gui.view.*;
 //import org.ftccommunity.simulator.RobotSimulator;
 import org.ftccommunity.simulator.RobotSimulator;
@@ -64,7 +66,7 @@ public class MainApp extends Application {
         Runtime.getRuntime().addShutdownHook(new Thread("shutdown thread") {
             public void run() {
                 System.out.println("***** Threads Exiting *****");
-                RobotSimulator.isgThreadsAreRunning();
+                RobotSimulator.requestTermination();
             }
         });
 
@@ -72,8 +74,16 @@ public class MainApp extends Application {
         MainApp.primaryStage.setTitle("Simulator App");
 
         // Set the application icon.
-        this.primaryStage.getIcons().add(new Image("file:resources/images/robot.png"));
+        MainApp.primaryStage.getIcons().add(new Image("file:resources/images/robot.png"));
 
+        // Add a close request handler to run when closed, otherwise certian cleanup procedures won't run
+        MainApp.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                primaryStage.close();
+                System.exit(0);
+            }
+        });
         initRootLayout();
         showBrickOverview();
     }

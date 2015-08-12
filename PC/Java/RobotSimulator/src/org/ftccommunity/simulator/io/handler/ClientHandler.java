@@ -1,5 +1,7 @@
 package org.ftccommunity.simulator.io.handler;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
 import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 import org.ftccommunity.simulator.net.manager.NetworkManager;
 import io.netty.buffer.ByteBuf;
@@ -12,10 +14,10 @@ import org.ftccommunity.simulator.net.protocol.SimulatorData;
 import java.io.IOException;
 import java.net.SocketException;
 
-public class ClientHandler extends ChannelInboundHandlerAdapter {
+public class ClientHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        SimulatorData.Data data = (SimulatorData.Data) msg;
+        SimulatorData.Data recieved = (SimulatorData.Data) msg;
 
         // Uncomment to display all data
         /*for (byte test : data.getInfo(0).getBytes(Charsets.US_ASCII)) {
@@ -24,10 +26,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 
         // We don't need to queue heartbearts (OPT_DATA2)
-        if (data.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
+        if (recieved.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
             // Print out size and data
             // System.out.println("Received Data of significance with size=" + data.getSerializedSize());
-            NetworkManager.add(data);
+            NetworkManager.add(recieved);
 
         }
          // The following shouldn't be necessary, do to new behavior below
@@ -39,16 +41,25 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             heartbeatBuffer.writeBytes(heartbeat.toByteArray());
             ctx.write(heartbeatBuffer);
         }*/
-
+/*
         SimulatorData.Data next  = NetworkManager.getNextSend();
         final ByteBuf writeBuffer = ctx.alloc().buffer(4 + next.getSerializedSize());
         writeBuffer.writeInt(next.getSerializedSize());
         writeBuffer.writeBytes(next.toByteArray());
-        ctx.write(writeBuffer);
+        ctx.write(writeBuffer);*/
 
+        final SimulatorData.Data[] writeData = NetworkManager.getNextSends();
+        for (SimulatorData.Data data : writeData) {
+            writeMessage(ctx.channel(), data);
+        }
 
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
         ctx.flush();
     }
+
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
@@ -72,5 +83,17 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         } else {
             ctx.close();
         }
+    }
+
+    private void writeMessage(Channel channel, SimulatorData.Data data) {
+        while (!channel.isWritable()) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+        channel.write(data);
     }
 }

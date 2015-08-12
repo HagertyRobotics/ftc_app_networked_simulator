@@ -26,23 +26,26 @@ public class RobotSimulator  {
     private static boolean simulatorStarted = false;
     private static boolean visualizerStarted = false;
 
-    static public void startSimulator(MainApp mainApp) {
+    static public void startSimulator(MainApp mainApp, boolean multicast) {
         Thread processQueue = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 NetworkManager.processQueue();
             }
-        });
+        }, "Process Queue");
         processQueue.start();
+        threadLinkedList.add(processQueue);
         simulatorStarted = true;
 
         System.out.println("Starting Module Lister...");
         gBrickListGenerator = new BrickListGenerator(mainApp);  // Runnable
         Thread moduleListerThread = new Thread(gBrickListGenerator, "Brick List Generator");
         moduleListerThread.start();
-        NetworkManager.start();
+        threadLinkedList.add(moduleListerThread);
 
-        final boolean useMulticast = false;
-        if (useMulticast) {
+        // Start the network and add its thread to the threads running
+        threadLinkedList.add(NetworkManager.start());
+
+        if (multicast) {
             System.out.println("Seeing if we can get a multicast...");
             Thread multicastListener = new Thread(new Runnable() {
                 @Override
