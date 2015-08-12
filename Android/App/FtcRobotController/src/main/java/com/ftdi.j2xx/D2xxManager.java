@@ -40,7 +40,6 @@ public class D2xxManager
     public boolean multicast;
     public boolean simulate;
 
-    // InetAddress mIPAddress;
     private ArrayList<FT_Device> mFtdiDevices;
     private Server server;
 
@@ -132,21 +131,18 @@ public class D2xxManager
                                 SimulatorData.Data.Modules.LEGACY_CONTROLLER,
                                 sendData);
                         Log.d("D2xx::", "Send Packet to PC");
-                        receiveData = NetworkManager.getLatestData(
-                                SimulatorData.Type.Types.DEVICE_LIST, true);
+                        try {
+                            receiveData = NetworkManager.getLatestData(
+                                    SimulatorData.Type.Types.DEVICE_LIST, true, true);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            return rc;
+                        }
 
                         Log.d(TAG, "Got a reply!");
                         // If we got a reply from the PC then parse the xml and return a list of FT_Device objects
 
                         // De-convert the data
-                        /*SimulatorData.DeviceListOld deviceListOld = null;
-                        try {
-                            deviceListOld = SimulatorData.DeviceListOld.parseFrom(receiveData);
-                        } catch (InvalidProtocolBufferException e) {
-                            Log.e(TAG, "Data is not valid: " + e.toString(), e);
-                            Log.i(TAG, "Got: " + receiveData[0] + " " + receiveData.length);
-                        }
-                        if (deviceListOld != null) {*/
                             this.mFtdiDevices = buildFT_DeviceList(receiveData);
                             done = true;
                         }
@@ -171,7 +167,7 @@ public class D2xxManager
         //updateContext(parentContext);
 
         for (int i = 0; i < this.mFtdiDevices.size(); i++) {
-            FT_Device tmpDev = (FT_Device) this.mFtdiDevices.get(i);
+            FT_Device tmpDev = this.mFtdiDevices.get(i);
             if (tmpDev == null)
                 continue;
             devInfo = tmpDev.mDeviceInfoNode;
@@ -192,7 +188,7 @@ public class D2xxManager
     {
         if ((index > this.mFtdiDevices.size()) || (index < 0))
             return null;
-        return ((FT_Device)this.mFtdiDevices.get(index)).mDeviceInfoNode;
+        return this.mFtdiDevices.get(index).mDeviceInfoNode;
     }
 
     @NotNull
@@ -224,7 +220,6 @@ public class D2xxManager
                         Element eElement = (Element) nNode;
                         String serial = eElement.getElementsByTagName("serial").item(0).getTextContent();
                         String name = eElement.getElementsByTagName("name").item(0).getTextContent();
-                        String portString = eElement.getElementsByTagName("port").item(0).getTextContent();
 
                         ftDev = new FT_Device_Legacy(serial, name);
                         devices.add(ftDev);
@@ -235,14 +230,13 @@ public class D2xxManager
                         Element eElement = (Element) nNode;
                         String serial = eElement.getElementsByTagName("serial").item(0).getTextContent();
                         String name = eElement.getElementsByTagName("name").item(0).getTextContent();
-                        String portString = eElement.getElementsByTagName("port").item(0).getTextContent();
                         ftDev = new FT_Device_Motor(serial, name);
                         devices.add(ftDev);
                     }
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, e.toString() + " Tried with: " + inputText, e);
+            Log.e(TAG, e.toString(), e);
         }
         return devices;
     }
@@ -250,10 +244,6 @@ public class D2xxManager
     public static class D2xxException extends IOException
     {
         private static final long serialVersionUID = 1L;
-
-        public D2xxException() {
-        }
-
         public D2xxException(String ftStatusMsg) {
             super();
         }

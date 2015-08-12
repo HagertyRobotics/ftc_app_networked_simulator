@@ -1,129 +1,132 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context=".FtcFileLoadActivity"
-                android:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".FtcFileLoadActivity">
 
-    <include layout="@layout/header"
-        android:id="@+id/included_header"/>
+    <include
+        android:id="@+id/included_header"
+        layout="@layout/header" />
 
     <LinearLayout
-      android:layout_below="@id/included_header"
-      android:layout_above="@+id/load_bottom"
-      android:id="@+id/holds_buttons"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:paddingBottom="8dp"
-      android:paddingLeft="@dimen/activity_horizontal_margin"
-      android:paddingRight="@dimen/activity_horizontal_margin"
-      android:paddingTop="5dp"
-      android:orientation="vertical">
-
-    <Button
-      android:id="@+id/new_button"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="New"
-      android:textSize="12sp"
-      android:minHeight="0dp"
-      android:minWidth="0dp"
-      android:onClick="new_button"/>
-
-    <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="5dp"
-      android:text="Click here to create a new configuration file"/>
-
-    <!-- red line -->
-    <View
-      android:layout_width="match_parent"
-      android:layout_height="2dip"
-      android:background="#FF0000" />
-
-    <RelativeLayout
-      android:id="@+id/files_holder"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content">
-      <TextView
-        android:text="Available files:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="18sp"/>
-
-      <include
-        layout="@layout/info_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"/>
-
-    </RelativeLayout>
-
-    <ScrollView
-      android:fillViewport="true"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content">
-      <LinearLayout
-        android:id="@+id/inclusionlayout"
+        android:id="@+id/holds_buttons"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical" >
-      </LinearLayout>
-    </ScrollView>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/load_bottom"
+        android:layout_below="@id/included_header"
+        android:orientation="vertical"
+        android:paddingBottom="8dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="5dp">
 
-      <LinearLayout
-        android:id="@+id/empty_filelist"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/new_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:onClick="new_button"
+            android:text="New"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="Click here to create a new configuration file" />
+
+        <!-- red line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dip"
+            android:background="#FF0000" />
+
+        <RelativeLayout
+            android:id="@+id/files_holder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Available files:"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <include
+                layout="@layout/info_button"
+                android:layout_width="60dp"
+                android:layout_height="60dp" />
+
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/inclusionlayout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"></LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/empty_filelist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/load_bottom"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
-  </LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:paddingBottom="8dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="5dp">
 
-  <LinearLayout
-    android:id="@+id/load_bottom"
-    android:orientation="vertical"
-    android:layout_alignParentBottom="true"
-    android:paddingBottom="8dp"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="5dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+        <!-- red line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dip"
+            android:background="#FF0000" />
 
-    <!-- red line -->
-    <View
-      android:layout_width="match_parent"
-      android:layout_height="2dip"
-      android:background="#FF0000" />
-    <RelativeLayout
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:id="@+id/autoconfigure_holder"
-      android:orientation="horizontal">
+        <RelativeLayout
+            android:id="@+id/autoconfigure_holder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-      <Button
-        android:id="@+id/autoconfigure"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:onClick="launch_autoConfigure"
-        android:text="@string/autoconfigure" />
+            <Button
+                android:id="@+id/autoconfigure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:onClick="launch_autoConfigure"
+                android:text="@string/autoconfigure"
+                android:textSize="12sp" />
 
-      <include
-        layout="@layout/info_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"/>
-    </RelativeLayout>
+            <include
+                layout="@layout/info_button"
+                android:layout_width="60dp"
+                android:layout_height="60dp" />
+        </RelativeLayout>
 
-    <TextView
-      android:id="@+id/autoconfigure_text"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="@string/autoconfigureLaunch_text"/>
+        <TextView
+            android:id="@+id/autoconfigure_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/autoconfigureLaunch_text" />
 
 
-  </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>

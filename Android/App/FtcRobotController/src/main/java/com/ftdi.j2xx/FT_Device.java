@@ -37,10 +37,15 @@ abstract public class FT_Device
     }
 
     private int getPacketFromPC(byte[] data, int length, long wait_ms) {
-        int rc;
+        int rc = 0;
         byte[] packet;
 
-        packet = NetworkManager.getLatestData(SimulatorData.Type.Types.BRICK_INFO, true);
+        try {
+            packet = NetworkManager.getLatestData(SimulatorData.Type.Types.BRICK_INFO, true);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return rc;
+        }
 
         // If timed out waiting for packet then return the last packet that was read
         if (packet == null) {

@@ -14,7 +14,6 @@ import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,8 +23,6 @@ public class NetworkManager {
     private static final LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
     private static final ConcurrentLinkedQueue<SimulatorData.Data> sendingQueue = new ConcurrentLinkedQueue<>();
     private static boolean serverWorking;
-    private static InetAddress robotAddress;
-    private static volatile boolean isReady;
 
     public NetworkManager(NetworkTypes type) {
         if (type == NetworkTypes.BLUETOOTH) {
@@ -139,76 +136,65 @@ public class NetworkManager {
 
             return datas;
     }
-/*
- /*   *//*
-*
-     * NetworkRecevier
-     * Receive packets from the PC simulator and feed them into a queue that the FT_Device class will read
-     * The FT_Device class will pretend to be a FTDI USB device and feed the
-     * received packets to the FTC_APP
-     *
-     *//*
-/*
-    public class NetworkReceiver implements Runnable {
-        private LinkedBlockingQueue queue;
-        DatagramSocket mSocket;
-        byte[] mReceiveData = new byte[1024];
 
-        public NetworkReceiver(LinkedBlockingQueue queue, DatagramSocket my_socket) {
-            this.queue = queue;
-            this.mSocket = my_socket;
->>>>>>> develop
-        }
-    }
-*/
-
-    public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type, boolean block) {
+    /**
+     * Returns the latest message recieved by the software
+     * @param type type of message that is returned
+     * @param block do we need to want for data, or just get whatever there is (including nothing)
+     * @param cache do we want to cache the data (in case we need it again)
+     * @return the last message recieved by the software of specific type
+     * @throws InterruptedException
+     */
+    public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type,
+                                                      boolean block, boolean cache) throws InterruptedException {
         if (block) {
             while (!Thread.currentThread().isInterrupted()) {
-                if (main.get(type).size() > 0) {
-                    synchronized (main) {
-                        // return main.get(type).remove(main.get(type).size() - 1);
-                        return main.get(type).remove(main.get(type).size() - 1);
-                    }
+                if (main.get(type).size() > 0) { // Check if we can something
+                    break;
                 } else {
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(10); // Good time to take a nap
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
+                        throw new InterruptedException();
                     }
                 }
-            }
-
-/*
-        @Override
-        public void run() {
-
-            while (true) {
-                DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
-                try {
-                    mSocket.receive(receivePacket);
-
-                    byte[] readBuffer = new byte[receivePacket.getLength()];
-                    System.arraycopy(receivePacket.getData(), 0, readBuffer, 0, receivePacket.getLength());
-                    Log.v("D2xx::", "Receive: " + readBuffer[0] + " Len: " + receivePacket.getLength());
-                    queue.put(readBuffer);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
->>>>>>> develop
-                }
-            }
-        }*/
-
+            } // End while
         }
         synchronized (main) {
-            return main.get(type).remove(main.get(type).size() - 1);
+            if (cache) {
+                SimulatorData.Data data = main.get(type).get(main.get(type).size() - 1);
+                if (data == null) {
+                    return null;
+                }
+
+                // Cleanout the rest, since they should never be used, and put the cached message back in.
+                clear(type);
+                main.put(type, data);
+                return data;
+            } else {
+                SimulatorData.Data data = main.get(type).remove(main.get(type).size() - 1);
+                if (data == null) {
+                    return null;
+                }
+                return data;
+            }
         }
     }
 
-    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type, boolean block) {
-        SimulatorData.Data data = getLatestMessage(type, block);
+    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type, boolean block) throws InterruptedException {
+        SimulatorData.Data data = getLatestMessage(type, block, false);
+        if (data == null) {
+            return null;
+        }
+        return data.getInfo(0).getBytes(Charsets.US_ASCII);
+    }
+
+    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type, boolean block, boolean cache) throws InterruptedException {
+        SimulatorData.Data data = getLatestMessage(type, block, cache);
+        if (data == null) {
+            return null;
+        }
         return data.getInfo(0).getBytes(Charsets.US_ASCII);
     }
 
@@ -272,7 +258,8 @@ public class NetworkManager {
      * @param autoShrink if true this automatically adjusts the size returned
      * @return a data array of the next datas to send
      */
-    public synchronized static SimulatorData.Data[] getNextSends(final int size, final boolean autoShrink) {
+    public synchronized static SimulatorData.Data[] getNextSends(final int size,
+                                                                 final boolean autoShrink) {
         int currentSize = size;
         if (currentSize <= sendingQueue.size() / 2) {
             cleanup();
@@ -313,23 +300,6 @@ public class NetworkManager {
                 sendingQueue.addAll(temp);
             }
         }
-    }
-
-
-    public static InetAddress getRobotAddress() {
-        return robotAddress;
-    }
-
-    public static void setRobotAddress(InetAddress robotAddress) {
-        NetworkManager.robotAddress = robotAddress;
-    }
-
-    public static boolean isReady() {
-        return isReady;
-    }
-
-    public static void changeReadiness(boolean isReady) {
-        NetworkManager.isReady = isReady;
     }
 
     public enum NetworkTypes {

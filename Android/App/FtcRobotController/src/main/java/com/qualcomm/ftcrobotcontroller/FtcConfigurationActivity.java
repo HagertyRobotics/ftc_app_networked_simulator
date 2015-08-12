@@ -33,33 +33,24 @@ package com.qualcomm.ftcrobotcontroller;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.qualcomm.ftccommon.DbgLog;
-import com.qualcomm.modernrobotics.ModernRoboticsDeviceManager;
 import com.qualcomm.robotcore.exception.RobotCoreException;
-import com.qualcomm.robotcore.hardware.DeviceManager;
 import com.qualcomm.robotcore.hardware.DeviceManager.DeviceType;
 import com.qualcomm.robotcore.hardware.configuration.ControllerConfiguration;
 import com.qualcomm.robotcore.hardware.configuration.DeviceConfiguration.ConfigurationType;
 import com.qualcomm.robotcore.hardware.configuration.DeviceInfoAdapter;
 import com.qualcomm.robotcore.hardware.configuration.ReadXMLFileHandler;
 import com.qualcomm.robotcore.hardware.configuration.Utility;
-import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.util.SerialNumber;
 
 import java.io.FileInputStream;
@@ -79,18 +70,74 @@ public class FtcConfigurationActivity extends Activity{
   private static final int EDIT_MOTOR_CONTROLLER = 1;
   private static final int EDIT_SERVO_CONTROLLER = 2;
   private static final int EDIT_LEGACY_MODULE_CONTROLLER = 3;
-
+  protected Map<SerialNumber, DeviceType> scannedDevices = new HashMap<SerialNumber, DeviceType>();
+  protected Set<Entry<SerialNumber, DeviceType>> entries = new HashSet<Entry<SerialNumber, DeviceType>>();
+  protected SharedPreferences preferences;
+  DialogInterface.OnClickListener close_ok_listener = new DialogInterface.OnClickListener(){
+    public void onClick(DialogInterface dialog, int button){
+      //do nothing
+    }
+  };
+er = new DialogInterface.OnClickListener()  /**
+   * Turns a list of device Controllers into a
   private Thread t;
-
   private Map<SerialNumber, ControllerConfiguration> deviceControllers = new HashMap<SerialNumber, ControllerConfiguration>();
   private Context context;
   private DeviceManager deviceManager;
   private Button scanButton;
   private String preferredFilename = Utility.NO_FILE;
-  protected Map<SerialNumber, DeviceType> scannedDevices = new HashMap<SerialNumber, DeviceType>();
-  protected Set<Entry<SerialNumber, DeviceType>> entries = new HashSet<Entry<SerialNumber, DeviceType>>();
-  protected SharedPreferences preferences;
   private Utility utility;
+ changes the filename and ends the activity, like one would
+   * expect the back button to do.
+   */
+  DialogInterface.OnClickListener back_cancel_listener = new DialogInterface.OnClickListener(){
+    public void onClick(DialogInterface dialog, int button){
+      // Set preferredFilename to unchanged file that was there previously
+      utility.saveToPreferences(preferredFilename.substring(7).trim(), R.string.pref_hardware_config_filename); // chop off "Unsaved"
+      finish();
+    }
+  };;
+  priv  pr
+DialogInterface.OnClickListener do_nothing_cancel_li
+
+
+  priate
+ap. When reading lists d
+
+  priv
+   *
+from an
+XML file
+you get list o
+a list
+
+  @Override
+his
+otected builds up
+  /**
+   *
+
+  @Override
+that
+otected the hashmap
+void war
+from that
+void warnDuplica
+list. The hashmap
+used to
+  /**  pr
+  hashm
+populate the
+void onActivityisplaying
+void onDes the current,
+   * @param deviceList a
+  /**
+f back, so this
+{
+    public void onClick(DialogInterface dialog, int button){
+      // do nothing
+    }
+  } A button-specific method,
 
   @Override
   protected void onCreate(Bundle savedInstanceState){
@@ -114,12 +161,6 @@ public class FtcConfigurationActivity extends Activity{
 
     preferences = PreferenceManager.getDefaultSharedPreferences(this);
   }
-
-  DialogInterface.OnClickListener close_ok_listener = new DialogInterface.OnClickListener(){
-    public void onClick(DialogInterface dialog, int button){
-      //do nothing
-    }
-  };
 
   private void buildInfoButtons(){
     Button devicesInfoButton = (Button) findViewById(R.id.devices_holder).findViewById(R.id.info_btn);
@@ -155,7 +196,7 @@ public class FtcConfigurationActivity extends Activity{
     });
   }
 
-  @Override
+    @Override
   protected void onStart() {
     super.onStart();
 
@@ -211,8 +252,7 @@ public class FtcConfigurationActivity extends Activity{
         alertBeforeScan();
       }
     });
-  }
-
+  }vate
   private void alertBeforeScan(){
     if (preferredFilename.toLowerCase().contains(Utility.UNSAVED.toLowerCase())){
 
@@ -234,9 +274,8 @@ public class FtcConfigurationActivity extends Activity{
     } else {
       t.start();
     }
-  }
-
-  /**
+  }ate
+/**
    * This method parses the XML of the active configuration file, and calls methods to populate
    * the appropriate data structures to the configuration information can be displayed to the
    * user.
@@ -262,10 +301,7 @@ public class FtcConfigurationActivity extends Activity{
     buildHashMap(controllerList);
     populateList();
     warnIfNoDevices();
-  }
-
-
-  private void warnIfNoDevices(){
+  }nIfNoDevices(){
     if (deviceControllers.size() == 0){
       String msg0 ="No devices found!";
       String msg1 = "In order to find devices: \n" +
@@ -278,23 +314,17 @@ public class FtcConfigurationActivity extends Activity{
       empty_devicelist.removeAllViews();
       empty_devicelist.setVisibility(View.GONE);
     }
-  }
-
-  private void warnDuplicateNames(String dupeMsg){
+  }teNames(String dupeMsg){
     String msg0 ="Found " + dupeMsg;
     String msg1 = "Please fix and re-save.";
     utility.setOrangeText(msg0, msg1, R.id.warning_layout, R.layout.orange_warning, R.id.orangetext0, R.id.orangetext1);
-  }
-
-  private void clearDuplicateWarning(){
+  } gets
+   *
+void clearDuplicateWarning(){
     LinearLayout warning_layout = (LinearLayout) findViewById(R.id.warning_layout);
     warning_layout.removeAllViews();
     warning_layout.setVisibility(View.GONE);
-  }
-
-
-  /**
-   * Populates the list with the relevant controllers from the deviceControllers variable.
+  }Populates the list with the relevant controllers from the deviceControllers variable.
    * That variable is either from scanned devices, or read in from an xml file.
    */
   private void populateList() {
@@ -337,10 +367,7 @@ public class FtcConfigurationActivity extends Activity{
 
     });
 
-  }
-
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+  }Result(int requestCode, int resultCode, Intent data) {
 
     if (resultCode == RESULT_CANCELED){
       return;
@@ -371,16 +398,14 @@ public class FtcConfigurationActivity extends Activity{
       DbgLog.error("Received Result with an incorrect request code: " + String.valueOf(requestCode));
     }
 
-  }
-
-  @Override
-  protected void onDestroy(){
+  }troy(){
     super.onDestroy();
     utility.resetCount();
-  }
-
+  } devices.
+   *
   /**
-   * This has a lot of code in common with saveConfiguration. This is apparently the only way to do
+   * Tthis
+has a lot of code in common with saveConfiguration. This is apparently the only way to do
    * this, because of the way the onClickListener accesses the "final EditText input". I
    * modularized as much as I could but this was as far as I got.
    *
@@ -436,22 +461,8 @@ public class FtcConfigurationActivity extends Activity{
     } else {
       super.onBackPressed();
     }
-  }
-
-  /**
-   * The cancel listener that changes the filename and ends the activity, like one would
-   * expect the back button to do.
-   */
-  DialogInterface.OnClickListener back_cancel_listener = new DialogInterface.OnClickListener(){
-    public void onClick(DialogInterface dialog, int button){
-      // Set preferredFilename to unchanged file that was there previously
-      utility.saveToPreferences(preferredFilename.substring(7).trim(), R.string.pref_hardware_config_filename); // chop off "Unsaved"
-      finish();
-    }
-  };
-
-  /**
-   * A button-specific method, this gets called when you click the "writeXML" button.
+  }   * The cancel listener sten
+ gets called when you click the "writeXML" button.
    * This writes the current objects into an XML file located in the Configuration File Directory.
    * The user is prompted for the name of the file.
    * @param v the View from which this was called
@@ -501,22 +512,9 @@ public class FtcConfigurationActivity extends Activity{
     builder.setPositiveButton("Ok", ok_listener);
     builder.setNegativeButton("Cancel", do_nothing_cancel_listener);
     builder.show();
-  }
-
-  DialogInterface.OnClickListener do_nothing_cancel_listener = new DialogInterface.OnClickListener(){
-    public void onClick(DialogInterface dialog, int button){
-      // do nothing
-    }
-  };
-
-
-
-  /**
-   * Turns a list of device Controllers into a hashmap. When reading from an XML file,
-   * you get a list back, so this builds up the hashmap from that list. The hashmap gets
-   * used to populate the lists displaying the current devices.
-   * @param deviceList a list of devices
+  } devices
    */
+
   private void buildHashMap(ArrayList<ControllerConfiguration> deviceList){
     deviceControllers = new HashMap<SerialNumber, ControllerConfiguration>();
 
