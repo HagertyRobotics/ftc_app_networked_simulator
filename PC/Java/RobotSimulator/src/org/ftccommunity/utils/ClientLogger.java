@@ -15,7 +15,7 @@ public class ClientLogger {
 
         Handler[] handlers = rootLogger.getHandlers();
         if (handlers.length > 0 && handlers[0] instanceof ConsoleHandler) {
-            rootLogger.removeHandler(handlers[0]);
+            handlers[0].setLevel(Level.SEVERE);
         }
 
         logger.setLevel(Level.INFO);
