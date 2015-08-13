@@ -318,7 +318,6 @@ public final class NetworkManager {
                 // Start the client.
                 ChannelFuture f = b.connect(host, port).sync(); // (5)
                 f.channel().closeFuture().sync();
-                // ScheduledFuture g = f.channel().eventLoop().scheduleAtFixedRate(new HeartbeatTask(f.channel(), port), 0, 1, TimeUnit.SECONDS);
 
                 // Wait until the connection is closed.
                 f.channel().closeFuture().sync();

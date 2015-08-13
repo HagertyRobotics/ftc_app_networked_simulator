@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -56,7 +57,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
 
 	@Override
 	protected byte[] receivePacketFromPhone() {
-		return new byte[0];
+		return NetworkManager.getLatestData(SimulatorData.Type.Types.SIM_DATA);
 	}
 
 	private void sendPacketToPhone(byte[] sendData) {
@@ -73,6 +74,10 @@ public class LegacyBrickSimulator extends BrickSimulator {
 
     public void handleIncomingPacket(byte[] data, int length, boolean wait)
     {
+		if (data.length < 5) {
+			logger.log(Level.WARNING, "Received a data with in invalid length");
+			return;
+		}
     	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
     		sendPacketToPhone(mCurrentStateBuffer);
     		

@@ -58,11 +58,11 @@ public abstract class BrickSimulator implements Runnable {
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 packet = receivePacketFromPhone();
-            	handleIncomingPacket(packet, packet.length, false);
+            	handleIncomingPacket(packet, packet.length, true);
             }
             // Catch unhandled exceptions and cleanup
     	} catch (Exception e) {
-    		logger.log(Level.SEVERE, e.toString());
+    		logger.log(Level.SEVERE, e.toString(), e);
     	}
     }
 
