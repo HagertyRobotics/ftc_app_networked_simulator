@@ -18,10 +18,6 @@ public class MessageEncoder extends MessageToByteEncoder<SimulatorData.Data> {
 
         out.writeInt(length);
         out.writeBytes(msg.toByteArray());
-        /*
-        final int offset = out.arrayOffset() + out.writerIndex();
-        final byte[] array = out.array();
-        out.writerIndex(out.writerIndex() + encode(msg, array, offset, length));*/
     }
 
     private int encode(final SimulatorData.Data msg, byte[] array, final int offset, final int length) {

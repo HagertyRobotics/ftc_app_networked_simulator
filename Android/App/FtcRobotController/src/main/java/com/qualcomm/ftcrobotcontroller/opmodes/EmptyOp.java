@@ -1,6 +1,10 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
+import android.util.Log;
+
+import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.RobotLog;
 
 /**
  * An empty op mode serving as a template for custom OpModes
@@ -20,7 +24,6 @@ public class EmptyOp extends OpMode {
     */
     @Override
     public void start() {
-
     }
 
 

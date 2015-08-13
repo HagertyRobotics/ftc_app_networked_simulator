@@ -75,18 +75,7 @@ public class BrickListGenerator implements Runnable {
         // System.out.println("Receive Buffer: (" + Utils.bufferToHexString(data, 0, 25) + ") len=" + data.length);
 
         // Wrap the device list in a data in order to be sent correctly
-        if (data[0] == '?') { // infoCmd
-/*            SimulatorData.DeviceListOld.Builder builder = SimulatorData.DeviceListOld.newBuilder()
-                                                       .setType(SimulatorData.Type.newBuilder().setType(SimulatorData.Type.Types.DEVICE_LIST))
-                                                                  .setSerialized(getXmlModuleList(mMainApp.getBrickData()));
-            SimulatorData.DeviceListOld deviceListOld = builder.build();
-            System.out.println(deviceListOld.toByteArray()[0] + " " + deviceListOld.getSerializedSize());
-            try {
-                SimulatorData.DeviceListOld.parseFrom(deviceListOld.toByteArray());
-            } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
-                throw new AssertionError("Invalid Configuration of protocol!");
-            }*/
+        if (data[0] == '?') {
             NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST,
                                               SimulatorData.Data.Modules.LEGACY_CONTROLLER,
                                               getXmlModuleList(mMainApp.getBrickData()));
