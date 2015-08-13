@@ -145,13 +145,6 @@ public final class NetworkManager {
         String dataString = new String(data, Charsets.US_ASCII);
         System.out.println(dataString);
         requestSend(type, module, dataString);
-    /*SimulatorData.Data.Builder sendDataBuilder = SimulatorData.Data.newBuilder();
-    sendDataBuilder.setType(SimulatorData.Type.newBuilder().setType(type).build())
-            .setModule(module)
-            .addInfo(new String(data, Charsets.US_ASCII));
-    synchronized (sendingQueue) {
-        sendingQueue.add(sendDataBuilder.build());
-    }*/
     }
 
     /**
@@ -169,7 +162,6 @@ public final class NetworkManager {
             sendingQueue.add(sendDataBuilder.build());
         }
     }
-
 
     /**
      * Gets the next data to send
@@ -223,6 +215,7 @@ public final class NetworkManager {
      * @param autoShrink if true this automatically adjusts the size returned
      * @return a data array of the next datas to send
      */
+    @NotNull
     public static SimulatorData.Data[] getNextSends(final int size, final boolean autoShrink) {
         int currentSize = size;
         if (currentSize <= sendingQueue.size() / 2) {
@@ -239,13 +232,18 @@ public final class NetworkManager {
             }
         }
 
-        SimulatorData.Data[] datas = new SimulatorData.Data[currentSize];
-        synchronized (sendingQueue) {
-            for (int i = 0; i < datas.length; i++) {
-                datas[i] = sendingQueue.removeLast();
+        SimulatorData.Data[] datas;
+        if (currentSize == 0) {
+            datas = new SimulatorData.Data[1];
+            datas[0] = HeartbeatTask.buildMessage();
+        } else {
+            datas = new SimulatorData.Data[currentSize];
+            synchronized (sendingQueue) {
+                for (int i = 0; i < datas.length; i++) {
+                    datas[i] = sendingQueue.removeLast();
+                }
             }
         }
-
         return datas;
     }
 
@@ -263,15 +261,6 @@ public final class NetworkManager {
                 sendingQueue.addAll(temp);
             }
         }
-    }
-
-    /**
-     * The address of the Robot Controller
-     * @return the robot controller IP address
-     */
-    @Nullable
-    public static InetAddress getRobotAddress() {
-        return robotAddress;
     }
 
     /**

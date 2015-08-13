@@ -24,35 +24,17 @@ public class ClientHandler extends ChannelDuplexHandler {
             System.out.print(String.format("0x%02X ", test));
         }*/
 
-
         // We don't need to queue heartbearts (OPT_DATA2)
         if (recieved.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
             // Print out size and data
             // System.out.println("Received Data of significance with size=" + data.getSerializedSize());
             NetworkManager.add(recieved);
-
         }
-         // The following shouldn't be necessary, do to new behavior below
-         /*else { // Acknowledge an HEARTBEAT with another Heartbeat
-            // System.out.print(" Received heartbeat ");
-            final SimulatorData.Data heartbeat = HeartbeatTask.buildMessage();
-            final ByteBuf heartbeatBuffer = ctx.alloc().buffer(4 + heartbeat.getSerializedSize());
-           heartbeatBuffer.writeInt(heartbeat.getSerializedSize());
-            heartbeatBuffer.writeBytes(heartbeat.toByteArray());
-            ctx.write(heartbeatBuffer);
-        }*/
-/*
-        SimulatorData.Data next  = NetworkManager.getNextSend();
-        final ByteBuf writeBuffer = ctx.alloc().buffer(4 + next.getSerializedSize());
-        writeBuffer.writeInt(next.getSerializedSize());
-        writeBuffer.writeBytes(next.toByteArray());
-        ctx.write(writeBuffer);*/
 
         final SimulatorData.Data[] writeData = NetworkManager.getNextSends();
         for (SimulatorData.Data data : writeData) {
             writeMessage(ctx.channel(), data);
         }
-
     }
 
     @Override

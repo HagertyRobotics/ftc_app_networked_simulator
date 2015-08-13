@@ -19,15 +19,14 @@ repositories {
 dependencies {
     compile files('libs/android-support-v4.jar')
     //   compile (name:'d2xx', ext:'jar')
+    compile 'com.android.support:support-v4:22.2.0'
     compile(name: 'RobotCore-release', ext: 'aar')
     compile(name: 'ModernRobotics-release', ext: 'aar')
     compile(name: 'FtcCommon-release', ext: 'aar')
     compile(name: 'WirelessP2p-release', ext: 'aar')
     compile(name: 'Analytics-release', ext: 'aar')
+    compile 'com.intellij:annotations:12.0'
+    compile files('libs/guava-18.0.jar')
     compile files('libs/netty-all-4.0.30.Final.jar')
     compile files('libs/protobuf.jar')
-    compile files('libs/guava-18.0.jar')
-
-    compile 'com.intellij:annotations:12.0'
-    compile 'com.android.support:support-v4:22.2.0'
 }

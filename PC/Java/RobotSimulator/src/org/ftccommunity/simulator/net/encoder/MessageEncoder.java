@@ -12,13 +12,16 @@ public class MessageEncoder extends MessageToByteEncoder<SimulatorData.Data> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, SimulatorData.Data o, ByteBuf byteBuf) throws Exception {
-        int length = o.getSerializedSize();
-        byteBuf.writeInt(length);
-        byteBuf.ensureWritable(length);
-        final int offset = byteBuf.arrayOffset() + byteBuf.writerIndex();
-        final byte[] array = byteBuf.array();
-        byteBuf.writerIndex(byteBuf.writerIndex() + encode(o, array, offset, length));
+    protected void encode(ChannelHandlerContext ctx, SimulatorData.Data msg, ByteBuf out) throws Exception {
+        int length = msg.getSerializedSize();
+        out.ensureWritable(4 + length);
+
+        out.writeInt(length);
+        out.writeBytes(msg.toByteArray());
+        /*
+        final int offset = out.arrayOffset() + out.writerIndex();
+        final byte[] array = out.array();
+        out.writerIndex(out.writerIndex() + encode(msg, array, offset, length));*/
     }
 
     private int encode(final SimulatorData.Data msg, byte[] array, final int offset, final int length) {
