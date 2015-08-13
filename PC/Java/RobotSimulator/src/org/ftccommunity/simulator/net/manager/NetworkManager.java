@@ -29,7 +29,6 @@ public final class NetworkManager {
     private static boolean isReady;
     private static final String host = "192.168.42.129";
     private static final int port = 7002;
-    static EventLoopGroup workerGroup = new NioEventLoopGroup();
 
     /**
      * Add a recieved packet to the processing queue for deferred processing
@@ -295,6 +294,12 @@ public final class NetworkManager {
     }
 
     public static class Client implements Runnable {
+        private EventLoopGroup workerGroup;
+
+        public Client() {
+            workerGroup = new NioEventLoopGroup();
+        }
+
         @Override
         public void run() {
             try {

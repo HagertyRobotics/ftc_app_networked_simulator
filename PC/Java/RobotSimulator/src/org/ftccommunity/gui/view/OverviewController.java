@@ -1,16 +1,13 @@
 package org.ftccommunity.gui.view;
 
+import javafx.scene.control.*;
 import org.ftccommunity.gui.MainApp;
 // import org.ftccommunity.simulator.RobotSimulator;
 import org.ftccommunity.simulator.RobotSimulator;
 import org.ftccommunity.simulator.modules.BrickSimulator;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 
@@ -30,6 +27,9 @@ public class OverviewController {
     private Label brickSerialLabel;
     @FXML
     private Pane detailsPane;
+
+    @FXML
+    Button btnStartSimulator;
 
     // Reference to the main application.
     private MainApp mainApp;
@@ -156,11 +156,14 @@ public class OverviewController {
      */
     @FXML
     private void handleStartSimulatorButton() {
-    	if (!RobotSimulator.simulatorStarted())
+    	if (!RobotSimulator.simulatorStarted()) {
             // TODO: read from interface (multicast)
-    		RobotSimulator.startSimulator(mainApp, false);
-        else {
+            RobotSimulator.startSimulator(mainApp, false);
+            btnStartSimulator.setText("Stop Simulator");
+        } else {
+            System.out.println("Trying to terminate Robot Simulator");
             RobotSimulator.requestTermination();
+            btnStartSimulator.setText("Start Simulator");
         }
     }
 

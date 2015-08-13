@@ -118,6 +118,7 @@ public class RobotSimulator  {
         }
         threadLinkedList.forEach(Thread::interrupt);
         Thread.currentThread().interrupt();
+        simulatorStarted = false;
     }
 
     public static int getPhonePort() {
