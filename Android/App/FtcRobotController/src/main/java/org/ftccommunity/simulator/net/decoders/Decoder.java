@@ -16,8 +16,7 @@ public class Decoder extends ByteToMessageDecoder { // (1)
     @Override
     protected void decode(io.netty.channel.ChannelHandlerContext ctx, ByteBuf in, List<Object> out) { // (2)
         final String TAG = "SERVER_H::";
-        long size = 0;
-
+        long size;
         if (in.readableBytes() < 4) {
             return;
         } else {
@@ -32,8 +31,10 @@ public class Decoder extends ByteToMessageDecoder { // (1)
         try {
             test = SimulatorData.Data.parseFrom(in.readBytes((int) size).array());
             out.add(test);
-            Log.d("SIM_NETWORKING::", "Decoded data type " +
-                    test.getType().getType().getValueDescriptor().getName());
+            if (test.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
+                Log.d("SIM_NETWORKING::", "Decoded data type " +
+                        test.getType().getType().getValueDescriptor().getName());
+            }
         } catch (InvalidProtocolBufferException e) {
             Log.w(TAG, "An attempt to decode an otherwise valid packet failed", e);
         }

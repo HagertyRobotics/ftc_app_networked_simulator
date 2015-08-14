@@ -22,8 +22,10 @@ public class MessageEncoder extends MessageToByteEncoder<SimulatorData.Data> {
         final int offset = out.arrayOffset() + out.writerIndex();
         final byte[] array = out.array();
         out.writerIndex(out.writerIndex() + encode(msg, array, offset, length));
-        Log.d("SIM_NETWORKING::", "Encoded data type " +
-                msg.getType().getType().getValueDescriptor().getName());
+        if (msg.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
+            Log.d("SIM_NETWORKING::", "Encoded data type " +
+                    msg.getType().getType().getValueDescriptor().getName());
+        }
     }
 
     private int encode(final SimulatorData.Data msg, byte[] array, final int offset, final int length) {

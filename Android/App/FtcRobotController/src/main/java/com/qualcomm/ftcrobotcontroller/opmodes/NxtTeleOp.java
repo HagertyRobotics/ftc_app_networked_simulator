@@ -75,7 +75,7 @@ public class NxtTeleOp extends OpMode {
 
   /*
    * Code to run when the op mode is first enabled goes here
-   * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#start()
+   * @see com.qualcomm.robotcore.eventloop.opmode.RunnableOpMode#start()
    */
   @Override
   public void start() {
@@ -102,7 +102,7 @@ public class NxtTeleOp extends OpMode {
 
   /*
    * This method will be called repeatedly in a loop
-   * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#loop()
+   * @see com.qualcomm.robotcore.eventloop.opmode.RunnableOpMode#loop()
    */
   @Override
   public void loop() {
@@ -249,7 +249,7 @@ public class NxtTeleOp extends OpMode {
 
   /*
    * Code to run when the op mode is first disabled goes here
-   * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#stop()
+   * @see com.qualcomm.robotcore.eventloop.opmode.RunnableOpMode#stop()
    */
   @Override
   public void stop() {

@@ -122,15 +122,13 @@ public class D2xxManager
                 if (this.mFtdiDevices == null) {
                     final byte[] sendData = new byte[1];
                     sendData[0] = '?';      // Simple packet, ask for a list of connected modules
-                    NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST,
-                            SimulatorData.Data.Modules.LEGACY_CONTROLLER, sendData);
-                    while (!done) {
+                    // do {
 
                         // Send a query for a list of connected modules
                         NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST,
                                 SimulatorData.Data.Modules.LEGACY_CONTROLLER,
                                 sendData);
-                        Log.d("D2xx::", "Send Packet to PC");
+                        Log.i("D2xx::", "Send Packet to PC");
                         try {
                             receiveData = NetworkManager.getLatestData(
                                     SimulatorData.Type.Types.DEVICE_LIST, true, true);
@@ -144,8 +142,8 @@ public class D2xxManager
 
                         // De-convert the data
                             this.mFtdiDevices = buildFT_DeviceList(receiveData);
-                            done = true;
-                        }
+
+                        //} while (!(done && Thread.currentThread().isInterrupted()))
                     }
                     //ftDev = new FT_Device("A501E27V", "Hagerty USB1");
                     //devices.add(ftDev);

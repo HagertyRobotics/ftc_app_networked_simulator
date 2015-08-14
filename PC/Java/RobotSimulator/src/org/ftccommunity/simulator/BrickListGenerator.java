@@ -58,14 +58,14 @@ public class BrickListGenerator implements Runnable {
     }
 
     private byte[] receivePacketFromPhone() {
-        return NetworkManager.getLatestData(SimulatorData.Type.Types.DEVICE_LIST);
+        return NetworkManager.getLatestData(SimulatorData.Type.Types.DEVICE_LIST, true);
     }
 
-    private void sendPacketToPhone(byte[] sendData) {
+    private void sendPacketToPhone(String sendData) {
         try {
             NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST, SimulatorData.Data.Modules.LEGACY_CONTROLLER, sendData);
-            logger.log(Level.FINER, "sendPacketToPhone: (" + Utils.bufferToHexString(sendData, 0, sendData.length) +
-                                            ") len=" + sendData.length);
+//            logger.log(Level.FINER, "sendPacketToPhone: (" + Utils.bufferToHexString(sendData, 0, sendData.length()) +
+//                                            ") len=" + sendData.length());
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.toString());
         }
@@ -76,9 +76,11 @@ public class BrickListGenerator implements Runnable {
 
         // Wrap the device list in a data in order to be sent correctly
         if (data[0] == '?') {
-            NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST,
-                                              SimulatorData.Data.Modules.LEGACY_CONTROLLER,
-                                              getXmlModuleList(mMainApp.getBrickData()));
+            logger.log(Level.INFO, "Sending DEVICE_LIST...");
+            sendPacketToPhone(getXmlModuleList(mMainApp.getBrickData()));
+            //NetworkManager.requestSend(SimulatorData.Type.Types.DEVICE_LIST,
+             //                                 SimulatorData.Data.Modules.LEGACY_CONTROLLER,
+            //        getXmlModuleList(mMainApp.getBrickData()));
         }
 
     }

@@ -58,7 +58,7 @@ public class TestTankOp extends OpMode {
 	/*
 	 * Code to run when the op mode is first enabled goes here
 	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#start()
+	 * @see com.qualcomm.robotcore.eventloop.opmode.RunnableOpMode#start()
 	 */
 	@Override
 	public void start() {
@@ -83,7 +83,7 @@ public class TestTankOp extends OpMode {
 	/*
 	 * This method will be called repeatedly in a loop
 	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#run()
+	 * @see com.qualcomm.robotcore.eventloop.opmode.RunnableOpMode#run()
 	 */
 	@Override
 	public void loop() {
@@ -124,7 +124,7 @@ public class TestTankOp extends OpMode {
 	/*
 	 * Code to run when the op mode is first disabled goes here
 	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#stop()
+	 * @see com.qualcomm.robotcore.eventloop.opmode.RunnableOpMode#stop()
 	 */
 	@Override
 	public void stop() {

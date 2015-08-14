@@ -89,11 +89,22 @@ public final class NetworkManager {
      */
     @NotNull
     public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type) {
+        return getLatestMessage(type, false);
+    }
+
+    /**
+     * Find what the latest data is and returns it based on the type need
+     * @param type the type of packet to get
+     * @param cache delete the value
+     * @return The latest message in the queue, based on the type
+     */
+    @NotNull
+    public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type, boolean cache) {
         int size;
         synchronized (main) {
             size = main.get(type).size();
         }
-        while (!(size > 0) && !(Thread.currentThread().isInterrupted())) {
+        while ((size <= 0) && !(Thread.currentThread().isInterrupted())) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -105,9 +116,17 @@ public final class NetworkManager {
                 size = main.get(type).size();
             }
         }
+
         synchronized (main) {
             System.out.println("Retrieving latest packet of " + type.getValueDescriptor().getName());
-            return main.get(type).remove(main.get(type).size() - 1);
+            if (cache) {
+                SimulatorData.Data data =  main.get(type).get(main.get(type).size() - 1);
+                clear(type);
+                main.put(type, data);
+                return data;
+            } else {
+                return main.get(type).remove(main.get(type).size() - 1);
+            }
         }
     }
 
@@ -122,7 +141,18 @@ public final class NetworkManager {
      */
     @NotNull
     public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type) {
-        SimulatorData.Data data = getLatestMessage(type);
+        return getLatestData(type, false);
+    }
+
+    /**
+     *  This returns that data information based on the type specifed
+     * @param type the type of data to get
+     * @param cache delete the old version
+     * @return a byte array of the latest data
+     */
+    @NotNull
+    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type, boolean cache) {
+        SimulatorData.Data data = getLatestMessage(type, cache);
         return data.getInfo(0).getBytes(Charsets.US_ASCII);
     }
 
