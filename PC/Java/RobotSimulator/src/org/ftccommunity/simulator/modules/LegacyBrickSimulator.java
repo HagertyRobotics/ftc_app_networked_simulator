@@ -30,17 +30,16 @@ public class LegacyBrickSimulator extends BrickSimulator {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     protected final byte[] mCurrentStateBuffer = new byte[208];
+    protected final byte[] temp15 = new byte[15];
+    protected final byte[] temp12 = new byte[12];
 
     /*
      ** Packet types
      */
-    protected final byte[] writeCmd = {85, -86, 0, 0, 0};
-    protected final byte[] readCmd = {85, -86, -128, 0, 0};
-    protected final byte[] recSyncCmd3 = {51, -52, 0, 0, 3};
-    protected final byte[] recSyncCmd0 = {51, -52, -128, 0, 0};
-    protected final byte[] recSyncCmd208 = {51, -52, -128, 0, (byte) 208};
-    protected final byte[] controllerTypeLegacy = {0, 77, 73};       // Controller type USBLegacyModule
-
+    protected static final byte PACKET_HEADER_0 = (byte)0x55;
+    protected static final byte PACKET_HEADER_1 = (byte)0xaa;
+    protected static final byte PACKET_WRITE_FLAG = (byte)0x00;
+    protected static final byte PACKET_READ_FLAG = (byte)0x80;
 
     /**
      * Default constructor.
@@ -74,22 +73,34 @@ public class LegacyBrickSimulator extends BrickSimulator {
 
     public void handleIncomingPacket(byte[] data, int length, boolean wait)
     {
+    	if (data[0] == PACKET_HEADER_0 && data[1] == PACKET_HEADER_1) { // valid packet
 		if (data.length < 5) {
 			logger.log(Level.WARNING, "Received a data with in invalid length");
 			return;
 		}
     	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
     		sendPacketToPhone(mCurrentStateBuffer);
-    		
+
         } else {
 	        // Write Command...
 	    	// Process the received data packet
 	        // Loop through each of the ports in this object
 
-	        for (int i=0;i<mNumberOfPorts;i++) {
-	        	mDevices[i].processBuffer(data, mCurrentStateBuffer, i);
+	    	if (data[2] == PACKET_READ_FLAG) { // read command
+	    		byte[] tempBuffer = new byte[data[4]];
+	    		System.arraycopy(mCurrentStateBuffer, Byte.toUnsignedInt(data[3]), tempBuffer, 0, tempBuffer.length);
+	    		sendPacketToPhone(tempBuffer);
+	    		//temp15[3] = (byte)0xfe;
+	        } else { // write command
+	        	int offset = Byte.toUnsignedInt(data[3]);
+	        	int len = Byte.toUnsignedInt(data[4]);
+	        	System.arraycopy(data, 5, mCurrentStateBuffer, offset, len);
+	        	// Loop through each ports and process the buffer
+		        for (int i=0;i<mNumberOfPorts;i++) {
+		        	mDevices[i].processBuffer(mCurrentStateBuffer, i);
+		        }
 	        }
-        }
+    	}
     }
 
 
@@ -142,7 +153,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		return null;
 	}
 
-	/**
+    /**
      * Getters/Setters
      */
 
@@ -163,13 +174,12 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		}
 	}
 
-	public List<SimulatorData.Type.Types> getDeviceTypeList() {
-		List<SimulatorData.Type.Types> dtl = new ArrayList<>();
-		dtl.add(SimulatorData.Type.Types.LEGACY_LIGHT);
-		dtl.add(SimulatorData.Type.Types.LEGACY_MOTOR);
-		dtl.add(SimulatorData.Type.Types.LEGACY_TOUCH);
-		dtl.add(SimulatorData.Type.Types.USB_MOTOR);
-		dtl.add(SimulatorData.Type.Types.USB_SERVO);
+	public List<DeviceType> getDeviceTypeList() {
+		List<DeviceType> dtl = new ArrayList<>();
+		dtl.add(DeviceType.NONE);
+		dtl.add(DeviceType.TETRIX_MOTOR);
+		dtl.add(DeviceType.TETRIX_SERVO);
+		dtl.add(DeviceType.LEGO_LIGHT);
 		return dtl;
 	}
 

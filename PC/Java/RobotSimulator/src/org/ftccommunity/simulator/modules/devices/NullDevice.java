@@ -18,7 +18,7 @@ public class NullDevice extends Device {
 		mSimData[0] = new NullSimData();	// Add 1st motor
 	}
 
-	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum) {
+	public void processBuffer(byte[] currentStateBuffer, int portNum) {
 	}
 
 	public void updateDebugGuiVbox() {

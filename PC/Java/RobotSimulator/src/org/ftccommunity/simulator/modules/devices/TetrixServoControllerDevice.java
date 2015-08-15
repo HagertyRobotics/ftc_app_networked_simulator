@@ -17,7 +17,7 @@ public class TetrixServoControllerDevice extends Device
 		super(SimulatorData.Type.Types.USB_MOTOR);
 	}
 
-	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum ) {
+	public void processBuffer(byte[] currentStateBuffer, int portNum ) {
 	}
 
 	public void updateDebugGuiVbox() {

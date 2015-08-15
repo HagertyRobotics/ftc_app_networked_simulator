@@ -34,7 +34,7 @@ public class TetrixMotorControllerDevice extends Device {
 		mSimData[1] = new MotorSimData();	// Add 2nd motor
 	}
 
-	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum ) {
+	public void processBuffer(byte[] currentStateBuffer, int portNum ) {
 		int p;
 
         p=16+portNum*32;
@@ -42,17 +42,11 @@ public class TetrixMotorControllerDevice extends Device {
         // This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
         // If I2C_ACTION is set, take some action
 //	        if (packet[p+32] == (byte)0xff) { // Action flag
-        if ((packet[p] & (byte)0x01) == (byte)0x01) { // I2C Mode
-        	if ((packet[p] & (byte)0x80) == (byte)0x80) { // Read mode
-            	// Copy this port's 32 bytes into buffer
-        		System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
-
+        if ((currentStateBuffer[p] & (byte)0x01) == (byte)0x01) { // I2C Mode
+        	if ((currentStateBuffer[p] & (byte)0x80) == (byte)0x80) { // Read mode
             } else { // Write mode
-            	// Copy this port's 32 bytes into buffer
-            	System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
-
-            	((MotorSimData)mSimData[0]).setMotorSpeed(mCurrentStateBuffer[p+4+5]);
-            	((MotorSimData)mSimData[1]).setMotorSpeed(mCurrentStateBuffer[p+4+6]);
+            	((MotorSimData)mSimData[0]).setMotorSpeed(currentStateBuffer[p+4+5]);
+            	((MotorSimData)mSimData[1]).setMotorSpeed(currentStateBuffer[p+4+6]);
             }
         }
     }

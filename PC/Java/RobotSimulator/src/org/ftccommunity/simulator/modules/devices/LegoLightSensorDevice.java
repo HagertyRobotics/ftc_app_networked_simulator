@@ -30,21 +30,20 @@ public class LegoLightSensorDevice extends Device {
 		mSimData[0] = new AnalogSimData();
 	}
 
-	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum) {
+	public void processBuffer(byte[] currentStateBuffer, int portNum) {
 		int p;
 		int q;
 
         p=16+portNum*32;
         q=4+portNum*2;
 
-        if ((packet[p] & (byte)0x01) == (byte)0x00) { // Analog Mode
-        	// Copy this port's 32 bytes into buffer
+        if ((currentStateBuffer[p] & (byte)0x01) == (byte)0x00) { // Analog Mode
     		int a = (int) (((AnalogSimData)mSimData[0]).getAnalogValue()*256.0);
-    		mCurrentStateBuffer[q] = (byte)a;
+    		currentStateBuffer[q] = (byte)a;
 
     		// Set the Port ready bit in the global part of the Current State Buffer
     		int bufferStatus = ~(1 << portNum);
-    		mCurrentStateBuffer[3] &= (byte)bufferStatus;
+    		currentStateBuffer[3] &= (byte)bufferStatus;
         }
     }
 

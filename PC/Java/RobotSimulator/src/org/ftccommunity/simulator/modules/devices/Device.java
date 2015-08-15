@@ -27,7 +27,7 @@ public abstract class Device {
 		mType = type;
 	}
 
-	abstract public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum);
+	abstract public void processBuffer(byte[] currentStateBuffer, int portNum);
 	abstract public void updateDebugGuiVbox();
 	abstract public void setupDebugGuiVbox(VBox vbox);
 
