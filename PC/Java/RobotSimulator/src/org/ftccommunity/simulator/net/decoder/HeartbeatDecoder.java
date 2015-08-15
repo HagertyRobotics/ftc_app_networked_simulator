@@ -1,25 +1,30 @@
-package org.ftccommunity.simulator.io.decoder;
+package org.ftccommunity.simulator.net.decoder;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import java.util.List;
 
-public class Decoder extends ByteToMessageDecoder { // (1)
+@Deprecated
+public class HeartbeatDecoder extends ByteToMessageDecoder {
     @Override
-    protected void decode(io.netty.channel.ChannelHandlerContext ctx, ByteBuf in, List<Object> out) { // (2)
+    protected void decode(ChannelHandlerContext context, ByteBuf in, List<Object> list) throws Exception {
         long size = 0;
-        if (in.readableBytes() >= 4) {
-            size = in.readUnsignedInt();
-            // System.out.print(" Size of data: " + size + " Received: " + in.readableBytes());
-            if (in.readableBytes() < size) {
-                return;
-            }
-        } else {
+        if (in.readableBytes() < 4) {
             return;
         }
+
+        if (in.readableBytes() >= 4) {
+            size = in.readUnsignedInt();
+        }
+
+        if (in.readableBytes() < size) {
+            return;
+        }
+
         SimulatorData.Data test;
         try {
             test = SimulatorData.Data.parseFrom(in.readBytes((int) size).array());
@@ -27,8 +32,7 @@ public class Decoder extends ByteToMessageDecoder { // (1)
             return;
         }
         if (test != null) {
-            out.add(test);
+            list.add(test);
         }
     }
 }
-

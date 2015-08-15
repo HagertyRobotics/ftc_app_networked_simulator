@@ -21,8 +21,8 @@ import org.ftccommunity.simulator.net.protocol.SimulatorData;
 public class TetrixMotorControllerDevice extends Device {
 
 	// GUI stuff for the Debug windows
-	public Label mMotor1SpeedDebugLabel;
-	public Label mMotor2SpeedDebugLabel;
+	private Label mMotor1SpeedDebugLabel;
+	private Label mMotor2SpeedDebugLabel;
 
     /**
      * Default constructor.

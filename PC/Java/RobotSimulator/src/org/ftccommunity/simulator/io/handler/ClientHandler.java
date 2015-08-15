@@ -28,10 +28,11 @@ public class ClientHandler extends ChannelDuplexHandler {
         if (recieved.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
             // Print out size and data
             // System.out.println("Received Data of significance with size=" + data.getSerializedSize());
+
             NetworkManager.add(recieved);
         }
 
-        final SimulatorData.Data[] writeData = NetworkManager.getNextSends();
+        final SimulatorData.Data[] writeData = NetworkManager.getNextSends(10, true);
         for (SimulatorData.Data data : writeData) {
             writeMessage(ctx.channel(), data);
         }
@@ -50,7 +51,8 @@ public class ClientHandler extends ChannelDuplexHandler {
             if (e.state() == IdleState.WRITER_IDLE ||
                         e.state() == IdleState.READER_IDLE ||
                         e.state() == IdleState.ALL_IDLE) {
-                ctx.writeAndFlush(HeartbeatTask.buildMessage());
+                writeMessage(ctx.channel(), HeartbeatTask.buildMessage());
+                // ctx.writeAndFlush(HeartbeatTask.buildMessage());
             }
         }
     }

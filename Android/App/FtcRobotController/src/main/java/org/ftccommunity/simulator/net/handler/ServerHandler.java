@@ -1,6 +1,6 @@
 package org.ftccommunity.simulator.net.handler;
 
-import com.ftdi.j2xx.NetworkManager;
+import org.ftccommunity.simulator.net.NetworkManager;
 import com.google.common.base.Charsets;
 import com.qualcomm.robotcore.util.RobotLog;
 

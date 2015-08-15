@@ -35,7 +35,7 @@ public class BrickListGenerator implements Runnable {
     byte[] mReceiveData = new byte[1024];
     byte[] mSendData = new byte[1024];
 
-    MainApp mMainApp;
+    private final MainApp mMainApp;
 
     public BrickListGenerator(MainApp mainApp) {
         mMainApp = mainApp;

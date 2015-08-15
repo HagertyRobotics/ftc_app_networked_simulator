@@ -1,5 +1,6 @@
 package com.ftdi.j2xx;
 
+import org.ftccommunity.simulator.net.NetworkManager;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import java.util.concurrent.ConcurrentLinkedQueue;

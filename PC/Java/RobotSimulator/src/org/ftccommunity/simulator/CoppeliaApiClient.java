@@ -36,7 +36,7 @@ public class CoppeliaApiClient implements Runnable {
 
 	int mClientID;
 	remoteApi mVrep;
-	org.ftccommunity.gui.MainApp mMainApp;
+	final org.ftccommunity.gui.MainApp mMainApp;
     private volatile boolean done;
     int ret;
 

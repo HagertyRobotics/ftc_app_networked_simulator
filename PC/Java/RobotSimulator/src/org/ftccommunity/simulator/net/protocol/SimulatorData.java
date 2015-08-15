@@ -79,6 +79,7 @@ public final class SimulatorData {
   /**
    * Protobuf type {@code org.ftccommunity.simulator.net.protocol.Data}
    */
+  @SuppressWarnings("FinalStaticMethod")
   public  static final class Data extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.ftccommunity.simulator.net.protocol.Data)
@@ -196,6 +197,7 @@ public final class SimulatorData {
     /**
      * Protobuf enum {@code org.ftccommunity.simulator.net.protocol.Data.Modules}
      */
+    @SuppressWarnings("FinalStaticMethod")
     public enum Modules
         implements com.google.protobuf.ProtocolMessageEnum {
       /**
@@ -563,6 +565,7 @@ public final class SimulatorData {
     /**
      * Protobuf type {@code org.ftccommunity.simulator.net.protocol.Data}
      */
+    @SuppressWarnings("FinalStaticMethod")
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:org.ftccommunity.simulator.net.protocol.Data)
@@ -1168,6 +1171,7 @@ public final class SimulatorData {
   /**
    * Protobuf type {@code org.ftccommunity.simulator.net.protocol.DeviceListOld}
    */
+  @SuppressWarnings("FinalStaticMethod")
   public  static final class DeviceListOld extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.ftccommunity.simulator.net.protocol.DeviceListOld)
@@ -1442,6 +1446,7 @@ public final class SimulatorData {
     /**
      * Protobuf type {@code org.ftccommunity.simulator.net.protocol.DeviceListOld}
      */
+    @SuppressWarnings("FinalStaticMethod")
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:org.ftccommunity.simulator.net.protocol.DeviceListOld)
@@ -1861,6 +1866,7 @@ public final class SimulatorData {
   /**
    * Protobuf type {@code org.ftccommunity.simulator.net.protocol.DeviceList}
    */
+  @SuppressWarnings("FinalStaticMethod")
   public  static final class DeviceList extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.ftccommunity.simulator.net.protocol.DeviceList)
@@ -2135,6 +2141,7 @@ public final class SimulatorData {
     /**
      * Protobuf type {@code org.ftccommunity.simulator.net.protocol.DeviceList}
      */
+    @SuppressWarnings("FinalStaticMethod")
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:org.ftccommunity.simulator.net.protocol.DeviceList)
@@ -2755,6 +2762,7 @@ public final class SimulatorData {
   /**
    * Protobuf type {@code org.ftccommunity.simulator.net.protocol.BrickInfo}
    */
+  @SuppressWarnings("FinalStaticMethod")
   public  static final class BrickInfo extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.ftccommunity.simulator.net.protocol.BrickInfo)
@@ -3081,6 +3089,7 @@ public final class SimulatorData {
     /**
      * Protobuf type {@code org.ftccommunity.simulator.net.protocol.BrickInfo}
      */
+    @SuppressWarnings("FinalStaticMethod")
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:org.ftccommunity.simulator.net.protocol.BrickInfo)
@@ -3556,6 +3565,7 @@ public final class SimulatorData {
   /**
    * Protobuf type {@code org.ftccommunity.simulator.net.protocol.Type}
    */
+  @SuppressWarnings("FinalStaticMethod")
   public  static final class Type extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.ftccommunity.simulator.net.protocol.Type)
@@ -3634,6 +3644,7 @@ public final class SimulatorData {
     /**
      * Protobuf enum {@code org.ftccommunity.simulator.net.protocol.Type.Types}
      */
+    @SuppressWarnings("FinalStaticMethod")
     public enum Types
         implements com.google.protobuf.ProtocolMessageEnum {
       /**
@@ -4050,6 +4061,7 @@ public final class SimulatorData {
     /**
      * Protobuf type {@code org.ftccommunity.simulator.net.protocol.Type}
      */
+    @SuppressWarnings("FinalStaticMethod")
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:org.ftccommunity.simulator.net.protocol.Type)

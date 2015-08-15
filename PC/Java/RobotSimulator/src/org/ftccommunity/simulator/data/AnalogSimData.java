@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 public class AnalogSimData extends SimData {
 
-	float mAnalogValue=0.0f;
+	private float mAnalogValue=0.0f;
 
 	public AnalogSimData() {
 		super();

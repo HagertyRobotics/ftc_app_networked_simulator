@@ -10,6 +10,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
+@Deprecated
 public class HeartbeatDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext context, ByteBuf in, List<Object> list) throws Exception {

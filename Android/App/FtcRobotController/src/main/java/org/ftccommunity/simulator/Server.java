@@ -45,14 +45,14 @@ public class Server implements Runnable {
                     .childHandler(new ChannelInitializer<SocketChannel>() { // (4)
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new Decoder(), new MessageEncoder(),
+                            ch.pipeline().addLast(new MessageEncoder(), new Decoder(),
                                     new ServerHandler());
                         }
                     })
-                    .option(ChannelOption.SO_BACKLOG, 64) // (5)
+                    // .option(ChannelOption.SO_BACKLOG, 64) // (5)
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .childOption(ChannelOption.WRITE_BUFFER_HIGH_WATER_MARK, 32 * 1024)
-                .childOption(ChannelOption.WRITE_BUFFER_LOW_WATER_MARK, 8 * 1024)
+                    .childOption(ChannelOption.WRITE_BUFFER_HIGH_WATER_MARK, 32 * 1024)
+                    .childOption(ChannelOption.WRITE_BUFFER_LOW_WATER_MARK, 8 * 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
 
 
@@ -89,7 +89,7 @@ public class Server implements Runnable {
                 RobotLog.e("Something Bad happened " + e.toString());
             }
             // Wait until the server socket is closed.
-            // In this example, this does not happen, but you can do that to gracefully
+            // You can do this to gracefully
             // shut down your server.
 
         } finally {

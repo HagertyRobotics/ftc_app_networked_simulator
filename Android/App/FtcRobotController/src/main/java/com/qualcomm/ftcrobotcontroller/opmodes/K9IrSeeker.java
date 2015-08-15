@@ -59,7 +59,7 @@ public class K9IrSeeker extends OpMode {
 	 * Constructor
 	 */
 	public K9IrSeeker() {
-		motorLeft.se
+
 	}
 
 	/*

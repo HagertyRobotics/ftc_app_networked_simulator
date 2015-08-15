@@ -3,9 +3,8 @@ package org.ftccommunity.simulator.net.manager;
 import com.google.common.base.Charsets;
 import com.google.common.collect.LinkedListMultimap;
 import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import org.ftccommunity.simulator.io.handler.ClientHandler;
-import org.ftccommunity.simulator.io.decoder.Decoder;
+import org.ftccommunity.simulator.net.decoder.Decoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -324,7 +323,7 @@ public final class NetworkManager {
     }
 
     public static class Client implements Runnable {
-        private EventLoopGroup workerGroup;
+        private final EventLoopGroup workerGroup;
 
         public Client() {
             workerGroup = new NioEventLoopGroup();

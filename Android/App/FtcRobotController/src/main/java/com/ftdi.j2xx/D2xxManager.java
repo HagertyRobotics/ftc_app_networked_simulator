@@ -9,6 +9,7 @@ import com.google.common.net.InetAddresses;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.ftccommunity.simulator.Server;
+import org.ftccommunity.simulator.net.NetworkManager;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;

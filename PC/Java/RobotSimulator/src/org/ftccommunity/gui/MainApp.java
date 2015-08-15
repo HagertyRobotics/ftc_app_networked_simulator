@@ -37,7 +37,7 @@ public class MainApp extends Application {
     /**
      * The data as an observable list of Controllers.
      */
-    private ObservableList<BrickSimulator> brickList;
+    private final ObservableList<BrickSimulator> brickList;
 
     public MainApp() {
         brickList = FXCollections.observableArrayList();
@@ -77,12 +77,9 @@ public class MainApp extends Application {
         MainApp.primaryStage.getIcons().add(new Image("file:resources/images/robot.png"));
 
         // Add a close request handler to run when closed, otherwise certian cleanup procedures won't run
-        MainApp.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                primaryStage.close();
-                System.exit(0);
-            }
+        MainApp.primaryStage.setOnCloseRequest(event -> {
+            primaryStage.close();
+            System.exit(0);
         });
         initRootLayout();
         showBrickOverview();

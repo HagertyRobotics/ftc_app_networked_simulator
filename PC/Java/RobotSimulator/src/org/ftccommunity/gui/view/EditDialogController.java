@@ -40,8 +40,8 @@ public class EditDialogController {
     @FXML
     private GridPane portGrid;
 
-    private ChoiceBox[] choiceBoxes;
-    private TextField[][] portNames = new TextField[6][2];
+    private final ChoiceBox[] choiceBoxes;
+    private final TextField[][] portNames = new TextField[6][2];
 
     private Stage dialogStage;
     private BrickSimulator brick;
@@ -115,7 +115,7 @@ public class EditDialogController {
         brickPortField.setText(brick.getPort().toString());
         brickSerialField.setText(brick.getSerial());
 
-        for (int i=0;i<brick.getNumberOfPorts();i++) {
+        for (int i=0;i<  brick.getNumberOfPorts();i++) {
         	choiceBoxes[i].getSelectionModel().select(brick.getPortDeviceType(i));
         	List<String> nameList = brick.getPortDevice(i).getPortNames();
         	for (int j=0;j<nameList.size();j++) {

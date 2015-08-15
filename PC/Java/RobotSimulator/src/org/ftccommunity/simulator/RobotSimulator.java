@@ -19,7 +19,7 @@ public class RobotSimulator  {
     private static BrickListGenerator gBrickListGenerator;
     private static CoppeliaApiClient gCoppeliaApiClient;
     private static volatile boolean gThreadsAreRunning = true;
-    private static LinkedList<Thread> threadLinkedList = new LinkedList<>();
+    private static final LinkedList<Thread> threadLinkedList = new LinkedList<>();
     private static int gPhonePort;
     private static InetAddress gPhoneIPAddress;
 
@@ -47,25 +47,22 @@ public class RobotSimulator  {
 
         if (multicast) {
             System.out.println("Seeing if we can get a multicast...");
-            Thread multicastListener = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    DatagramSocket socket = null;
+            Thread multicastListener = new Thread(() -> {
+                DatagramSocket socket = null;
+                try {
+                    socket = new DatagramSocket(7003);
+                } catch (SocketException e) {
+                    logger.log(Level.SEVERE, e.toString());
+                }
+
+                while (!Thread.currentThread().isInterrupted() && socket != null) {
+                    DatagramPacket packet = new DatagramPacket(new byte[1], 1);
                     try {
-                        socket = new DatagramSocket(7003);
-                    } catch (SocketException e) {
+                        socket.receive(packet);
+                    } catch (IOException e) {
                         logger.log(Level.SEVERE, e.toString());
                     }
-
-                    while (!Thread.currentThread().isInterrupted() && socket != null) {
-                        DatagramPacket packet = new DatagramPacket(new byte[1], 1);
-                        try {
-                            socket.receive(packet);
-                        } catch (IOException e) {
-                            logger.log(Level.SEVERE, e.toString());
-                        }
-                        System.out.println(packet.getAddress().getHostAddress());
-                    }
+                    System.out.println(packet.getAddress().getHostAddress());
                 }
             });
             multicastListener.start();

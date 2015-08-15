@@ -34,9 +34,9 @@ public abstract class BrickSimulator implements Runnable {
     protected String mType;
     protected int mNumberOfPorts;
 
-    protected final StringProperty mName;
+    private final StringProperty mName;
     protected final StringProperty mSerial;
-    protected IntegerProperty mPort;
+    private final IntegerProperty mPort;
     protected String mFXMLFileName;
 
     @XmlElementRef(name="Devices")
@@ -68,7 +68,7 @@ public abstract class BrickSimulator implements Runnable {
 
     protected abstract byte[] receivePacketFromPhone();
 
-	public abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
+	protected abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
 
     //public abstract String getName();
 

@@ -1,9 +1,10 @@
-package com.ftdi.j2xx;
+package org.ftccommunity.simulator.net;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.LinkedListMultimap;
@@ -208,6 +209,8 @@ public class NetworkManager {
                 .setModule(module)
                 .addInfo(new String(data, Charsets.US_ASCII));
         sendingQueue.add(sendDataBuilder.build());
+        Log.d("SIM_NETWORK_MANAGER::", "Adding a data of type: " +
+                type.getValueDescriptor().getName());
     }
 
     /**

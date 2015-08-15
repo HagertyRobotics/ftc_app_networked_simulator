@@ -22,7 +22,7 @@ import org.ftccommunity.simulator.net.protocol.SimulatorData;
 public class LegoLightSensorDevice extends Device {
 
 	// GUI stuff for the Debug windows
-	public Label mLightSensorDebugLabel;
+	private Label mLightSensorDebugLabel;
 
 	public LegoLightSensorDevice() {
 		super(SimulatorData.Type.Types.LEGACY_LIGHT);

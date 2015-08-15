@@ -4,7 +4,7 @@ import org.ftccommunity.simulator.net.protocol.SimulatorData;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public final class DeviceType {
-	public static DeviceTypes fromProtocol(SimulatorData.Type.Types type) {
+	/*public static DeviceTypes fromProtocol(SimulatorData.Type.Types type) {
 		switch (type) {
 			case NONE:
 				return DeviceTypes.NONE;
@@ -23,7 +23,7 @@ public final class DeviceType {
 			default:
 				throw new NotImplementedException();
 		}
-	}
+	}*/
 
 	public static SimulatorData.Type.Types fromDeviceTypes(DeviceTypes type) {
 		switch (type) {

@@ -12,7 +12,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class HeartbeatTask implements Runnable {
-    private Channel chl;
+    private final Channel chl;
     private static int port = 0;
 
     public HeartbeatTask(Channel channel, int bondedPort) {
@@ -52,10 +52,8 @@ public class HeartbeatTask implements Runnable {
     }
 
     public static SimulatorData.Data buildMessage() {
-        // ByteBuf info = new EmptyByteBuf(new PooledByteBufAllocator(false));
-        String infoString = "";
+       /* String infoString = "";
         try {
-
             infoString = InetAddress.getLocalHost().getHostAddress() + "%20" + "null" + "%20" + port +
                                  "%20";
         } catch (UnknownHostException e) {
@@ -63,9 +61,7 @@ public class HeartbeatTask implements Runnable {
         }
         byte[] dataEncoded = infoString.getBytes(Charsets.US_ASCII);
         infoString += dataEncoded.length;
-        dataEncoded = infoString.getBytes(Charsets.US_ASCII);
-
-        // info.writeBytes(dataEncoded);
+        dataEncoded = infoString.getBytes(Charsets.US_ASCII);*/
         SimulatorData.Data.Builder dataBuilded = SimulatorData.Data.newBuilder()
                                                          .setType(SimulatorData.Type.newBuilder()
                                                                           .setType(SimulatorData.Type.Types.HEARTBEAT))

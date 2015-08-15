@@ -8,8 +8,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 public class MotorSimData extends SimData {
 
-	float mMotorSpeed=0;
-	boolean mMotorFloatMode=false;
+	private float mMotorSpeed=0;
+	private boolean mMotorFloatMode=false;
 
 	public MotorSimData() {
 		super();
