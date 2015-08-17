@@ -87,8 +87,8 @@ public final class NetworkManager {
      * @return The latest message in the queue, based on the type
      */
     @NotNull
-    public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type) {
-        return getLatestMessage(type, false);
+    public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type) throws InterruptedException {
+            return getLatestMessage(type, false);
     }
 
     /**
@@ -98,7 +98,7 @@ public final class NetworkManager {
      * @return The latest message in the queue, based on the type
      */
     @NotNull
-    public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type, boolean cache) {
+    public static SimulatorData.Data getLatestMessage(@NotNull SimulatorData.Type.Types type, boolean cache) throws InterruptedException {
         int size;
         synchronized (main) {
             size = main.get(type).size();
@@ -108,7 +108,7 @@ public final class NetworkManager {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                break;
+                throw new InterruptedException();
             }
             // Fetch the size again
             synchronized (main) {
@@ -139,7 +139,7 @@ public final class NetworkManager {
      * @return a byte array of the latest data
      */
     @NotNull
-    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type) {
+    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type) throws InterruptedException {
         return getLatestData(type, false);
     }
 
@@ -150,7 +150,7 @@ public final class NetworkManager {
      * @return a byte array of the latest data
      */
     @NotNull
-    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type, boolean cache) {
+    public static byte[] getLatestData(@NotNull SimulatorData.Type.Types type, boolean cache) throws InterruptedException {
         SimulatorData.Data data = getLatestMessage(type, cache);
         return data.getInfo(0).getBytes(Charsets.US_ASCII);
     }

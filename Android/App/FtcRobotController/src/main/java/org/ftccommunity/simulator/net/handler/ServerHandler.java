@@ -46,12 +46,12 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                         34, 43, 90, 127, 76, 97
                 }, Charsets.US_ASCII));
         SimulatorData.Data data = dataBuilder.build();
+        writeMessage(ctx.channel(), data);
+//        final ByteBuf time = ctx.alloc().buffer(4 + data.getSerializedSize());
+//        time.writeInt(data.getSerializedSize());
+//        time.writeBytes(data.toByteArray());
 
-        final ByteBuf time = ctx.alloc().buffer(4 + data.getSerializedSize());
-        time.writeInt(data.getSerializedSize());
-        time.writeBytes(data.toByteArray());
-
-        ctx.writeAndFlush(time);
+//        ctx.writeAndFlush(time);
         NetworkManager.setServerWorking(true);
     }
 

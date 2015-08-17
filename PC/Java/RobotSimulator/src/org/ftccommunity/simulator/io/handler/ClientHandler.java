@@ -2,14 +2,12 @@ package org.ftccommunity.simulator.io.handler;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
-import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
-import org.ftccommunity.simulator.net.manager.NetworkManager;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
+import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -17,7 +15,7 @@ import java.net.SocketException;
 public class ClientHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        SimulatorData.Data recieved = (SimulatorData.Data) msg;
+        SimulatorData.Data received = (SimulatorData.Data) msg;
 
         // Uncomment to display all data
         /*for (byte test : data.getInfo(0).getBytes(Charsets.US_ASCII)) {
@@ -25,14 +23,13 @@ public class ClientHandler extends ChannelDuplexHandler {
         }*/
 
         // We don't need to queue heartbearts (OPT_DATA2)
-        if (recieved.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
+        if (received.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
             // Print out size and data
             // System.out.println("Received Data of significance with size=" + data.getSerializedSize());
-
-            NetworkManager.add(recieved);
+            NetworkManager.add(received);
         }
 
-        final SimulatorData.Data[] writeData = NetworkManager.getNextSends(10, true);
+        final SimulatorData.Data[] writeData = NetworkManager.getNextSends();
         for (SimulatorData.Data data : writeData) {
             writeMessage(ctx.channel(), data);
         }
@@ -52,13 +49,12 @@ public class ClientHandler extends ChannelDuplexHandler {
                         e.state() == IdleState.READER_IDLE ||
                         e.state() == IdleState.ALL_IDLE) {
                 writeMessage(ctx.channel(), HeartbeatTask.buildMessage());
-                // ctx.writeAndFlush(HeartbeatTask.buildMessage());
             }
         }
     }
 
     @Override
-    public void exceptionCaught(io.netty.channel.ChannelHandlerContext ctx, Throwable cause) {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (cause instanceof SocketException) {
             cause.printStackTrace();
         } else if (cause instanceof IOException) {

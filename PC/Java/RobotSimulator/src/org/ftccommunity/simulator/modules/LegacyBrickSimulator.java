@@ -55,7 +55,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
     }
 
 	@Override
-	protected byte[] receivePacketFromPhone() {
+	protected byte[] receivePacketFromPhone() throws InterruptedException {
 		return NetworkManager.getLatestData(SimulatorData.Type.Types.SIM_DATA);
 	}
 
@@ -74,13 +74,11 @@ public class LegacyBrickSimulator extends BrickSimulator {
     public void handleIncomingPacket(byte[] data, int length, boolean wait)
     {
     	if (data[0] == PACKET_HEADER_0 && data[1] == PACKET_HEADER_1) { // valid packet
-		if (data.length < 5) {
-			logger.log(Level.WARNING, "Received a data with in invalid length");
-			return;
-		}
-    	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
+			if (data.length < 5) {
+				logger.log(Level.WARNING, "Received a data with in invalid length");
+				return;
+			}
     		sendPacketToPhone(mCurrentStateBuffer);
-
         } else {
 	        // Write Command...
 	    	// Process the received data packet
@@ -174,12 +172,12 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		}
 	}
 
-	public List<DeviceType> getDeviceTypeList() {
-		List<DeviceType> dtl = new ArrayList<>();
-		dtl.add(DeviceType.NONE);
-		dtl.add(DeviceType.TETRIX_MOTOR);
-		dtl.add(DeviceType.TETRIX_SERVO);
-		dtl.add(DeviceType.LEGO_LIGHT);
+	public List<SimulatorData.Type.Types> getDeviceTypeList() {
+		List<SimulatorData.Type.Types> dtl = new ArrayList<>();
+		dtl.add(SimulatorData.Type.Types.NONE);
+		dtl.add(SimulatorData.Type.Types.LEGACY_MOTOR);
+		dtl.add(SimulatorData.Type.Types.LEGACY_SERVO);
+		dtl.add(SimulatorData.Type.Types.LEGACY_LIGHT);
 		return dtl;
 	}
 

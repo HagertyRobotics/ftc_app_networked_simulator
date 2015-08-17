@@ -35,7 +35,7 @@ public class ServoBrickSimulator extends BrickSimulator {
     }
 
 	@Override
-	protected byte[] receivePacketFromPhone() {
+	protected byte[] receivePacketFromPhone() throws InterruptedException {
 		return NetworkManager.getLatestData(SimulatorData.Type.Types.USB_SERVO);
 	}
 

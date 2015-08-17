@@ -4,7 +4,6 @@ package org.ftccommunity.simulator.modules;
 import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.DeviceFactory;
-import org.ftccommunity.simulator.modules.devices.DeviceTypes;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -66,7 +65,7 @@ public abstract class BrickSimulator implements Runnable {
     	}
     }
 
-    protected abstract byte[] receivePacketFromPhone();
+    protected abstract byte[] receivePacketFromPhone() throws InterruptedException;
 
 	protected abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
 

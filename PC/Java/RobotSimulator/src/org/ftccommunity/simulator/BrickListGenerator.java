@@ -57,7 +57,7 @@ public class BrickListGenerator implements Runnable {
         }
     }
 
-    private byte[] receivePacketFromPhone() {
+    private byte[] receivePacketFromPhone() throws InterruptedException{
         return NetworkManager.getLatestData(SimulatorData.Type.Types.DEVICE_LIST, true);
     }
 

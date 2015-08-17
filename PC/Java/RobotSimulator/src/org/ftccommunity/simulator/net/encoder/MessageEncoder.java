@@ -45,11 +45,6 @@ public class MessageEncoder extends MessageToByteEncoder<SimulatorData.Data> {
         out.writeInt(length);
         out.writeBytes(msg.toByteArray());
 
-        // Test
-        final ByteBuf test = out.duplicate();
-        final int testLength = test.readInt();
-        SimulatorData.Data.parseFrom(test.readBytes(testLength).array());
-
         if (msg.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
             logger.log(Level.INFO, "Encoded data type " +
                     msg.getType().getType().getValueDescriptor().getName());

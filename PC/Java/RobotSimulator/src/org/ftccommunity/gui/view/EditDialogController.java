@@ -2,8 +2,6 @@ package org.ftccommunity.gui.view;
 
 
 import org.ftccommunity.simulator.modules.BrickSimulator;
-import org.ftccommunity.simulator.modules.devices.DeviceType;
-import org.ftccommunity.simulator.modules.devices.DeviceTypes;
 
 import java.util.List;
 

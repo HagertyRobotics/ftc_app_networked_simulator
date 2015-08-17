@@ -3,6 +3,7 @@
 
 package org.ftccommunity.simulator.net.protocol;
 
+@SuppressWarnings("ALL")
 public final class SimulatorData {
   private SimulatorData() {}
   public static void registerAllExtensions(
