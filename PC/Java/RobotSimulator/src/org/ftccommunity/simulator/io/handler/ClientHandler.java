@@ -16,7 +16,6 @@ public class ClientHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         SimulatorData.Data received = (SimulatorData.Data) msg;
-
         // Uncomment to display all data
         /*for (byte test : data.getInfo(0).getBytes(Charsets.US_ASCII)) {
             System.out.print(String.format("0x%02X ", test));

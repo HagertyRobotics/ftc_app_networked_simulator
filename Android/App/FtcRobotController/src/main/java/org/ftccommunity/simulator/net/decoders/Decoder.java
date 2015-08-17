@@ -33,7 +33,7 @@ public class Decoder extends ByteToMessageDecoder { // (1)
             out.add(test);
             if (test.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
                 Log.d("SIM_NETWORKING::", "Decoded data type " +
-                        test.getType().getType().getValueDescriptor().getName());
+                        test.getType().getType().toString());
             }
         } catch (InvalidProtocolBufferException e) {
             Log.w(TAG, "An attempt to decode an otherwise valid packet failed", e);

@@ -5,6 +5,7 @@ import com.google.common.base.Charsets;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
+import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -13,6 +14,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
@@ -23,10 +26,29 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             NetworkManager.add(receiveData);
         }
 
-        // Write and send the data according to protocol (send size of data then the data itself)
+        while (ctx.channel().isWritable()) {
+            SimulatorData.Data data = NetworkManager.getNextSend();
+            if (data != null) {
+                ctx.write(data);
+            } else {
+                break;
+            }
+        }/*// Write and send the data according to protocol (send size of data then the data itself)
         final SimulatorData.Data[] writeData = NetworkManager.getWriteData();
         for (SimulatorData.Data data : writeData) {
             writeMessage(ctx.channel(), data);
+        }*/
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) evt;
+            if (e.state() == IdleState.WRITER_IDLE ||
+                    e.state() == IdleState.READER_IDLE ||
+                    e.state() == IdleState.ALL_IDLE) {
+                ctx.writeAndFlush(HeartbeatTask.buildMessage());
+            }
         }
     }
 
@@ -46,13 +68,27 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                         34, 43, 90, 127, 76, 97
                 }, Charsets.US_ASCII));
         SimulatorData.Data data = dataBuilder.build();
-        writeMessage(ctx.channel(), data);
+        ctx.writeAndFlush(data);
 //        final ByteBuf time = ctx.alloc().buffer(4 + data.getSerializedSize());
 //        time.writeInt(data.getSerializedSize());
 //        time.writeBytes(data.toByteArray());
 
 //        ctx.writeAndFlush(time);
         NetworkManager.setServerWorking(true);
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        // Write and send the data according to protocol (send size of data then the data itself)
+        while (ctx.channel().isWritable()) {
+            SimulatorData.Data data = NetworkManager.getNextSend();
+            if (data != null) {
+                ctx.write(data);
+            } else {
+                break;
+            }
+        }
+        ctx.flush();
     }
 
     @Override
@@ -64,17 +100,5 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         } else {
             ctx.close();
         }
-    }
-
-    private void writeMessage(Channel channel, SimulatorData.Data data) {
-        while (!channel.isWritable()) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }
-        channel.write(data);
     }
 }

@@ -1,16 +1,10 @@
 package org.ftccommunity.simulator.io.handler;
 
-import com.google.common.net.InetAddresses;
-import org.ftccommunity.simulator.net.manager.NetworkManager;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
-import java.io.IOException;
-import java.net.InetAddress;
-
+@Deprecated
 public class HeartbeatHandler extends ChannelInboundHandlerAdapter {
-    @Override
+/*    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         SimulatorData.Data data = (SimulatorData.Data) msg;
         if (data.getType().getType() == SimulatorData.Type.Types.HEARTBEAT) {
@@ -32,5 +26,5 @@ public class HeartbeatHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(io.netty.channel.ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         ctx.close();
-    }
+    }*/
 }

@@ -2,32 +2,24 @@ package org.ftccommunity.simulator.net.manager;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.LinkedListMultimap;
+import com.google.common.net.InetAddresses;
 import com.sun.istack.internal.NotNull;
-import org.ftccommunity.simulator.io.handler.ClientHandler;
-import org.ftccommunity.simulator.net.decoder.Decoder;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
-import org.ftccommunity.simulator.net.encoder.MessageEncoder;
+import org.ftccommunity.simulator.net.Client;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
 import org.ftccommunity.simulator.net.tasks.HeartbeatTask;
 
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class NetworkManager {
+    public static final String host = "192.168.42.129";
+    public static final int port = 7002;
     private final static LinkedListMultimap<SimulatorData.Type.Types, SimulatorData.Data> main = LinkedListMultimap.create();
     private final static LinkedList<SimulatorData.Data> receivedQueue = new LinkedList<>();
     private final static LinkedList<SimulatorData.Data> sendingQueue = new LinkedList<>();
-    private static InetAddress robotAddress;
+    private static InetSocketAddress robotAddress;
     private static boolean isReady;
-    private static final String host = "192.168.42.129";
-    private static final int port = 7002;
 
     /**
      * Add a recieved packet to the processing queue for deferred processing
@@ -129,10 +121,6 @@ public final class NetworkManager {
         }
     }
 
-    public static boolean isReadyToFetch(SimulatorData.Type.Types type) {
-        return main.get(type).size() > 0;
-    }
-
     /**
      *  This returns that data information based on the type specifed
      * @param type the type of data to get
@@ -161,6 +149,10 @@ public final class NetworkManager {
      */
     public static void clear(SimulatorData.Type.Types type) {
         main.get(type).clear();
+    }
+
+    public static boolean isReadyToFetch(SimulatorData.Type.Types type) {
+        return main.get(type).size() > 0;
     }
 
     /**
@@ -291,11 +283,15 @@ public final class NetworkManager {
         }
     }
 
+    public static InetSocketAddress getRobotAddress() {
+        return new InetSocketAddress(InetAddresses.forString(host), port);
+    }
+
     /**
      * Sets the current Robot IP address
      * @param robotAddress an <code>InetAddress</code> of the Robot Controller
      */
-    public static void setRobotAddress(@NotNull InetAddress robotAddress) {
+    public static void setRobotAddress(@NotNull InetSocketAddress robotAddress) {
         NetworkManager.robotAddress = robotAddress;
     }
 
@@ -320,44 +316,6 @@ public final class NetworkManager {
        Thread clientListener = new Thread(new Client(), "Client");
         clientListener.start();
         return clientListener;
-    }
-
-    public static class Client implements Runnable {
-        private final EventLoopGroup workerGroup;
-
-        public Client() {
-            workerGroup = new NioEventLoopGroup();
-        }
-
-        @Override
-        public void run() {
-            try {
-                Bootstrap b = new Bootstrap(); // (1)
-                b.group(workerGroup); // (2)
-                b.channel(NioSocketChannel.class); // (3)
-                b.option(io.netty.channel.ChannelOption.SO_KEEPALIVE, true); // (4)
-                b.handler(new io.netty.channel.ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new IdleStateHandler(1, 1, 2), new MessageEncoder(),
-                                new Decoder(), new ClientHandler());
-                    }
-                });
-
-                // Start the client.
-                ChannelFuture f = b.connect(host, port).sync(); // (5)
-                f.channel().closeFuture().sync();
-
-                // Wait until the connection is closed.
-                f.channel().closeFuture().sync();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            } finally {
-                workerGroup.shutdownGracefully();
-            }
-            System.out.print("Server closed");
-        }
-
     }
 
 }

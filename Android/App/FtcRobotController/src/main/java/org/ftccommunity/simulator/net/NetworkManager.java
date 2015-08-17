@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.common.base.Charsets;
@@ -218,20 +219,26 @@ public class NetworkManager {
      *
      * @return the next data to send
      */
-    public synchronized static SimulatorData.Data getNextSend() {
+    @Nullable
+    public static SimulatorData.Data getNextSend() {
         if (sendingQueue.size() > 100) {
             ConcurrentLinkedQueue<SimulatorData.Data> temp = new ConcurrentLinkedQueue<>();
-            for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
-                temp.add(sendingQueue.poll());
+            synchronized (sendingQueue) {
+                for (int i = sendingQueue.size() - 1; i > sendingQueue.size() / 2; i--) {
+                    temp.add(sendingQueue.poll());
+                }
+                sendingQueue.clear();
+                sendingQueue.addAll(temp);
             }
-            sendingQueue.clear();
-            sendingQueue.addAll(temp);
         }
 
         if (sendingQueue.size() > 0) {
-            return sendingQueue.poll();
+            synchronized (sendingQueue) {
+                return sendingQueue.poll();
+            }
         } else {
-            return HeartbeatTask.buildMessage();
+            return null;
+            //return HeartbeatTask.buildMessage();
         }
     }
 
