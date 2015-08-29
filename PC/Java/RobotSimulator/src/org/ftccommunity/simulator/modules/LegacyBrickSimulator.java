@@ -1,19 +1,20 @@
 package org.ftccommunity.simulator.modules;
 
 
+import javafx.geometry.Insets;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.DeviceType;
 import org.ftccommunity.simulator.modules.devices.NullDevice;
-
-import javafx.geometry.Insets;
-import javafx.scene.layout.*;
-import javafx.scene.text.Text;
 import org.ftccommunity.simulator.net.manager.NetworkManager;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlRootElement;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,12 +28,6 @@ import java.util.logging.Logger;
  */
 @XmlRootElement(name="Legacy")
 public class LegacyBrickSimulator extends BrickSimulator {
-    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
-    protected final byte[] mCurrentStateBuffer = new byte[208];
-    protected final byte[] temp15 = new byte[15];
-    protected final byte[] temp12 = new byte[12];
-
     /*
      ** Packet types
      */
@@ -40,6 +35,10 @@ public class LegacyBrickSimulator extends BrickSimulator {
     protected static final byte PACKET_HEADER_1 = (byte)0xaa;
     protected static final byte PACKET_WRITE_FLAG = (byte)0x00;
     protected static final byte PACKET_READ_FLAG = (byte)0x80;
+	private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	protected final byte[] mCurrentStateBuffer = new byte[208];
+	protected final byte[] temp15 = new byte[15];
+	protected final byte[] temp12 = new byte[12];
 
     /**
      * Default constructor.
@@ -56,7 +55,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
 
 	@Override
 	protected byte[] receivePacketFromPhone() throws InterruptedException {
-		return NetworkManager.getLatestData(SimulatorData.Type.Types.SIM_DATA);
+		return NetworkManager.getLatestData(SimulatorData.Type.Types.BRICK_INFO);
 	}
 
 	private void sendPacketToPhone(byte[] sendData) {
@@ -66,14 +65,13 @@ public class LegacyBrickSimulator extends BrickSimulator {
         } catch (IOException e) {
             e.printStackTrace();
         }*/
-		NetworkManager.requestSend(SimulatorData.Type.Types.SIM_DATA,
+		NetworkManager.requestSend(SimulatorData.Type.Types.BRICK_INFO,
 										  SimulatorData.Data.Modules.LEGACY_CONTROLLER, sendData);
     }
 
 
-    public void handleIncomingPacket(byte[] data, int length, boolean wait)
-    {
-    	if (data[0] == PACKET_HEADER_0 && data[1] == PACKET_HEADER_1) { // valid packet
+	public void handleIncomingPacket(byte[] data, int length, boolean wait) {
+		if (data[0] == PACKET_HEADER_0 && data[1] == PACKET_HEADER_1) { // valid packet
 			if (data.length < 5) {
 				logger.log(Level.WARNING, "Received a data with in invalid length");
 				return;

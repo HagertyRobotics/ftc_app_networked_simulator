@@ -16,21 +16,26 @@ public class ClientHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         SimulatorData.Data received = (SimulatorData.Data) msg;
+
         // Uncomment to display all data
         /*for (byte test : data.getInfo(0).getBytes(Charsets.US_ASCII)) {
             System.out.print(String.format("0x%02X ", test));
         }*/
 
-        // We don't need to queue heartbearts (OPT_DATA2)
+        // We don't need to queue heartbearts (HEARTBEAT)
         if (received.getType().getType() != SimulatorData.Type.Types.HEARTBEAT) {
             // Print out size and data
             // System.out.println("Received Data of significance with size=" + data.getSerializedSize());
             NetworkManager.add(received);
         }
 
-        final SimulatorData.Data[] writeData = NetworkManager.getNextSends();
-        for (SimulatorData.Data data : writeData) {
-            writeMessage(ctx.channel(), data);
+        while (ctx.channel().isWritable()) {
+            SimulatorData.Data data = NetworkManager.getNextSend();
+            if (data != null) {
+                ctx.write(data);
+            } else {
+                break;
+            }
         }
     }
 
@@ -47,7 +52,16 @@ public class ClientHandler extends ChannelDuplexHandler {
             if (e.state() == IdleState.WRITER_IDLE ||
                         e.state() == IdleState.READER_IDLE ||
                         e.state() == IdleState.ALL_IDLE) {
-                writeMessage(ctx.channel(), HeartbeatTask.buildMessage());
+                while (ctx.channel().isWritable()) {
+                    SimulatorData.Data data = NetworkManager.getNextSend();
+                    if (data != null) {
+                        ctx.write(data);
+                    } else {
+                        ctx.write(HeartbeatTask.buildMessage());
+                        break;
+                    }
+                }
+                ctx.flush();
             }
         }
     }

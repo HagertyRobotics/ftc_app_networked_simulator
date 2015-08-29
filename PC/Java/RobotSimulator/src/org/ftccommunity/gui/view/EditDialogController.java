@@ -1,21 +1,19 @@
 package org.ftccommunity.gui.view;
 
 
-import org.ftccommunity.simulator.modules.BrickSimulator;
-
-import java.util.List;
-
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.ftccommunity.simulator.modules.BrickSimulator;
 import org.ftccommunity.simulator.net.protocol.SimulatorData;
+
+import java.util.List;
 
 /**
  * Dialog to edit details of a Motor Controller.
@@ -24,7 +22,9 @@ import org.ftccommunity.simulator.net.protocol.SimulatorData;
  */
 public class EditDialogController {
 
-	@FXML
+    private final ChoiceBox[] choiceBoxes;
+    private final TextField[][] portNames = new TextField[6][2];
+    @FXML
 	private Label brickTypeField;
     @FXML
     private TextField brickNameField;
@@ -34,13 +34,8 @@ public class EditDialogController {
     private TextField brickPortField;
     @FXML
     private TextField brickSerialField;
-
     @FXML
     private GridPane portGrid;
-
-    private final ChoiceBox[] choiceBoxes;
-    private final TextField[][] portNames = new TextField[6][2];
-
     private Stage dialogStage;
     private BrickSimulator brick;
     private boolean okClicked = false;
@@ -184,7 +179,7 @@ public class EditDialogController {
             return true;
         } else {
             // Show the error message.
-            Alert alert = new Alert(AlertType.ERROR);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.initOwner(dialogStage);
             alert.setTitle("Invalid Fields");
             alert.setHeaderText("Please correct invalid fields");
