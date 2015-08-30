@@ -4,7 +4,6 @@ package org.ftccommunity.simulator.modules;
 import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.DeviceFactory;
-import org.ftccommunity.simulator.modules.devices.DeviceType;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -12,16 +11,14 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.logging.Level;
 import javax.xml.bind.annotation.XmlElementRef;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,12 +33,9 @@ public abstract class BrickSimulator implements Runnable {
     protected String mType;
     protected int mNumberOfPorts;
 
-    protected final StringProperty mName;
+    private final StringProperty mName;
     protected final StringProperty mSerial;
-    protected IntegerProperty mPort;
-    protected int mPhonePort;
-    protected InetAddress mPhoneIPAddress;
-    protected DatagramSocket mServerSocket;
+    private final IntegerProperty mPort;
     protected String mFXMLFileName;
 
     @XmlElementRef(name="Devices")
@@ -50,9 +44,6 @@ public abstract class BrickSimulator implements Runnable {
     byte[] mReceiveData = new byte[1024];
     byte[] mSendData = new byte[1024];
 
-    /** Default Constructor.
-     *
-     */
     public BrickSimulator() {
         mName = new SimpleStringProperty("");
         mPort = new SimpleIntegerProperty(0);
@@ -64,48 +55,21 @@ public abstract class BrickSimulator implements Runnable {
     public void run() {
     	byte[] packet;
         try {
-        	mServerSocket = new DatagramSocket(mPort.intValue());
-
             while (!Thread.currentThread().isInterrupted()) {
                 packet = receivePacketFromPhone();
-            	handleIncomingPacket(packet, packet.length, false);
+            	handleIncomingPacket(packet, packet.length, true);
             }
             // Catch unhandled exceptions and cleanup
     	} catch (Exception e) {
-    		e.printStackTrace();
-    		close();
+    		logger.log(Level.SEVERE, e.toString(), e);
     	}
     }
 
-    private byte[] receivePacketFromPhone() {
-    	DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
-    	try {
-    		mServerSocket.receive(receivePacket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    protected abstract byte[] receivePacketFromPhone() throws InterruptedException;
 
-    	// Get the port and address of the sender from the incoming packet and set some global variables
-    	// to be used when we reply back.
-    	// TODO: do we need to set this every time?
-    	mPhonePort = receivePacket.getPort();
-    	mPhoneIPAddress = receivePacket.getAddress();
+	protected abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
 
-    	// Make a copy of the packet.  Not sure if we need to do this.  Might not hold on to it for long.
-    	byte[] mypacket = new byte[receivePacket.getLength()];
-    	System.arraycopy(receivePacket.getData(), 0, mypacket, 0, receivePacket.getLength());
-
-    	return mypacket;
-    }
-
-    public void close() {
-    	try {
-    		mServerSocket.close();
-    	} catch (Exception ex) {
-    		System.out.println("An error occurred while closing!");
-    		ex.printStackTrace();
-    	}
-    }
+    //public abstract String getName();
 
 	public abstract void setupDebugGuiVbox(VBox vbox);
 
@@ -113,9 +77,10 @@ public abstract class BrickSimulator implements Runnable {
 
 	public abstract void populateDetailsPane(Pane pane);
 
-	public abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
+	public abstract SimData findSimDataName(String name);
+	//public abstract void handleIncomingPacket(byte[] data, int length, boolean wait);
 
-	public abstract List<DeviceType> getDeviceTypeList();
+	public abstract List<SimulatorData.Type.Types> getDeviceTypeList();
 
 
     //---------------------------------------------------------------
@@ -171,11 +136,11 @@ public abstract class BrickSimulator implements Runnable {
     	return mDevices[i];
     }
 
-    public DeviceType getPortDeviceType(int i) {
+    public SimulatorData.Type.Types getPortDeviceType(int i) {
     	return mDevices[i].getType();
     }
 
-    public void setPortDeviceType(int i, DeviceType type) {
+    public void setPortDeviceType(int i, SimulatorData.Type.Types type) {
     	mDevices[i] = DeviceFactory.buildDevice(type);
     }
 
@@ -201,13 +166,6 @@ public abstract class BrickSimulator implements Runnable {
 			   return s;
 		   }
 	   }
-//   	for (int i=0;i<mNumberOfPorts;i++) {
-//   		if (portName[i] != null) {
-//   			if (portName[i].equals(name)) {
-//   				return portSimData[i];
-//   			}
-//   		}
-//   	}
 	   return null;
     }
 }

@@ -79,18 +79,37 @@ public class FtcConfigurationActivity extends Activity{
   private static final int EDIT_MOTOR_CONTROLLER = 1;
   private static final int EDIT_SERVO_CONTROLLER = 2;
   private static final int EDIT_LEGACY_MODULE_CONTROLLER = 3;
-
+  protected Map<SerialNumber, DeviceType> scannedDevices = new HashMap<SerialNumber, DeviceType>();
+  protected Set<Entry<SerialNumber, DeviceType>> entries = new HashSet<Entry<SerialNumber, DeviceType>>();
+  protected SharedPreferences preferences;
+  DialogInterface.OnClickListener close_ok_listener = new DialogInterface.OnClickListener(){
+    public void onClick(DialogInterface dialog, int button) {
+      //do nothing
+    }
+  };
+  DialogInterface.OnClickListener do_nothing_cancel_listener = new DialogInterface.OnClickListener() {
+    public void onClick(DialogInterface dialog, int button){
+      // do nothing
+    }
+  };
   private Thread t;
-
   private Map<SerialNumber, ControllerConfiguration> deviceControllers = new HashMap<SerialNumber, ControllerConfiguration>();
   private Context context;
   private DeviceManager deviceManager;
   private Button scanButton;
   private String preferredFilename = Utility.NO_FILE;
-  protected Map<SerialNumber, DeviceType> scannedDevices = new HashMap<SerialNumber, DeviceType>();
-  protected Set<Entry<SerialNumber, DeviceType>> entries = new HashSet<Entry<SerialNumber, DeviceType>>();
-  protected SharedPreferences preferences;
   private Utility utility;
+  /**
+   * The cancel listener that changes the filename and ends the activity, like one would
+   * expect the back button to do.
+   */
+  DialogInterface.OnClickListener back_cancel_listener = new DialogInterface.OnClickListener(){
+    public void onClick(DialogInterface dialog, int button){
+      // Set preferredFilename to unchanged file that was there previously
+      utility.saveToPreferences(preferredFilename.substring(7).trim(), R.string.pref_hardware_config_filename); // chop off "Unsaved"
+      finish();
+    }
+  };
 
   @Override
   protected void onCreate(Bundle savedInstanceState){
@@ -115,22 +134,16 @@ public class FtcConfigurationActivity extends Activity{
     preferences = PreferenceManager.getDefaultSharedPreferences(this);
   }
 
-  DialogInterface.OnClickListener close_ok_listener = new DialogInterface.OnClickListener(){
-    public void onClick(DialogInterface dialog, int button){
-      //do nothing
-    }
-  };
-
   private void buildInfoButtons(){
     Button devicesInfoButton = (Button) findViewById(R.id.devices_holder).findViewById(R.id.info_btn);
     devicesInfoButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
         AlertDialog.Builder builder = utility.buildBuilder("Devices", "These are the devices " +
-            "discovered by the Hardware Wizard. You can click on the name of each device to edit" +
-            " the information relating to that device. Make sure each device has a unique name. " +
-            "The names should match what is in the Op mode code. Scroll down to see more " +
-            "devices if there are any.");
+                "discovered by the Hardware Wizard. You can click on the name of each device to edit" +
+                " the information relating to that device. Make sure each device has a unique name. " +
+                "The names should match what is in the Op mode code. Scroll down to see more " +
+                "devices if there are any.");
         builder.setPositiveButton("Ok", close_ok_listener);
         AlertDialog alert = builder.create();
         alert.show();
@@ -144,8 +157,8 @@ public class FtcConfigurationActivity extends Activity{
       @Override
       public void onClick(View view) {
         AlertDialog.Builder builder = utility.buildBuilder("Save Configuration", "Clicking the " +
-            "save button will create an xml file in: \n      /sdcard/FIRST/  \nThis file will be used to " +
-            "initialize the robot.");
+                "save button will create an xml file in: \n      /sdcard/FIRST/  \nThis file will be used to " +
+                "initialize the robot.");
         builder.setPositiveButton("Ok", close_ok_listener);
         AlertDialog alert = builder.create();
         alert.show();
@@ -178,36 +191,36 @@ public class FtcConfigurationActivity extends Activity{
       @Override
       public void onClick(View view) {
 
-      t = new Thread(new Runnable() {
-        @Override
-        public void run() {
-        try{
-          DbgLog.msg("Scanning USB bus");
-          scannedDevices = deviceManager.scanForUsbDevices();
-
-        }catch (RobotCoreException e){
-          DbgLog.error("Device scan failed");
-        }
-
-        runOnUiThread(new Runnable() {
+        t = new Thread(new Runnable() {
           @Override
           public void run() {
-          utility.resetCount();
-          clearDuplicateWarning();
-          utility.saveToPreferences(Utility.NO_FILE, R.string.pref_hardware_config_filename);
-          preferredFilename = Utility.NO_FILE;
-          utility.updateHeader(Utility.NO_FILE, R.string.pref_hardware_config_filename, R.id.active_filename, R.id.included_header);
-          entries = scannedDevices.entrySet();
+            try {
+              DbgLog.msg("Scanning USB bus");
+              scannedDevices = deviceManager.scanForUsbDevices();
 
-          //if you just scanned, wipe out the previous devices
-          deviceControllers = new HashMap<SerialNumber, ControllerConfiguration>();
-          utility.createLists(entries, deviceControllers);
-          populateList();
-          warnIfNoDevices();
+            } catch (RobotCoreException e) {
+              DbgLog.error("Device scan failed");
+            }
+
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                utility.resetCount();
+                clearDuplicateWarning();
+                utility.saveToPreferences(Utility.NO_FILE, R.string.pref_hardware_config_filename);
+                preferredFilename = Utility.NO_FILE;
+                utility.updateHeader(Utility.NO_FILE, R.string.pref_hardware_config_filename, R.id.active_filename, R.id.included_header);
+                entries = scannedDevices.entrySet();
+
+                //if you just scanned, wipe out the previous devices
+                deviceControllers = new HashMap<SerialNumber, ControllerConfiguration>();
+                utility.createLists(entries, deviceControllers);
+                populateList();
+                warnIfNoDevices();
+              }
+            });
           }
         });
-        }
-      });
         alertBeforeScan();
       }
     });
@@ -264,13 +277,12 @@ public class FtcConfigurationActivity extends Activity{
     warnIfNoDevices();
   }
 
-
-  private void warnIfNoDevices(){
+  private void warnIfNoDevices() {
     if (deviceControllers.size() == 0){
       String msg0 ="No devices found!";
       String msg1 = "In order to find devices: \n" +
-          "    1. Attach a robot \n " +
-          "   2. Press the 'Scan' button";
+              "    1. Attach a robot \n " +
+              "   2. Press the 'Scan' button";
       utility.setOrangeText(msg0, msg1, R.id.empty_devicelist, R.layout.orange_warning, R.id.orangetext0, R.id.orangetext1);
       clearDuplicateWarning();
     } else {
@@ -280,18 +292,17 @@ public class FtcConfigurationActivity extends Activity{
     }
   }
 
-  private void warnDuplicateNames(String dupeMsg){
+  private void warnDuplicateNames(String dupeMsg) {
     String msg0 ="Found " + dupeMsg;
     String msg1 = "Please fix and re-save.";
     utility.setOrangeText(msg0, msg1, R.id.warning_layout, R.layout.orange_warning, R.id.orangetext0, R.id.orangetext1);
   }
 
-  private void clearDuplicateWarning(){
+  private void clearDuplicateWarning() {
     LinearLayout warning_layout = (LinearLayout) findViewById(R.id.warning_layout);
     warning_layout.removeAllViews();
     warning_layout.setVisibility(View.GONE);
   }
-
 
   /**
    * Populates the list with the relevant controllers from the deviceControllers variable.
@@ -309,7 +320,7 @@ public class FtcConfigurationActivity extends Activity{
       public void onItemClick(AdapterView<?> adapterView, View v, int pos, long arg3) {
         ControllerConfiguration item = (ControllerConfiguration) adapterView.getItemAtPosition(pos);
         ConfigurationType itemType = item.getType();
-        if (itemType.equals(ConfigurationType.MOTOR_CONTROLLER)){
+        if (itemType.equals(ConfigurationType.MOTOR_CONTROLLER)) {
           int requestCode = EDIT_MOTOR_CONTROLLER;
           Intent editMotorControllerIntent = new Intent(context, EditMotorControllerActivity.class);
           editMotorControllerIntent.putExtra(EditMotorControllerActivity.EDIT_MOTOR_CONTROLLER_CONFIG, item);
@@ -317,7 +328,7 @@ public class FtcConfigurationActivity extends Activity{
           setResult(RESULT_OK, editMotorControllerIntent);
           startActivityForResult(editMotorControllerIntent, requestCode);
         }
-        if (itemType.equals(ConfigurationType.SERVO_CONTROLLER)){
+        if (itemType.equals(ConfigurationType.SERVO_CONTROLLER)) {
           int requestCode = EDIT_SERVO_CONTROLLER;
           Intent editServoControllerIntent = new Intent(context, EditServoControllerActivity.class);
           editServoControllerIntent.putExtra(EditServoControllerActivity.EDIT_SERVO_ACTIVITY, item);
@@ -325,7 +336,7 @@ public class FtcConfigurationActivity extends Activity{
           setResult(RESULT_OK, editServoControllerIntent);
           startActivityForResult(editServoControllerIntent, requestCode);
         }
-        if (itemType.equals(ConfigurationType.LEGACY_MODULE_CONTROLLER)){
+        if (itemType.equals(ConfigurationType.LEGACY_MODULE_CONTROLLER)) {
           int requestCode = EDIT_LEGACY_MODULE_CONTROLLER;
           Intent editLegacyControllerIntent = new Intent(context, EditLegacyModuleControllerActivity.class);
           editLegacyControllerIntent.putExtra(EditLegacyModuleControllerActivity.EDIT_LEGACY_CONFIG, item);
@@ -342,7 +353,7 @@ public class FtcConfigurationActivity extends Activity{
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-    if (resultCode == RESULT_CANCELED){
+    if (resultCode == RESULT_CANCELED) {
       return;
     }
     Serializable extra = null;
@@ -361,7 +372,7 @@ public class FtcConfigurationActivity extends Activity{
 
       String name = preferredFilename;
       // only update the filename if it hasn't already been updated to have "unsaved" in it
-      if (!name.toLowerCase().contains(Utility.UNSAVED.toLowerCase())){
+      if (!name.toLowerCase().contains(Utility.UNSAVED.toLowerCase())) {
         name = Utility.UNSAVED + " " + preferredFilename;
         utility.saveToPreferences(name, R.string.pref_hardware_config_filename);
         preferredFilename = name;
@@ -374,7 +385,7 @@ public class FtcConfigurationActivity extends Activity{
   }
 
   @Override
-  protected void onDestroy(){
+  protected void onDestroy() {
     super.onDestroy();
     utility.resetCount();
   }
@@ -383,30 +394,30 @@ public class FtcConfigurationActivity extends Activity{
    * This has a lot of code in common with saveConfiguration. This is apparently the only way to do
    * this, because of the way the onClickListener accesses the "final EditText input". I
    * modularized as much as I could but this was as far as I got.
-   *
+   * <p/>
    * Note that onBackPressed has to have a finish() once you click the "OK" button or the back button
    * won't actually go back.
    */
   @Override
   public void onBackPressed() {
-    if (preferredFilename.toLowerCase().contains(Utility.UNSAVED.toLowerCase())){
+    if (preferredFilename.toLowerCase().contains(Utility.UNSAVED.toLowerCase())) {
       boolean foundDuplicates = utility.writeXML(deviceControllers);
-      if (foundDuplicates){
+      if (foundDuplicates) {
         return;
       }
       String message = "Please save your file before exiting the Hardware Wizard! \n " +
-          "If you click 'Cancel' your changes will be lost.";
+              "If you click 'Cancel' your changes will be lost.";
       final EditText input = new EditText(this);
       String currentFile = utility.prepareFilename(preferredFilename);
 
       input.setText(currentFile);
       AlertDialog.Builder builder = utility.buildBuilder("Unsaved changes", message);
       builder.setView(input);
-      DialogInterface.OnClickListener ok_listener = new DialogInterface.OnClickListener(){
-        public void onClick(DialogInterface dialog, int button){
-          String filename = input.getText().toString()+Utility.FILE_EXT;
+      DialogInterface.OnClickListener ok_listener = new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int button) {
+          String filename = input.getText().toString() + Utility.FILE_EXT;
           filename = filename.trim();
-          if (filename.equals(".xml")){
+          if (filename.equals(".xml")) {
             utility.complainToast("File not saved: Please entire a filename.", context);
             return;
           }
@@ -416,7 +427,7 @@ public class FtcConfigurationActivity extends Activity{
             utility.complainToast(e.getMessage(), context);
             DbgLog.error(e.getMessage());
             return;
-          } catch (IOException e){
+          } catch (IOException e) {
             warnDuplicateNames(e.getMessage());
             DbgLog.error(e.getMessage());
             return;
@@ -439,27 +450,15 @@ public class FtcConfigurationActivity extends Activity{
   }
 
   /**
-   * The cancel listener that changes the filename and ends the activity, like one would
-   * expect the back button to do.
-   */
-  DialogInterface.OnClickListener back_cancel_listener = new DialogInterface.OnClickListener(){
-    public void onClick(DialogInterface dialog, int button){
-      // Set preferredFilename to unchanged file that was there previously
-      utility.saveToPreferences(preferredFilename.substring(7).trim(), R.string.pref_hardware_config_filename); // chop off "Unsaved"
-      finish();
-    }
-  };
-
-  /**
    * A button-specific method, this gets called when you click the "writeXML" button.
    * This writes the current objects into an XML file located in the Configuration File Directory.
    * The user is prompted for the name of the file.
    * @param v the View from which this was called
    */
-  public void saveConfiguration(View v){
+  public void saveConfiguration(View v) {
 
     boolean foundDuplicates = utility.writeXML(deviceControllers);
-    if (foundDuplicates){
+    if (foundDuplicates) {
       return;
     }
 
@@ -470,11 +469,11 @@ public class FtcConfigurationActivity extends Activity{
     input.setText(currentFile);
     AlertDialog.Builder builder = utility.buildBuilder("Enter file name", message);
     builder.setView(input);
-    DialogInterface.OnClickListener ok_listener = new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int button){
-        String filename = input.getText().toString()+Utility.FILE_EXT;
+    DialogInterface.OnClickListener ok_listener = new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int button) {
+        String filename = input.getText().toString() + Utility.FILE_EXT;
         filename = filename.trim();
-        if (filename.equals(".xml")){
+        if (filename.equals(".xml")) {
           utility.complainToast("File not saved: Please entire a filename.", context);
           return;
         }
@@ -484,7 +483,7 @@ public class FtcConfigurationActivity extends Activity{
           utility.complainToast(e.getMessage(), context);
           DbgLog.error(e.getMessage());
           return;
-        } catch (IOException e){
+        } catch (IOException e) {
           //utility.complainToast("Found " + e.getMessage() + "\n Please fix and re-save", context);
           warnDuplicateNames(e.getMessage());
           DbgLog.error(e.getMessage());
@@ -502,14 +501,6 @@ public class FtcConfigurationActivity extends Activity{
     builder.setNegativeButton("Cancel", do_nothing_cancel_listener);
     builder.show();
   }
-
-  DialogInterface.OnClickListener do_nothing_cancel_listener = new DialogInterface.OnClickListener(){
-    public void onClick(DialogInterface dialog, int button){
-      // do nothing
-    }
-  };
-
-
 
   /**
    * Turns a list of device Controllers into a hashmap. When reading from an XML file,

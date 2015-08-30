@@ -50,7 +50,7 @@ public class DebugWindowController {
     /**
      * Start a thread that queries the Brick Simulators and displays current values here.
      */
-    public void startLiveDebug() {
+    private void startLiveDebug() {
 
         Task<Void> task = new Task<Void>() {
       	  @Override

@@ -75,7 +75,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <Button mnemonicParsing="false" onAction="#handleStartSimulatorButton" text="Start Simulator">
+                        <Button fx:id="btnStartSimulator" mnemonicParsing="false" onAction="#handleStartSimulatorButton" text="Start Simulator">
                             <GridPane.margin>
                                 <Insets left="10.0" />
                             </GridPane.margin>

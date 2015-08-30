@@ -14,26 +14,27 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 @XmlRootElement(name="TetrixMotorControllerDevice")
 @XmlAccessorType(XmlAccessType.NONE)
 public class TetrixMotorControllerDevice extends Device {
 
 	// GUI stuff for the Debug windows
-	public Label mMotor1SpeedDebugLabel;
-	public Label mMotor2SpeedDebugLabel;
+	private Label mMotor1SpeedDebugLabel;
+	private Label mMotor2SpeedDebugLabel;
 
     /**
      * Default constructor.
      */
 	public TetrixMotorControllerDevice() {
-		super(DeviceType.TETRIX_MOTOR);
+		super(SimulatorData.Type.Types.LEGACY_MOTOR);
 		mSimData = new SimData[2];
 		mSimData[0] = new MotorSimData();	// Add 1st motor
 		mSimData[1] = new MotorSimData();	// Add 2nd motor
 	}
 
-	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum ) {
+	public void processBuffer(byte[] currentStateBuffer, int portNum ) {
 		int p;
 
         p=16+portNum*32;
@@ -41,17 +42,11 @@ public class TetrixMotorControllerDevice extends Device {
         // This is for Port P0 only.  16 is the base offset.  Each port has 32 bytes.
         // If I2C_ACTION is set, take some action
 //	        if (packet[p+32] == (byte)0xff) { // Action flag
-        if ((packet[p] & (byte)0x01) == (byte)0x01) { // I2C Mode
-        	if ((packet[p] & (byte)0x80) == (byte)0x80) { // Read mode
-            	// Copy this port's 32 bytes into buffer
-        		System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
-
+        if ((currentStateBuffer[p] & (byte)0x01) == (byte)0x01) { // I2C Mode
+        	if ((currentStateBuffer[p] & (byte)0x80) == (byte)0x80) { // Read mode
             } else { // Write mode
-            	// Copy this port's 32 bytes into buffer
-            	System.arraycopy(packet, p, mCurrentStateBuffer, p, 32);
-
-            	((MotorSimData)mSimData[0]).setMotorSpeed(mCurrentStateBuffer[p+4+5]);
-            	((MotorSimData)mSimData[1]).setMotorSpeed(mCurrentStateBuffer[p+4+6]);
+            	((MotorSimData)mSimData[0]).setMotorSpeed(currentStateBuffer[p+4+5]);
+            	((MotorSimData)mSimData[1]).setMotorSpeed(currentStateBuffer[p+4+6]);
             }
         }
     }
@@ -70,7 +65,7 @@ public class TetrixMotorControllerDevice extends Device {
 		vbox.setPadding(new Insets(10));
 		vbox.setSpacing(8);
 
-		Text title = new Text(mType.getName());
+		Text title = new Text(DeviceType.getName(mType));
 	    title.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 	    vbox.getChildren().add(title);
 

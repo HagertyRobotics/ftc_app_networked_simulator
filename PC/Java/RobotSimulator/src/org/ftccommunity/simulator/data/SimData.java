@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public abstract class SimData {
 	public final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-	protected StringProperty mName = null;
+	private StringProperty mName = null;
 
 	public SimData() {
 		mName = new SimpleStringProperty("");

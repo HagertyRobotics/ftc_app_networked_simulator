@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javax.xml.bind.*;
 
 import org.ftccommunity.gui.MainApp;
+import org.ftccommunity.simulator.data.AnalogSimData;
 import org.ftccommunity.simulator.data.MotorSimData;
 import org.ftccommunity.simulator.data.NullSimData;
 import org.ftccommunity.simulator.data.SimData;
@@ -29,12 +30,11 @@ public final class Utils {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public static String bufferToHexString(byte[] data, int start, int length) {
-        int i;
         int myStop;
         StringBuilder sb = new StringBuilder();
         //byte [] subArray = Arrays.copyOfRange(a, 4, 6);
         myStop = (length > data.length) ? data.length : length;
-        for (i=start; i<start+myStop; i++) {
+        for (int i=start; i < start+myStop; i++) {
             sb.append(String.format("%02x ", data[i]));
         }
         return sb.toString();
@@ -61,7 +61,10 @@ public final class Utils {
         		USBMotorControllerDevice.class,
         		MotorSimData.class,
         		NullSimData.class,
-        		SimData.class);
+        		SimData.class,
+        		AnalogSimData.class,
+        		NullSimData.class
+        		);
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
@@ -116,7 +119,10 @@ public final class Utils {
                 		TetrixMotorControllerDevice.class,
                 		TetrixServoControllerDevice.class,
                 		USBMotorControllerDevice.class,
-                		MotorSimData.class);
+                		MotorSimData.class,
+                		AnalogSimData.class,
+                		NullSimData.class
+                		);
 
         Unmarshaller um = context.createUnmarshaller();
         try {

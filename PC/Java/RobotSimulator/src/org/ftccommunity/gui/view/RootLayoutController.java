@@ -54,7 +54,7 @@ public class RootLayoutController {
         fileChooser.getExtensionFilters().add(extFilter);
 
         // Show save file dialog
-        File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
+        File file = fileChooser.showOpenDialog(MainApp.getPrimaryStage());
 
         if (file != null) {
             try {
@@ -96,7 +96,7 @@ public class RootLayoutController {
         fileChooser.getExtensionFilters().add(extFilter);
 
         // Show save file dialog
-        File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
+        File file = fileChooser.showSaveDialog(MainApp.getPrimaryStage());
 
         if (file != null) {
             // Make sure it has the correct extension

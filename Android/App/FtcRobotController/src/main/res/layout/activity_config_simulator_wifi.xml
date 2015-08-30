@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="5dp">
+
+        <!--<EditText-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:inputType="number"-->
+        <!--android:ems="4"-->
+        <!--android:id="@+id/simPortNumber"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:layout_margin="5dp"-->
+        <!--android:layout_toEndOf="@id/simPortNumberLabel"-->
+        <!--android:text="7002" />-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:labelFor="@id/simPortNumber"-->
+        <!--android:id="@+id/simPortNumberLabel"-->
+        <!--android:layout_alignBaseline="@id/simPortNumber"-->
+        <!--android:textAlignment="viewEnd"-->
+        <!--android:text="Port Number" />-->
+        <!--&lt;!&ndash;android:layout_toStartOf="@id/simPortNumber"/>&ndash;&gt;-->
+        <!--</RelativeLayout>-->
+
+        <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:layout_margin="5dp">-->
+
+        <!--<EditText-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:ems="8"-->
+        <!--android:id="@+id/simComputerIp"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:layout_margin="5dp"-->
+        <!--android:layout_toEndOf="@id/simComputerIpLabel"-->
+        <!--android:text="192.168.2.255" />-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:labelFor="@id/simPortNumber"-->
+        <!--android:id="@+id/simComputerIpLabel"-->
+        <!--android:layout_alignBaseline="@id/simComputerIp"-->
+        <!--android:textAlignment="viewEnd"-->
+        <!--android:text="Computer IP Address" />-->
+        <!--&lt;!&ndash;android:layout_toStartOf="@id/simPortNumber"/>&ndash;&gt;-->
+    </RelativeLayout>
+</LinearLayout>

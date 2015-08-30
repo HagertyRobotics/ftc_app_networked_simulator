@@ -50,9 +50,8 @@ import java.util.ArrayList;
 
 public class EditMotorControllerActivity extends Activity{
 
-  private Utility utility;
   public static final String EDIT_MOTOR_CONTROLLER_CONFIG = "EDIT_MOTOR_CONTROLLER_CONFIG";
-
+  private Utility utility;
   private MotorControllerConfiguration motorControllerConfigurationConfig;
   private ArrayList<DeviceConfiguration> motors = new ArrayList<DeviceConfiguration>();
   private MotorConfiguration motor1 = new MotorConfiguration(1);

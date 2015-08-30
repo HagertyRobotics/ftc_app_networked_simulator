@@ -4,10 +4,6 @@ import android.util.Log;
 
 public class FT_Device_Motor extends FT_Device {
 
-    public FT_Device_Motor(String serialNumber, String description, String ipAddress, int port) {
-        super(serialNumber, description, ipAddress, port);
-    }
-
     /*
     ** Packet types
     */
@@ -17,6 +13,9 @@ public class FT_Device_Motor extends FT_Device {
     protected final byte[] RECEIVE_SYNC_COMMAND_0 = { 51, -52, -128, 0, 0};
     protected final byte[] RECEIVE_SYNC_COMMAND_94 = { 51, -52, -128, 0, (byte)94};
     protected final byte[] CONTROLLER_TYPE_LEGACY = { 0, 77, 77};       // Controller type USB Motor Module
+    public FT_Device_Motor(String serialNumber, String description) {
+        super(serialNumber, description);
+    }
 
     public int write(byte[] data, int length, boolean wait)
     {
@@ -27,7 +26,7 @@ public class FT_Device_Motor extends FT_Device {
             return rc;
         }
 
-        Log.v(mFT_DeviceDescription, "WRITE(): Buffer len=" + length + " (" + bufferToHexString(data, 0, length) + ")");
+        //Log.v(mFT_DeviceDescription, "WRITE(): Buffer len=" + length + " (" + bufferToHexString(data, 0, length) + ")");
 
         // Write Command
         if (data[0] == WRITE_COMMAND[0] && data[2] == WRITE_COMMAND[2]) {  // WRITE_COMMAND

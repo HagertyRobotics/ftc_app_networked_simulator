@@ -1,5 +1,6 @@
 package org.ftccommunity.simulator.modules;
 
+import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.DeviceType;
 import org.ftccommunity.simulator.modules.devices.USBMotorControllerDevice;
@@ -7,11 +8,11 @@ import org.ftccommunity.simulator.modules.devices.USBMotorControllerDevice;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
 @XmlRootElement(name="Motor")
 public class MotorBrickSimulator extends BrickSimulator {
     private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    protected final byte[] mCurrentStateBuffer = new byte[94];
+    protected final byte[] mCurrentStateBuffer = new byte[30];
 
     /*
      ** Packet types
@@ -35,7 +36,7 @@ public class MotorBrickSimulator extends BrickSimulator {
     protected final byte[] readCmd = {85, -86, -128, 0, 0};
     protected final byte[] recSyncCmd3 = {51, -52, 0, 0, 3};
     protected final byte[] recSyncCmd0 = {51, -52, -128, 0, 0};
-    protected final byte[] recSyncCmd94 = {51, -52, -128, 0, (byte) 94};
+    protected final byte[] recSyncCmd30 = {51, -52, -128, 0, (byte) 30};
     protected final byte[] controllerTypeLegacy = {0, 77, 77};       // Controller type USBLegacyModule
 
 
@@ -52,27 +53,36 @@ public class MotorBrickSimulator extends BrickSimulator {
     	}
     }
 
+    @Override
+    protected byte[] receivePacketFromPhone() {
+        return new byte[0];
+    }
+
     private void sendPacketToPhone(byte[] sendData) {
-    	try {
+    	/*try {
     		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
         	mServerSocket.send(sendPacket);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+        NetworkManager.requestSend(SimulatorData.Type.Types.LEGACY_MOTOR,
+                                          SimulatorData.Data.Modules.LEGACY_MOTOR, sendData);
     }
 
 
     public void handleIncomingPacket(byte[] data, int length, boolean wait)
     {
-    	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)94) { // readCmd
+    	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)30) { // Read Command
+    		mCurrentStateBuffer[20] = (byte)150; // upper 8 bits. battery voltage  80mv per
+    		mCurrentStateBuffer[21] = 00;  // lower two bits
     		sendPacketToPhone(mCurrentStateBuffer);
-        } else {
-	        // Write Command...
-	    	// Process the received data packet
+        } else { // Write Command
+        	int offset = Byte.toUnsignedInt(data[3]);
+        	int len = Byte.toUnsignedInt(data[4]);
+        	System.arraycopy(data, 5, mCurrentStateBuffer, offset, len);
 	        // Loop through each of the ports in this object
-
 	        for (int i=0;i<mNumberOfPorts;i++) {
-	        	mDevices[i].processBuffer(data, mCurrentStateBuffer, i);
+	        	mDevices[i].processBuffer(mCurrentStateBuffer, i);
 	        }
         }
     }
@@ -98,7 +108,7 @@ public class MotorBrickSimulator extends BrickSimulator {
 			Text portText = new Text("Port " + i);
 			grid.add(portText, 0, i);
 
-			Text typeText = new Text(mDevices[i].getType().getName());
+			Text typeText = new Text(DeviceType.getName(mDevices[i].getType()));
 			grid.add(typeText, 1,  i);
 
         	List<String> nameList = getPortDevice(i).getPortNames();
@@ -110,6 +120,10 @@ public class MotorBrickSimulator extends BrickSimulator {
 		pane.getChildren().add(grid);
 	}
 
+    @Override
+    public SimData findSimDataName(String name) {
+        return null;
+    }
 
     /**
      * Getters/Setters
@@ -128,9 +142,9 @@ public class MotorBrickSimulator extends BrickSimulator {
 		mDevices[0].updateDebugGuiVbox();
 	}
 
-	public List<DeviceType> getDeviceTypeList() {
-		List<DeviceType> dtl = new ArrayList<>();
-		dtl.add(DeviceType.USB_MOTOR);
+	public List<SimulatorData.Type.Types> getDeviceTypeList() {
+		List<SimulatorData.Type.Types> dtl = new ArrayList<>();
+		dtl.add(SimulatorData.Type.Types.USB_MOTOR);
 		return dtl;
 	}
 

@@ -1,10 +1,8 @@
 package com.ftdi.j2xx;
 
-public class FT_Device_Legacy extends FT_Device {
+import android.util.Log;
 
-    public FT_Device_Legacy(String serialNumber, String description, String ipAddress, int port) {
-        super(serialNumber, description, ipAddress, port);
-    }
+public class FT_Device_Legacy extends FT_Device {
 
     /*
     ** Packet types
@@ -15,6 +13,9 @@ public class FT_Device_Legacy extends FT_Device {
     protected final byte[] RECEIVE_SYNC_COMMAND_0 = { 51, -52, -128, 0, 0};
     protected final byte[] RECEIVE_SYNC_COMMAND_208 = { 51, -52, -128, 0, (byte)208};
     protected final byte[] CONTROLLER_TYPE_LEGACY = { 0, 77, 73};       // Controller type USBLegacyModule
+    public FT_Device_Legacy(String serialNumber, String description) {
+        super(serialNumber, description);
+    }
 
     public int write(byte[] data, int length, boolean wait)
     {
@@ -54,7 +55,7 @@ public class FT_Device_Legacy extends FT_Device {
 //                Log.v("Legacy", "WRITE: Delta Time = " + mDeltaWriteTime);
 
                 // Set the Port S0 ready bit in the global part of the Current State Buffer
-                mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
+                //mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
 
             }
             // Read Command

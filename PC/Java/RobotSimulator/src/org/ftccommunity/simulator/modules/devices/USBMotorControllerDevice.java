@@ -14,29 +14,29 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 @XmlRootElement(name="USBMotorControllerDevice")
 @XmlAccessorType(XmlAccessType.NONE)
 public class USBMotorControllerDevice extends Device {
 
 	// GUI stuff for the Debug windows
-	public Label mMotor1SpeedDebugLabel;
-	public Label mMotor2SpeedDebugLabel;
+	private Label mMotor1SpeedDebugLabel;
+	private Label mMotor2SpeedDebugLabel;
 
     /**
      * Default constructor.
      */
 	public USBMotorControllerDevice() {
-		super(DeviceType.USB_MOTOR);
+		super(SimulatorData.Type.Types.USB_MOTOR);
 		mSimData = new SimData[2];
 		mSimData[0] = new MotorSimData();	// Add 1st motor
 		mSimData[1] = new MotorSimData();	// Add 2nd motor
 	}
 
-	public void processBuffer(byte[] packet, byte[] mCurrentStateBuffer, int portNum) {
-		System.arraycopy(packet, 0, mCurrentStateBuffer, 0, packet.length);
-    	((MotorSimData)mSimData[0]).setMotorSpeed(packet[0x45]);
-    	((MotorSimData)mSimData[1]).setMotorSpeed(packet[0x46]);
+	public void processBuffer(byte[] currentStateBuffer, int portNum) {
+    	((MotorSimData)mSimData[0]).setMotorSpeed(currentStateBuffer[0x5]);
+    	((MotorSimData)mSimData[1]).setMotorSpeed(currentStateBuffer[0x6]);
     }
 
 	//
@@ -52,7 +52,7 @@ public class USBMotorControllerDevice extends Device {
 		vbox.setPadding(new Insets(10));
 		vbox.setSpacing(8);
 
-		Text title = new Text(mType.getName());
+		Text title = new Text(DeviceType.getName(mType));
 	    title.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 	    vbox.getChildren().add(title);
 

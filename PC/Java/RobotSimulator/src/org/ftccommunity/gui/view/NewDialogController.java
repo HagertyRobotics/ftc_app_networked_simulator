@@ -1,5 +1,6 @@
 package org.ftccommunity.gui.view;
 
+import org.ftccommunity.gui.MainApp;
 import org.ftccommunity.simulator.modules.BrickSimulator;
 import org.ftccommunity.simulator.modules.LegacyBrickSimulator;
 import org.ftccommunity.simulator.modules.MotorBrickSimulator;
@@ -51,14 +52,18 @@ public class NewDialogController {
 
     @FXML
     public void initChoiceBox() {
-    	brickChoiceBox.setItems(FXCollections.observableArrayList("Core Legacy Module","Core Motor Controller","Core Servo Controller"));
+    	brickChoiceBox.setItems(FXCollections.observableArrayList(
+    			"Core Legacy Module",
+    			"Core Motor Controller",
+    			"Core Servo Controller"
+    	));
     	brickChoiceBox.getSelectionModel().selectFirst();
     }
 
     /**
      * Sets the brick to be edited in the dialog.
      *
-     * @param brick
+     * @param brickHolder
      */
     public void setBrick(BrickSimulator[] brickHolder) {
         this.brickHolder = brickHolder;
@@ -113,6 +118,10 @@ public class NewDialogController {
     private boolean isInputValid() {
         String errorMessage = "";
 
+        return isInputEmpty(errorMessage);
+    }
+
+    private boolean isInputEmpty(String errorMessage) {
         if (errorMessage.length() == 0) {
             return true;
         } else {

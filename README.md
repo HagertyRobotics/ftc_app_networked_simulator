@@ -6,17 +6,20 @@ The goal of this project is to create a standalone app that will replace the USB
 
 ## Software Used
 * Android Studio
-  * Version: 1.2.1.1
+  * Version: 1.2.1.1 - 1.3.1
 * Eclipse 
   * Version: Mars Release (4.5.0)
   * Need JavaFX; use http://efxclipse.bestsolution.at/install.html#all-in-one for pre-packaged install.
+* IntelliJ IDEA
+  * Version: 14 - 15
+  * Optional: JavaFX Scene Builder
 * V-Rep Pro EDU
   * Version: 3.2.1
   * Vendor: Coppelia Robotics
 * Java JDK 
-  * Version: jdk1.8.0_45
-* TCPView  (Used to kill process holding port 6500 when pc java program doesn't release it. TODO: fix)
- * Vendor: www.sysinternals.com
+  * Version: jdk1.8.0_51
+* ~~TCPView  (Used to kill process holding port 6500 when pc java program doesn't release it. TODO: fix)
+  Vendor: www.sysinternals.com~~
 
 ## Getting Started
 
@@ -55,10 +58,11 @@ In the repo you'll find the following directories and files.
   * Compile and run the app
     * Setup the newly found legacy controller with two motors "motor_1" and "motor_2"
     * Save configuration
-* Open PC Path editor and add following directory to PATH variable:
+* Open PC Path editor and add following directory to PATH variable, or copy the contents to the directory
+  where the program is ran:
  * C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\remoteApiBindings\java\lib\64Bit
-* Open V-Rep simulator and open scene file PC/V-rep/FTCRobot.ttt
-* Open Eclipse and import PC/Java/RobotSimulator
+* Open V-Rep simulator and open scene file PC/V-rep/FTCRobot.ttt, start the simulation
+* Open Eclipse or IntelliJ IDEA and import PC/Java/RobotSimulator
   * Compile and Run RobotSimulator  
     * Robot Simulator will listen on the socket selected in the GUI for incoming packets from the Phone and forward motor commands to the V-Rep simulator
     * Press the "Start Simulator" button to start the simulation.

@@ -63,11 +63,11 @@ import java.util.Set;
 
 public class AutoConfigureActivity extends Activity {
 
+  protected Map<SerialNumber, DeviceManager.DeviceType> scannedDevices = new HashMap<SerialNumber, DeviceManager.DeviceType>();
+  protected Set<Map.Entry<SerialNumber, DeviceManager.DeviceType>> entries = new HashSet<Map.Entry<SerialNumber, DeviceManager.DeviceType>>();
   private Context context;
   private Button configureButton;
   private DeviceManager deviceManager;
-  protected Map<SerialNumber, DeviceManager.DeviceType> scannedDevices = new HashMap<SerialNumber, DeviceManager.DeviceType>();
-  protected Set<Map.Entry<SerialNumber, DeviceManager.DeviceType>> entries = new HashSet<Map.Entry<SerialNumber, DeviceManager.DeviceType>>();
   private Map<SerialNumber, ControllerConfiguration> deviceControllers = new HashMap<SerialNumber, ControllerConfiguration>();
 
   private Thread t;

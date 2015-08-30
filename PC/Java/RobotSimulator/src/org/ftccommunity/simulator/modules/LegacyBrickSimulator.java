@@ -1,20 +1,23 @@
 package org.ftccommunity.simulator.modules;
 
 
+import javafx.geometry.Insets;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import org.ftccommunity.simulator.data.SimData;
 import org.ftccommunity.simulator.modules.devices.Device;
 import org.ftccommunity.simulator.modules.devices.DeviceType;
 import org.ftccommunity.simulator.modules.devices.NullDevice;
-
-import javafx.geometry.Insets;
-import javafx.scene.layout.*;
-import javafx.scene.text.Text;
+import org.ftccommunity.simulator.net.manager.NetworkManager;
+import org.ftccommunity.simulator.net.protocol.SimulatorData;
 
 import javax.xml.bind.annotation.XmlRootElement;
-
-import java.io.IOException;
-import java.net.DatagramPacket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -25,20 +28,17 @@ import java.util.logging.Logger;
  */
 @XmlRootElement(name="Legacy")
 public class LegacyBrickSimulator extends BrickSimulator {
-    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
-    protected final byte[] mCurrentStateBuffer = new byte[208];
-
     /*
      ** Packet types
      */
-    protected final byte[] writeCmd = {85, -86, 0, 0, 0};
-    protected final byte[] readCmd = {85, -86, -128, 0, 0};
-    protected final byte[] recSyncCmd3 = {51, -52, 0, 0, 3};
-    protected final byte[] recSyncCmd0 = {51, -52, -128, 0, 0};
-    protected final byte[] recSyncCmd208 = {51, -52, -128, 0, (byte) 208};
-    protected final byte[] controllerTypeLegacy = {0, 77, 73};       // Controller type USBLegacyModule
-
+    protected static final byte PACKET_HEADER_0 = (byte)0x55;
+    protected static final byte PACKET_HEADER_1 = (byte)0xaa;
+    protected static final byte PACKET_WRITE_FLAG = (byte)0x00;
+    protected static final byte PACKET_READ_FLAG = (byte)0x80;
+	private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	protected final byte[] mCurrentStateBuffer = new byte[208];
+	protected final byte[] temp15 = new byte[15];
+	protected final byte[] temp12 = new byte[12];
 
     /**
      * Default constructor.
@@ -53,31 +53,50 @@ public class LegacyBrickSimulator extends BrickSimulator {
     	}
     }
 
-    private void sendPacketToPhone(byte[] sendData) {
-    	try {
-    		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
-        	mServerSocket.send(sendPacket);
+	@Override
+	protected byte[] receivePacketFromPhone() throws InterruptedException {
+		return NetworkManager.getLatestData(SimulatorData.Type.Types.BRICK_INFO);
+	}
+
+	private void sendPacketToPhone(byte[] sendData) {
+    	/*try {
+    		//DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
+        	//mServerSocket.send(sendPacket);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+		NetworkManager.requestSend(SimulatorData.Type.Types.BRICK_INFO,
+										  SimulatorData.Data.Modules.LEGACY_CONTROLLER, sendData);
     }
 
 
-    public void handleIncomingPacket(byte[] data, int length, boolean wait)
-    {
-    	if (data[0] == readCmd[0] && data[2] == readCmd[2] && data[4] == (byte)208) { // readCmd
+	public void handleIncomingPacket(byte[] data, int length, boolean wait) {
+		if (data[0] == PACKET_HEADER_0 && data[1] == PACKET_HEADER_1) { // valid packet
+			if (data.length < 5) {
+				logger.log(Level.WARNING, "Received a data with in invalid length");
+				return;
+			}
     		sendPacketToPhone(mCurrentStateBuffer);
-    		// Set the Port S0 ready bit in the global part of the Current State Buffer
-    		mCurrentStateBuffer[3] = (byte)0xfe;  // Port S0 ready
         } else {
 	        // Write Command...
 	    	// Process the received data packet
 	        // Loop through each of the ports in this object
 
-	        for (int i=0;i<mNumberOfPorts;i++) {
-	        	mDevices[i].processBuffer(data, mCurrentStateBuffer, i);
+	    	if (data[2] == PACKET_READ_FLAG) { // read command
+	    		byte[] tempBuffer = new byte[data[4]];
+	    		System.arraycopy(mCurrentStateBuffer, Byte.toUnsignedInt(data[3]), tempBuffer, 0, tempBuffer.length);
+	    		sendPacketToPhone(tempBuffer);
+	    		//temp15[3] = (byte)0xfe;
+	        } else { // write command
+	        	int offset = Byte.toUnsignedInt(data[3]);
+	        	int len = Byte.toUnsignedInt(data[4]);
+	        	System.arraycopy(data, 5, mCurrentStateBuffer, offset, len);
+	        	// Loop through each ports and process the buffer
+		        for (int i=0;i<mNumberOfPorts;i++) {
+		        	mDevices[i].processBuffer(mCurrentStateBuffer, i);
+		        }
 	        }
-        }
+    	}
     }
 
 
@@ -112,7 +131,7 @@ public class LegacyBrickSimulator extends BrickSimulator {
 			Text portText = new Text("Port " + i);
 			grid.add(portText, 0, i);
 
-			Text typeText = new Text(mDevices[i].getType().getName());
+			Text typeText = new Text(DeviceType.getName(mDevices[i].getType()));
 			grid.add(typeText, 1,  i);
 
         	List<String> nameList = getPortDevice(i).getPortNames();
@@ -125,12 +144,14 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		pane.getChildren().add(grid);
 	}
 
+	@Override
+	public SimData findSimDataName(String name) {
+		return null;
+	}
 
     /**
      * Getters/Setters
      */
-
-
 
     /**
      * GUI Stuff
@@ -149,12 +170,12 @@ public class LegacyBrickSimulator extends BrickSimulator {
 		}
 	}
 
-	public List<DeviceType> getDeviceTypeList() {
-		List<DeviceType> dtl = new ArrayList<>();
-		dtl.add(DeviceType.NONE);
-		dtl.add(DeviceType.TETRIX_MOTOR);
-		dtl.add(DeviceType.TETRIX_SERVO);
-		dtl.add(DeviceType.LEGO_LIGHT);
+	public List<SimulatorData.Type.Types> getDeviceTypeList() {
+		List<SimulatorData.Type.Types> dtl = new ArrayList<>();
+		dtl.add(SimulatorData.Type.Types.NONE);
+		dtl.add(SimulatorData.Type.Types.LEGACY_MOTOR);
+		dtl.add(SimulatorData.Type.Types.LEGACY_SERVO);
+		dtl.add(SimulatorData.Type.Types.LEGACY_LIGHT);
 		return dtl;
 	}
 

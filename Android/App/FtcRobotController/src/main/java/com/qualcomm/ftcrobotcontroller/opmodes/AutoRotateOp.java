@@ -31,12 +31,14 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.ftccommon.DbgLog;
+import com.qualcomm.ftcrobotcontroller.opmodes.annt.RunnableOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+@RunnableOpMode(AutoRotateOp.NAME)
 public class AutoRotateOp extends OpMode {
-
+  public static final String NAME = "";
   // we will consider our goal reached if we are +/- ERROR_MARGIN degrees
   final static double ERROR_MARGIN = 5.0; // in degrees
 

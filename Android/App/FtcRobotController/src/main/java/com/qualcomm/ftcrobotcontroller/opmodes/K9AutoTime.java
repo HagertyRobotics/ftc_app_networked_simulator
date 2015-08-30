@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Example autonomous program.
  * <p>
  * This example program uses elapsed time to determine how to move the robot.
- * The OpMode.java class has some class members that provide time information
+ * The RunnableOpMode.java class has some class members that provide time information
  * for the current op mode.
  * The public member variable 'time' is updated before each call to the run() event.
  * The method getRunTime() returns the time that has elapsed since the op mode
@@ -71,7 +71,7 @@ public class K9AutoTime extends OpMode {
 	/*
 	 * Code to run when the op mode is first enabled goes here
 	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#start()
+	 * @see com.qualcomm.robotcore.eventloop.opmode.RunnableOpMode#start()
 	 */
 	@Override
 	public void start() {
@@ -116,7 +116,7 @@ public class K9AutoTime extends OpMode {
 	/*
 	 * This method will be called repeatedly in a loop
 	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#run()
+	 * @see com.qualcomm.robotcore.eventloop.opmode.RunnableOpMode#run()
 	 */
 	@Override
 	public void loop() {
@@ -182,7 +182,7 @@ public class K9AutoTime extends OpMode {
 	/*
 	 * Code to run when the op mode is first disabled goes here
 	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#stop()
+	 * @see com.qualcomm.robotcore.eventloop.opmode.RunnableOpMode#stop()
 	 */
 	@Override
 	public void stop() {

@@ -1,15 +1,13 @@
 package org.ftccommunity.gui.view;
 
+import javafx.scene.control.*;
 import org.ftccommunity.gui.MainApp;
+// import org.ftccommunity.simulator.RobotSimulator;
 import org.ftccommunity.simulator.RobotSimulator;
 import org.ftccommunity.simulator.modules.BrickSimulator;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 
@@ -30,6 +28,9 @@ public class OverviewController {
     @FXML
     private Pane detailsPane;
 
+    @FXML
+    Button btnStartSimulator;
+
     // Reference to the main application.
     private MainApp mainApp;
     private RobotSimulator simulator;
@@ -44,7 +45,7 @@ public class OverviewController {
         //controllerNameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
         //noinspection Convert2Diamond
     	// the "type" is tied to getType() in BrickSimulator
-        brickNameColumn.setCellValueFactory(new PropertyValueFactory<BrickSimulator,String>("type"));
+        brickNameColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         brickAliasColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
 
         // Show brick details in the Details window.
@@ -104,7 +105,7 @@ public class OverviewController {
         } else {
             // Nothing selected.
             Alert alert = new Alert(AlertType.WARNING);
-            alert.initOwner(mainApp.getPrimaryStage());
+            alert.initOwner(MainApp.getPrimaryStage());
             alert.setTitle("No Selection");
             alert.setHeaderText("No Controller Selected");
             alert.setContentText("Please select a controller in the table.");
@@ -155,8 +156,15 @@ public class OverviewController {
      */
     @FXML
     private void handleStartSimulatorButton() {
-    	if (!RobotSimulator.simulatorStarted())
-    		RobotSimulator.startSimulator(mainApp);
+    	if (!RobotSimulator.simulatorStarted()) {
+            // TODO: read from interface (multicast)
+            RobotSimulator.startSimulator(mainApp, false);
+            btnStartSimulator.setText("Stop Simulator");
+        } else {
+            System.out.println("Trying to terminate Robot Simulator");
+            RobotSimulator.requestTermination();
+            btnStartSimulator.setText("Start Simulator");
+        }
     }
 
     /**
