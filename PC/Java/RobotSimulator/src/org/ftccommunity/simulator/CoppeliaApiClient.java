@@ -8,6 +8,7 @@ import org.ftccommunity.simulator.modules.BrickSimulator;
 
 import coppelia.BoolW;
 import coppelia.CharWA;
+import coppelia.FloatW;
 import coppelia.FloatWAA;
 import coppelia.IntW;
 import coppelia.IntWA;
@@ -29,6 +30,7 @@ public class CoppeliaApiClient implements Runnable {
 	IntW mLightSensorHandle;
 	BoolW mLightSensorDetectionState;
 	FloatWAA mLightSensorAuxValues;
+	FloatW mLeftWheelPositionSignalValue;
 
 	//IntWA mLightSensorResolution;
 	//CharWA mLightSensorImage;
@@ -65,6 +67,8 @@ public class CoppeliaApiClient implements Runnable {
 			mLightSensorDetectionState = new BoolW(true);
 			mLightSensorAuxValues = new FloatWAA(20);
 
+			mLeftWheelPositionSignalValue = new FloatW(1.0f);
+
             ret = mVrep.simxGetObjects(mClientID, remoteApi.sim_handle_all, mObjectHandles,
                     remoteApi.simx_opmode_oneshot_wait);
             if (ret == remoteApi.simx_return_ok)
@@ -84,11 +88,14 @@ public class CoppeliaApiClient implements Runnable {
 			mVrep.simxGetObjectHandle(mClientID,"remoteApiControlledBubbleRobLeftMotor",mLeftMotorHandle,remoteApi.simx_opmode_oneshot_wait);
 			mVrep.simxGetObjectHandle(mClientID,"remoteApiControlledBubbleRobRightMotor",mRightMotorHandle,remoteApi.simx_opmode_oneshot_wait);
 
+			// Get Object Handle of LightSensor from V-REP
 			ret = mVrep.simxGetObjectHandle(mClientID,"lightSensor",mLightSensorHandle, remoteApi.simx_opmode_oneshot_wait);
 			if (ret == remoteApi.simx_return_ok)
                 System.out.println("Got Vision Handle");
             else
 				System.out.format("Error: get vision handle returned with error");
+
+
 
 			mStartTime=System.currentTimeMillis();
 			return true;
@@ -97,7 +104,6 @@ public class CoppeliaApiClient implements Runnable {
 			System.out.println("Failed connecting to remote API server");
 			return false;
 		}
-
 	}
 
 	public void run()
@@ -153,6 +159,20 @@ public class CoppeliaApiClient implements Runnable {
 			System.out.println("got image");
 		} else {
 			System.out.println("Error: Geting 1st Light Sensor Image. " + ret);
+			done = true;
+		}
+
+		// Initial read of  LeftMotorEncoder from V-REP
+		ret = mVrep.simxGetFloatSignal(mClientID,
+				"LeftWheelPosition",
+				mLeftWheelPositionSignalValue,
+				remoteApi.simx_opmode_streaming
+				);
+		if (ret == remoteApi.simx_return_ok || ret == remoteApi.simx_return_novalue_flag) {
+            System.out.println("Got LeftWheelPosition");
+		} else {
+			System.out.format("Error: Initial read of LeftWheelPosition returned with error %d\n",ret);
+			done = true;
 		}
 
         while (!done && !Thread.currentThread().isInterrupted()) {
@@ -178,6 +198,24 @@ public class CoppeliaApiClient implements Runnable {
 			} else {
 				System.out.println("Error: Geting Light Sensor Image. " + ret);
 			}
+
+
+//			// Buffered read of  LeftMotorEncoder from V-REP
+//			ret = mVrep.simxGetFloatSignal(mClientID,
+//					"LeftWheelPosition",
+//					mLeftWheelPositionSignalValue,
+//					remoteApi.simx_opmode_buffer
+//					);
+//			if (ret == remoteApi.simx_return_ok) {
+//	            System.out.println("Got LeftWheelPosition");
+//			} else if (ret == remoteApi.simx_return_novalue_flag) {
+//				//System.out.println("no LeftWheelPosition");
+//			} else {
+//				System.out.format("Error: Buffered Read of LeftWheelPosition returned with error %d\n", ret);
+//				done = true;
+//			}
+
+
         }
 
 
