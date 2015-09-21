@@ -18,10 +18,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -39,9 +43,10 @@ public abstract class BrickSimulator implements Runnable {
     protected final StringProperty mName;
     protected final StringProperty mSerial;
     protected IntegerProperty mPort;
-    protected int mPhonePort;
-    protected InetAddress mPhoneIPAddress;
-    protected DatagramSocket mServerSocket;
+    protected ServerSocket mServerSocket;
+    protected Socket mClientSocket;
+    protected DataOutputStream os = null;
+    protected DataInputStream is = null;
     protected String mFXMLFileName;
 
     @XmlElementRef(name="Devices")
@@ -64,38 +69,40 @@ public abstract class BrickSimulator implements Runnable {
     public void run() {
     	byte[] packet;
         try {
-        	mServerSocket = new DatagramSocket(mPort.intValue());
+        	mServerSocket = new ServerSocket(mPort.intValue());
+        	mClientSocket = mServerSocket.accept();
+
+        	is = new DataInputStream(mClientSocket.getInputStream());
+        	os = new DataOutputStream(mClientSocket.getOutputStream());
 
             while (!Thread.currentThread().isInterrupted()) {
                 packet = receivePacketFromPhone();
             	handleIncomingPacket(packet, packet.length, false);
             }
             // Catch unhandled exceptions and cleanup
-    	} catch (Exception e) {
+    	} catch (IOException e) {
     		e.printStackTrace();
     		close();
     	}
     }
 
     private byte[] receivePacketFromPhone() {
-    	DatagramPacket receivePacket = new DatagramPacket(mReceiveData, mReceiveData.length);
-    	try {
-    		mServerSocket.receive(receivePacket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    	// First byte in packet is the length
+    	int length;
+		try {
+			length = is.readByte() & 0xff;
 
-    	// Get the port and address of the sender from the incoming packet and set some global variables
-    	// to be used when we reply back.
-    	// TODO: do we need to set this every time?
-    	mPhonePort = receivePacket.getPort();
-    	mPhoneIPAddress = receivePacket.getAddress();
+	    	// Create a buffer to hold new packet
+	    	byte[] mypacket = new byte[length];
+	    	is.readFully(mypacket);
+	    	return mypacket;
 
-    	// Make a copy of the packet.  Not sure if we need to do this.  Might not hold on to it for long.
-    	byte[] mypacket = new byte[receivePacket.getLength()];
-    	System.arraycopy(receivePacket.getData(), 0, mypacket, 0, receivePacket.getLength());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 
-    	return mypacket;
     }
 
     public void close() {

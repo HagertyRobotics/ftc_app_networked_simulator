@@ -53,12 +53,13 @@ public class MotorBrickSimulator extends BrickSimulator {
     }
 
     private void sendPacketToPhone(byte[] sendData) {
-    	try {
-    		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, mPhoneIPAddress, mPhonePort);
-        	mServerSocket.send(sendPacket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+		try {
+			os.write(sendData);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 
